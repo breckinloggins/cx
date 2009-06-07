@@ -1,0 +1,1 @@
+add_library(common memory.c list.c)
