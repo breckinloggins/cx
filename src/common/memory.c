@@ -99,6 +99,8 @@ void* frealloc(void* ptr, size_t size, const char* file, const unsigned int line
 
 void ffree(void* ptr, const char* file, const unsigned int line)
 {
+	if (!ptr) return;
+	
 	free(ptr);
 	
 	memblock* prev = NULL;

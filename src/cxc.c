@@ -7,6 +7,7 @@
 
 #include "common/memory.h"
 #include "common/list.h"		// TEMP
+#include "ast/ast.h"
 
 
 	list_e* push_string(const char* string, list_e* list)
@@ -35,6 +36,29 @@ int main(int argc, char** argv)
 		printf("%s\n", (char*)s->p);
 	
 	list_free_forward(strings);
+	
+	namespace_node* ns = namespace_new("System.Power");
+	
+	if (ns->node.type == namespace_n)
+		printf("Yup, a namespace!\n");
+	printf(ns->name);
+	printf("\n");
+	
+	astnode_destroy((astnode*)ns);
+	
+	transunit_node* trans = transunit_new();
+	transunit_new_namespace(trans, "System");
+	transunit_new_namespace(trans, "System.Collections");
+	transunit_new_namespace(trans, "System.IO");
+	
+	list_e* ns_e;
+	for (ns_e = trans->node.children; (ns_e); ns_e = ns_e->next)	{
+		printf("%s\n", ((namespace_node*)ns_e->p)->name);
+	}
+	
+	astnode_destroy((astnode*)trans);
+	
+	
 	return 0;
 }
 

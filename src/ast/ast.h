@@ -16,7 +16,26 @@ typedef struct astnode_tag	{
 	nodetype type;					// The type of node this represents
 	struct astnode_tag* parent;		// The parent of this AST node
 	list_e* children;				// The child nodes (if any) of this AST node
+	
+	void (*cleanup)(struct astnode_tag* n);	// A pointer to a function that, if implemented, will be called
+											// when this AST node is destroyed.
 } astnode;
+
+/* A Namespace is the top-level syntactic organization structure in Cx programs.  Multiple namespaces are
+ * orgianized into a Translation Unit (see above).
+ *
+ * Cx namespaces can contain: Fields, Properties, Classes, Structs, Unions, and Functions
+ * Note that functions in a Cx namespace don't the equivalent of a Class's "this" pointer.  Namespace are to be 
+ * thought of as simply "bags of code" and do not have any object-oriented concepts baked into them.
+ *
+ * The generated C-name of a namespace object is well-defined: it is simply "namespace_object".  So, for example, 
+ * a C-module could call the function Start() in the namespace MyApp by referring to it is MyApp_Start();
+ */
+typedef struct namespace_node_tag	{
+	astnode node;
+	
+	char* name;						// The fully-qualified name of the namespace
+} namespace_node;
 
 /* A Translation Unit (a concept borrowed from C) is the fundamental unit of compilation
  * for Cx programs.  Each translation unit corresponds to a .o output file in most environments, 
@@ -33,20 +52,24 @@ typedef struct transunit_node_tag	{
 	//			for transunit_node to access them
 } transunit_node;
 
-/* A Namespace is the top-level syntactic organization structure in Cx programs.  Multiple namespaces are
- * orgianized into a Translation Unit (see above).
- *
- * Cx namespaces can contain: Fields, Properties, Classes, Structs, Unions, and Functions
- * Note that functions in a Cx namespace don't the equivalent of a Class's "this" pointer.  Namespace are to be 
- * thought of as simply "bags of code" and do not have any object-oriented concepts baked into them.
- *
- * The generated C-name of a namespace object is well-defined: it is simply "namespace_object".  So, for example, 
- * a C-module could call the function Start() in the namespace MyApp by referring to it is MyApp_Start();
+/*
+ * General Abstract Syntax Tree Functions (ast.c)
  */
-typedef struct namespace_tag	{
-	astnode node;
-	
-	const char* name;				// The fully-qualified name of the namespace
-}
+astnode* astnode_new(nodetype type);
+void astnode_init(astnode* node, nodetype type, void (*cleanup)(astnode*));
+void astnode_destroy(astnode* node);				// Destroys this node and every node under it
+
+/*
+ * Namespace Functions (namespace.c)
+ */
+namespace_node* namespace_new(const char* name);
+void namespace_cleanup(astnode* namespace);
+
+/* 
+ * Translation Unit Functions (transunit.c)
+ */
+transunit_node* transunit_new();									
+namespace_node* transunit_new_namespace(transunit_node* t, const char* namespace);	
+
 
 #endif
