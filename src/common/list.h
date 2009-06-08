@@ -1,6 +1,18 @@
 #ifndef LIST_H
 #define LIST_H
 
+/*
+// TODO: This is an idea for generic lists in C.  May want to give this a shot to make our lives
+//		easier
+#define	LIST(T)				list_t_##T
+#define DECLARE_LIST(T)		typedef struct list_e_##T_tag	{	\
+								##T value;						\
+								int owned;						\
+								struct list_e_##T_tag* prev;	\
+								struct list_e_##T_tag* next;	\
+							} LIST(T)
+*/
+
 /* Represents an element of a list of zero or more objects.  The list is doubly-linked to facilitate navigation, 
  * but could be converted to a singly-linked list to save space, if you're in to that kind of thing.
  */

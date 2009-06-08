@@ -22,3 +22,20 @@ void namespace_cleanup(astnode* namespace)
 {
 	free(((namespace_node*)namespace)->name);
 }
+
+function_node* namespace_new_function(namespace_node* ns, const char* name, const char* return_type, const char* arg)
+{
+	function_node* fn = function_new(name, return_type, arg);
+	
+	list_e* fn_e = list_e_new(fn, 1);
+	if (ns->node.children)	{
+		list_e_insert_after(list_last(ns->node.children), fn_e);
+	}
+	else	{
+		ns->node.children = fn_e;
+	}
+	
+	fn->node.parent = (astnode*)ns;
+	
+	return fn;
+}

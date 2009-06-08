@@ -1,1 +1,1 @@
-add_library(ast ast.c transunit.c namespace.c)
+add_library(ast ast.c transunit.c namespace.c function.c)

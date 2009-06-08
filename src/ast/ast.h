@@ -7,7 +7,7 @@
  *	Routines for construction and manipulation of the Cx Abstract Syntax Tree
  */
 
-typedef enum { transunit_n, namespace_n } nodetype;
+typedef enum { transunit_n, namespace_n, function_n } nodetype;
 
 /* Represents the root structure of every node in the AST.  All other types of nodes
  * "inherit" from this base node.
@@ -20,6 +20,18 @@ typedef struct astnode_tag	{
 	void (*cleanup)(struct astnode_tag* n);	// A pointer to a function that, if implemented, will be called
 											// when this AST node is destroyed.
 } astnode;
+
+/* 
+ * A Function in Cx is strictly a namespace-level concept.  In classes, functions are represented by
+ * class_method nodes.
+ */
+typedef struct function_node_tag	{
+	astnode node;
+	
+	char* name;						// The name of this function
+	char* return_type;				// (TEMP) A string representing the return type
+	char* arg;						// (TEMP) A string representing the arguments
+} function_node;
 
 /* A Namespace is the top-level syntactic organization structure in Cx programs.  Multiple namespaces are
  * orgianized into a Translation Unit (see above).
@@ -60,10 +72,17 @@ void astnode_init(astnode* node, nodetype type, void (*cleanup)(astnode*));
 void astnode_destroy(astnode* node);				// Destroys this node and every node under it
 
 /*
+ * Function Functions (function.c)
+ */
+function_node* function_new(const char* name, const char* return_type, const char* arg);
+void function_cleanup(astnode* function);
+
+/*
  * Namespace Functions (namespace.c)
  */
 namespace_node* namespace_new(const char* name);
 void namespace_cleanup(astnode* namespace);
+function_node* namespace_new_function(namespace_node* ns, const char* name, const char* return_type, const char* arg);
 
 /* 
  * Translation Unit Functions (transunit.c)
