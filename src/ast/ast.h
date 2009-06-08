@@ -7,7 +7,7 @@
  *	Routines for construction and manipulation of the Cx Abstract Syntax Tree
  */
 
-typedef enum { transunit_n, namespace_n, function_n } nodetype;
+typedef enum { transunit_n, namespace_n, function_n, expression_n } nodetype;
 
 /* Represents the root structure of every node in the AST.  All other types of nodes
  * "inherit" from this base node.
@@ -20,6 +20,28 @@ typedef struct astnode_tag	{
 	void (*cleanup)(struct astnode_tag* n);	// A pointer to a function that, if implemented, will be called
 											// when this AST node is destroyed.
 } astnode;
+
+/*
+ * Expressions are the main components of Cx.  Almost everything one normally thinks of as a "line of code" is 
+ * coded as an expression.  Because of the sheer number of different expression types, we use a 
+ * base structure called the "primary_expression", which serves as the building block for other expressions
+ */
+typedef enum { postfix_indexer_e, postfix_function_e, postfix_dot_e, postfix_arrow_e, postfix_incr_e, postfix_decr_e} expressiontype;
+
+typedef struct primary_expression_node_tag	{
+	astnode node;
+	expressiontype type;
+	
+	union content_tag	{
+		char* identifier;								// A variable name
+		int	int_constant;								
+		char char_constant;
+		float float_constant;
+		char* string_constant;
+		struct expression_node_tag* expression;			// An expression in parenthesis
+	} content;
+	
+} primary_expression_node;
 
 /* 
  * A Function in Cx is strictly a namespace-level concept.  In classes, functions are represented by
