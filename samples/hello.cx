@@ -1,0 +1,9 @@
+{ This is a hello word program }
+program helloworld;
+
+Begin
+	{ Nothing here! }
+	printLn();
+	printLn()
+End.
+

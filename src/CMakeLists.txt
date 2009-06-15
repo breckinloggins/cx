@@ -5,9 +5,8 @@ project(CX)
 
 add_subdirectory(common)
 add_subdirectory(ast)
-add_subdirectory(cgen)
 
 # Define the cxc executable for our compiler
-add_executable(cxc cxc.c)
+add_executable(cxc base.c symbol_table.c cxc.c lex.yy.c parser.tab.c c_codegen_visitor.c)
 
-target_link_libraries(cxc common ast cgen)
+target_link_libraries(cxc common ast)

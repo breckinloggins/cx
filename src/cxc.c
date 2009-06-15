@@ -7,29 +7,32 @@
 
 #include "common/memory.h"
 #include "ast/ast.h"
-#include "cgen/cgen.h"
+#include "parser.tab.h"
+#include "c_codegen_visitor.h"
+
+extern FILE* yyin;
+extern AstNode* ast;
+extern int yydebug;
 
 int main(int argc, char** argv)
 {
 	atexit(checkmem);
+	//yydebug = 1;
 	
-	transunit_node* trans = transunit_new();
-	namespace_node* ns_system = transunit_new_namespace(trans, "System");
-	namespace_node* ns_collections = transunit_new_namespace(trans, "System.Collections");
-	namespace_node* ns_io = transunit_new_namespace(trans, "System.IO");
+	if (argc < 2)	{
+		fprintf(stderr, "Usage: cxc <filename>\n");
+		return 1;
+	}
 	
-	namespace_new_function(ns_system, "WriteLine", "void", "string line");
-	namespace_new_function(ns_system, "ReadLine", "string", "void");
+	yyin = fopen(argv[1], "r");
 	
-	namespace_new_function(ns_collections, "ToArray", "int[]", "IList list");
+	yyparse();
 	
-	namespace_new_function(ns_io, "OpenFile", "FileHandle", "string path");
+	Visitor* visitor = c_codegen_new(stdout);
+	ast_node_accept(ast, visitor);
+	free(visitor);
 	
-	cgen_transunit(stderr, trans);
-	
-	astnode_destroy((astnode*)trans);
-	
-	
+	ast_node_destroy(ast);
 	return 0;
 }
 
