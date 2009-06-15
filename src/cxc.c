@@ -9,6 +9,7 @@
 #include "ast/ast.h"
 #include "parser.tab.h"
 #include "c_codegen_visitor.h"
+#include "graphprinter_visitor.h"
 
 extern FILE* yyin;
 extern AstNode* ast;
@@ -28,7 +29,7 @@ int main(int argc, char** argv)
 	
 	yyparse();
 	
-	Visitor* visitor = c_codegen_new(stdout);
+	Visitor* visitor = graphprinter_new(stdout);//c_codegen_new(stdout);
 	ast_node_accept(ast, visitor);
 	free(visitor);
 	

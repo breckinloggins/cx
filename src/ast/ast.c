@@ -12,7 +12,7 @@
 
 AstNode* ast_node_new(const char* name, Kind kind, Type type, int linenum, Symbol* symbol)
 {
-	printf("Created a node of type %s\n", name);
+	//printf("Created a node of type %s\n", name);
 	
 	AstNode* node = (AstNode*)malloc(sizeof(AstNode));
 	
