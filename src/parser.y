@@ -47,7 +47,6 @@ AstNode* ast;
 %token T_FUNCTION
 
 %token T_IF
-%token T_THEN
 %token T_ELSE
 %token T_WHILE
 %token T_FOR
@@ -342,33 +341,33 @@ StatementMatched:
 
 StatementUnmatched:
 	IfStatement { $$ = $1; }
-	| T_IF Expression T_THEN StatementMatched T_ELSE StatementUnmatched
+	| T_IF T_LPAR Expression T_RPAR StatementMatched T_ELSE StatementUnmatched
 	{
 		AstNode* ast_node = ast_node_new("IfStatement", IF_STMT, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $2);	// Expression
-		ast_node_add_child(ast_node, $4);	// StatementMatched
-		ast_node_add_child(ast_node, $6);	// StatementUnmatched
+		ast_node_add_child(ast_node, $3);	// Expression
+		ast_node_add_child(ast_node, $5);	// StatementMatched
+		ast_node_add_child(ast_node, $7);	// StatementUnmatched
 		$$ = ast_node;
 	}
 	;
 
 IfStatement:
-	T_IF Expression T_THEN Statements
+	T_IF T_LPAR Expression T_RPAR Statements
 	{
 		AstNode* ast_node = ast_node_new("IfStatement", IF_STMT, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $2);	// Expression
-		ast_node_add_child(ast_node, $4);	// Statements
+		ast_node_add_child(ast_node, $3);	// Expression
+		ast_node_add_child(ast_node, $5);	// Statements
 		$$ = ast_node;
 	}
 	;
 	
 IfStatementMatched:
-	T_IF Expression T_THEN StatementMatched T_ELSE StatementMatched
+	T_IF T_LPAR Expression T_RPAR StatementMatched T_ELSE StatementMatched
 	{
 		AstNode* ast_node = ast_node_new("IfStatement", IF_STMT, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $2);	// Expression
-		ast_node_add_child(ast_node, $4);	// StatementMatched true
-		ast_node_add_child(ast_node, $6);	// StatementMatched false
+		ast_node_add_child(ast_node, $3);	// Expression
+		ast_node_add_child(ast_node, $5);	// StatementMatched true
+		ast_node_add_child(ast_node, $7);	// StatementMatched false
 		$$ = ast_node;
 	}
 	;
@@ -426,22 +425,22 @@ Assignment:
 	;
 
 WhileStatement:
-	T_WHILE Expression T_DO Statements
+	T_WHILE T_LPAR Expression T_RPAR Statements
 	{
 		AstNode* ast_node = ast_node_new("WhileStatement", WHILE_STMT, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $2);
-		ast_node_add_child(ast_node, $4);
+		ast_node_add_child(ast_node, $3);
+		ast_node_add_child(ast_node, $5);
 		$$ = ast_node;
 	}
 	;
 	
 ForStatement:
-	T_FOR Assignment T_TO Expression T_DO Statements
+	T_FOR T_LPAR Assignment T_TO Expression T_RPAR Statements
 	{
 		AstNode* ast_node = ast_node_new("ForStatement", FOR_STMT, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $2);	// Assignment
-		ast_node_add_child(ast_node, $4);	// Expression
-		ast_node_add_child(ast_node, $6);	// Statements
+		ast_node_add_child(ast_node, $3);	// Assignment
+		ast_node_add_child(ast_node, $5);	// Expression
+		ast_node_add_child(ast_node, $7);	// Statements
 		$$ = ast_node;
 	}
 	

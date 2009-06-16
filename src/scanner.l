@@ -48,7 +48,6 @@
 "printLn"					{ uploc; return T_PRINT_LINE; }
 
 "if"						{ uploc; return T_IF; }
-"then"						{ uploc; return T_THEN; }
 "else"						{ uploc; return T_ELSE; }
 "while"						{ uploc; return T_WHILE; }
 "for"						{ uploc; return T_FOR; }
