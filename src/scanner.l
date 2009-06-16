@@ -33,6 +33,13 @@
 									}
 								}
 							}
+"//"						{
+								int c;
+								while ((c = input()))	{
+									if (c == '\n')
+										break;
+								}
+							}
 "program"					{ uploc; return T_PROGRAM; }	
 "var"						{ uploc; return T_VAR; }
 "integer"|"boolean"|"char"	{ uploc;

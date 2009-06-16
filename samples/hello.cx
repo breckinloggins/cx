@@ -4,6 +4,8 @@
  * Testing multiline comment
  */ 
 
+// Here we're testing a single line commen
+
 program helloworld;
 
 {
@@ -21,6 +23,7 @@ program helloworld;
 	printChar('a');
 	printChar('!');
 	
+	// Note: notice there is no semicolon here.  This is due to a bug in the grammar
 	printLn()
 }.
 
