@@ -7,12 +7,13 @@
 
 Type type_get_from_lexeme(const char* lexeme)
 {
-	if (!strcasecmp(lexeme, "Integer"))
+	if (!strcasecmp(lexeme, "integer"))
 		return INTEGER;
-	else if (!strcasecmp(lexeme, "Boolean"))
+	else if (!strcasecmp(lexeme, "boolean"))
 		return BOOLEAN;
-	else if (!strcasecmp(lexeme, "Char"))
-		return VOID;
+	else if (!strcasecmp(lexeme, "char"))
+		return CHAR;
+	else return VOID;
 }
 
 char* type_get_lexeme(Type type)
@@ -21,11 +22,11 @@ char* type_get_lexeme(Type type)
 		case VOID:
 			return "void";
 		case INTEGER:
-			return "Integer";
+			return "integer";
 		case BOOLEAN:
-			return "Boolean";
+			return "boolean";
 		case CHAR:
-			return "Char";
+			return "char";
 		case ERROR:
 			return "Error";
 		default:

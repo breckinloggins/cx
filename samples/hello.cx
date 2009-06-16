@@ -8,6 +8,8 @@
 
 program helloworld;
 
+var someChar : char;
+
 {
 	printChar('H');
 	printChar('e');
@@ -21,7 +23,9 @@ program helloworld;
 	printChar('a');
 	printChar('r');
 	printChar('a');
-	printChar('!');
+	
+	someChar = '!';
+	printChar(someChar);
 	
 	// Note: notice there is no semicolon here.  This is due to a bug in the grammar
 	printLn()
