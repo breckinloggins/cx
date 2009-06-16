@@ -22,11 +22,46 @@ int main(int argc, char** argv)
 	//yydebug = 1;
 	
 	if (argc < 2)	{
-		fprintf(stderr, "Usage: cxc <filename>\n");
+		fprintf(stderr, "Usage: cxc [options] <filename>\n");
+		fprintf(stderr, "Options:\n");
+		fprintf(stderr, "\t-c\tCompile\n");
+		fprintf(stderr, "\t-g\tOutput AST Graph\n");
 		return 1;
 	}
 	
-	yyin = fopen(argv[1], "r");
+	int compile_flag = 1;
+	int graph_flag = 0;
+	char* filename;
+	
+	// TODO: Unsafe code
+	if (argv[1][0] == '-')	{
+		switch (argv[1][1])	{
+			case 'c':
+				compile_flag = 1;
+				graph_flag = 0;
+				break;
+			case 'g':
+				compile_flag = 0;
+				graph_flag = 1;
+				break;
+			default: 
+				fprintf(stderr, "Unrecognized option '%c'\n", argv[1][1]);
+				exit(1);
+		}
+		
+		if (argc < 3)	{
+			fprintf(stderr, "No input file\n");
+			exit(1);
+		}
+		
+		filename = argv[2];
+	} else {
+		filename = argv[1];
+	}
+	
+	
+				
+	yyin = fopen(filename, "r");
 	
 	yyparse();
 	
@@ -42,11 +77,16 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	
-	
-	
-	Visitor* visitor = c_codegen_new(stdout);
-	ast_node_accept(ast, visitor);
-	free(visitor);
+	Visitor* visitor;
+	if (compile_flag)	{
+		visitor = c_codegen_new(stdout);
+		ast_node_accept(ast, visitor);
+		free(visitor);
+	} else if (graph_flag)	{
+		visitor = graphprinter_new(stdout);
+		ast_node_accept(ast, visitor);
+		free(visitor);
+	}
 	
 	ast_node_destroy(ast);
 	context_cleanup();

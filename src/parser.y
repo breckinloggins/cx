@@ -10,11 +10,6 @@
 
 #define YYDEBUG 1
 
-bool simple_flag = FALSE;
-bool c_flag = FALSE;
-
-int opts;
-
 extern FILE *yyin;
 
 static void yyerror(const char* msg);
