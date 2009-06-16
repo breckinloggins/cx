@@ -7,6 +7,6 @@ add_subdirectory(common)
 add_subdirectory(ast)
 
 # Define the cxc executable for our compiler
-add_executable(cxc base.c symbol_table.c cxc.c lex.yy.c parser.tab.c c_codegen_visitor.c graphprinter_visitor.c)
+add_executable(cxc base.c symbol_table.c cxc.c lex.yy.c parser.tab.c context_visitor.c c_codegen_visitor.c graphprinter_visitor.c)
 
 target_link_libraries(cxc common ast)

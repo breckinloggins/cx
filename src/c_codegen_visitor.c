@@ -54,6 +54,8 @@ Visitor* c_codegen_new(FILE* output)
 	V_INIT(rel_op, binary_op);
 	V_INIT(not_op, not_op);
 	
+	visitor->visit_callparam = NULL;
+	
 	return visitor;
 } 
 
@@ -307,8 +309,8 @@ C_VISITOR(notfactor)
 
 C_VISITOR(call)
 {
-	fprintf(out, "%s ();\n", node->symbol->name);
-	ast_node_accept(node->children, visitor);
+	fprintf(out, "%s ();\n", node->children->symbol->name);
+	//ast_node_accept(node->children, visitor);
 }
 
 C_VISITOR(callparam_list)

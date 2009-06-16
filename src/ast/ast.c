@@ -39,7 +39,6 @@ void ast_node_destroy(AstNode* self)
 		ast_node_destroy(self->children);
 		ast_node_destroy(self->sibling);
 		free(self->name);
-		free(self->symbol);
 		free(self);
 	}
 }
