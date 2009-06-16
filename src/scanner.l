@@ -12,15 +12,16 @@
 %option bison-bridge
 %option bison-locations
 %option noyywrap
-%option nounput
-%option case-insensitive
 
 %%
-"{"							{
+"/*"							{
 								int c;
 								while ((c = input()))	{
-									if (c == '}')
-										break;
+									if (c == '*')	{
+										if ((c = input()) == '/')
+											break;
+										else unput(c);
+									}
 									else if (c == '\n')	{
 										yylloc->first_line = yylloc->last_line = yylineno;
 										yylloc->first_column = 1;
@@ -40,8 +41,6 @@
 							}
 "procedure"					{ uploc; return T_PROCEDURE; }
 "function"					{ uploc; return T_FUNCTION; }
-"begin"						{ uploc; return T_BEGIN; }
-"end"						{ uploc; return T_END; }
 
 "printInt"					{ uploc; return T_PRINT_INT; }
 "printBool"					{ uploc; return T_PRINT_BOOL; }
@@ -56,20 +55,22 @@
 "to"						{ uploc; return T_TO; }
 "do"						{ uploc; return T_DO; }
 
-":="						{ uploc; return T_ASSIGNMENT; }
+"="							{ uploc; return T_ASSIGNMENT; }
 "("							{ uploc; return T_LPAR; }
 ")"							{ uploc; return T_RPAR; }
+"{"							{ uploc; return T_LBRACK; }
+"}"							{ uploc; return T_RBRACK; }
 "+"							{ uploc; yylval->lexeme=strdup(yytext); return T_PLUS; }
 "-"							{ uploc; yylval->lexeme=strdup(yytext); return T_MINUS; }
 "*"							{ uploc; yylval->lexeme=strdup(yytext); return T_STAR; }
 "/"							{ uploc; yylval->lexeme=strdup(yytext); return T_SLASH; }
-"and"						{ uploc; yylval->lexeme=strdup(yytext); return T_AND; }
-"or"						{ uploc; yylval->lexeme=strdup(yytext); return T_OR; }
-"not"						{ uploc; yylval->lexeme=strdup(yytext); return T_NOT; }
+"&&"						{ uploc; yylval->lexeme=strdup(yytext); return T_AND; }
+"||"						{ uploc; yylval->lexeme=strdup(yytext); return T_OR; }
+"!"							{ uploc; yylval->lexeme=strdup(yytext); return T_NOT; }
 ">"							{ uploc; yylval->lexeme=strdup(yytext); return T_GREATER; }
 "<"							{ uploc; yylval->lexeme=strdup(yytext); return T_LESSER; }
-"="							{ uploc; yylval->lexeme=strdup(yytext);	return T_EQUAL; }
-"<>"						{ uploc; yylval->lexeme=strdup(yytext);	return T_NOTEQUAL; }
+"=="						{ uploc; yylval->lexeme=strdup(yytext);	return T_EQUAL; }
+"!="						{ uploc; yylval->lexeme=strdup(yytext);	return T_NOTEQUAL; }
 ">="						{ uploc; yylval->lexeme=strdup(yytext); return T_GREATEREQUAL; }
 "<="						{ uploc; yylval->lexeme=strdup(yytext); return T_LESSEREQUAL; }
 

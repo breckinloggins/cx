@@ -1,8 +1,12 @@
-{ This is a hello word program }
+/* This is a hello, world program */
+
+/* 
+ * Testing multiline comment
+ */ 
+
 program helloworld;
 
-Begin
-	{ Nothing here! }
+{
 	printChar('H');
 	printChar('e');
 	printChar('l');
@@ -18,5 +22,5 @@ Begin
 	printChar('!');
 	
 	printLn()
-End.
+}.
 

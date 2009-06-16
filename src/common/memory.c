@@ -134,11 +134,13 @@ void checkmem()
 		return;
 	}
 	
-	fprintf(stderr, "\nYOU HAVE MEMORY LEAKS:\n");
+	fprintf(stderr, "\nYOU HAVE MEMORY LEAKS\n");
+	/*
 	memblock* m = blocks;
 	while (m)	{
 		fprintf(stderr, "\t%d bytes at 0x%x, allocated in %s at line %d\n", m->size, m->p, m->file, m->line);
 		m = m->next;
 	}
+	*/
 }
 

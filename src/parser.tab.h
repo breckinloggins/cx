@@ -46,18 +46,18 @@
      T_VAR = 272,
      T_PROCEDURE = 273,
      T_FUNCTION = 274,
-     T_BEGIN = 275,
-     T_END = 276,
-     T_IF = 277,
-     T_THEN = 278,
-     T_ELSE = 279,
-     T_WHILE = 280,
-     T_FOR = 281,
-     T_TO = 282,
-     T_DO = 283,
-     T_ASSIGNMENT = 284,
-     T_LPAR = 285,
-     T_RPAR = 286,
+     T_IF = 275,
+     T_THEN = 276,
+     T_ELSE = 277,
+     T_WHILE = 278,
+     T_FOR = 279,
+     T_TO = 280,
+     T_DO = 281,
+     T_ASSIGNMENT = 282,
+     T_LPAR = 283,
+     T_RPAR = 284,
+     T_LBRACK = 285,
+     T_RBRACK = 286,
      T_SEMICOLON = 287,
      T_COLON = 288,
      T_COMMA = 289,
@@ -90,18 +90,18 @@
 #define T_VAR 272
 #define T_PROCEDURE 273
 #define T_FUNCTION 274
-#define T_BEGIN 275
-#define T_END 276
-#define T_IF 277
-#define T_THEN 278
-#define T_ELSE 279
-#define T_WHILE 280
-#define T_FOR 281
-#define T_TO 282
-#define T_DO 283
-#define T_ASSIGNMENT 284
-#define T_LPAR 285
-#define T_RPAR 286
+#define T_IF 275
+#define T_THEN 276
+#define T_ELSE 277
+#define T_WHILE 278
+#define T_FOR 279
+#define T_TO 280
+#define T_DO 281
+#define T_ASSIGNMENT 282
+#define T_LPAR 283
+#define T_RPAR 284
+#define T_LBRACK 285
+#define T_RBRACK 286
 #define T_SEMICOLON 287
 #define T_COLON 288
 #define T_COMMA 289

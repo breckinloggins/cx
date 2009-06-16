@@ -50,8 +50,6 @@ AstNode* ast;
 %token T_VAR
 %token T_PROCEDURE
 %token T_FUNCTION
-%token T_BEGIN
-%token T_END
 
 %token T_IF
 %token T_THEN
@@ -65,6 +63,8 @@ AstNode* ast;
 
 %token T_LPAR
 %token T_RPAR
+%token T_LBRACK
+%token T_RBRACK
 %token T_SEMICOLON
 %token T_COLON
 %token T_COMMA
@@ -242,7 +242,7 @@ ProcFuncDecl:
 	
 ProcDecl:
 	T_PROCEDURE Identifier T_LPAR ParamList T_RPAR T_SEMICOLON VarDeclList
-	T_BEGIN StatementList T_END T_SEMICOLON
+	T_LBRACK StatementList T_RBRACK T_SEMICOLON
 	{
 		Symbol* symtab;
 		AstNode* ast_node = ast_node_new("ProcDecl", PROCEDURE, VOID, yylloc.last_line, NULL);
@@ -258,7 +258,7 @@ ProcDecl:
 	
 FuncDecl:
 	T_FUNCTION Identifier T_LPAR ParamList T_RPAR T_COLON TYPE_IDENTIFIER
-	T_SEMICOLON VarDeclList T_BEGIN StatementList T_END T_SEMICOLON
+	T_SEMICOLON VarDeclList T_LBRACK StatementList T_RBRACK T_SEMICOLON
 	{
 		Symbol* symtab;
 		AstNode* ast_node = ast_node_new("FuncDecl", FUNCTION, $7, yylloc.last_line, NULL);
@@ -302,12 +302,12 @@ SingleParam:
 
 ProgramBody:
 	/* empty */ { $$ = NULL; }
-	| T_BEGIN StatementList T_END T_DOT { $$ = $2; }
+	| T_LBRACK StatementList T_RBRACK T_DOT { $$ = $2; }
 	;
 	
 Statements:
 	Statement { $$ = $1; }
-	| T_BEGIN StatementList T_END { $$ = $2; }
+	| T_LBRACK StatementList T_RBRACK { $$ = $2; }
 	;
 
 StatementList:

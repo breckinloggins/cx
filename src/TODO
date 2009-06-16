@@ -1,10 +1,5 @@
-[]	Add several statement types to the AST (enough to make a function call)
-[]	Add several expression types to the AST (enough to pass a string to a function call)
-[]	Add appropriate cgen code for the new AST nodes
-[]	Build an AST for "Hello, World"
-[]	Pass "Hello, World" generated code to gcc and make a "Hello, World" executable 
-
-[]	Create rest of the AST for plain C
-[]	Create rest of code gen for plain C
-
--- AT THIS POINT WE'LL BE ABLE TO PASS C-CODE THROUGH THE COMPILER, UNTOUCHED EXCEPT FOR SPECIFIC CHANGES --
+[X] Type in toypasc compiler example
+[X] Change up a few tokens like Begin and End to make it more C-like
+[]  Add command line options and pass-through compiling
+[]	Remove Var blocks, allow declaration of vars inside a statement block
+[]	Modify Var declaration to be C-like instead of pascal-like
