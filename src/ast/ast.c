@@ -137,11 +137,8 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 		case IDENT_LIST:
 			visit = visitor->visit_identifier_list;
 			break;
-		case PROCFUNC_LIST:
-			visit = visitor->visit_procfunc_list;
-			break;
-		case PROCEDURE:
-			visit = visitor->visit_procedure;
+		case FUNCTION_LIST:
+			visit = visitor->visit_function_list;
 			break;
 		case FUNCTION:
 			visit = visitor->visit_function;

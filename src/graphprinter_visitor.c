@@ -22,9 +22,8 @@ graphprinter_new(FILE* output)
     visitor->visit_vardecl_list = &graphprinter_visit_vardecl_list;
     visitor->visit_vardecl = &graphprinter_visit_simplenode;
     visitor->visit_identifier_list = &graphprinter_visit_identifier_list;
-    visitor->visit_procfunc_list = &graphprinter_visit_procfunc_list;
-    visitor->visit_procedure = &graphprinter_visit_procfunc;
-    visitor->visit_function = &graphprinter_visit_procfunc;
+    visitor->visit_function_list = &graphprinter_visit_function_list;
+    visitor->visit_function = &graphprinter_visit_function;
     visitor->visit_param_list = &graphprinter_visit_param_list;
     visitor->visit_parameter = &graphprinter_visit_parameter;
     visitor->visit_statement_list = &graphprinter_visit_statement_list;
@@ -124,7 +123,7 @@ graphprinter_visit_identifier_list (Visitor *visitor, AstNode *node)
 }
 
 void
-graphprinter_visit_procfunc_list (Visitor *visitor, AstNode *node)
+graphprinter_visit_function_list (Visitor *visitor, AstNode *node)
 {
     _print_arrow(node);
     fprintf(out,"\tnode_%x [label=\"%s\",style=filled,", node, node->name);
@@ -133,7 +132,7 @@ graphprinter_visit_procfunc_list (Visitor *visitor, AstNode *node)
 }
 
 void
-graphprinter_visit_procfunc (Visitor *visitor, AstNode *node)
+graphprinter_visit_function (Visitor *visitor, AstNode *node)
 {
     _print_arrow(node);
     fprintf(out,"\tnode_%x [label=\"%s\\n<%s>\\n[line: %d]\",style=filled,",

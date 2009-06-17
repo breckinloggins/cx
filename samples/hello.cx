@@ -8,11 +8,17 @@
 
 namespace helloworld	
 {
-
+	
 	char someChar;
 	double someDouble;
 	float someFloat;
-
+	
+	getchar : char()
+	{
+		getchar = 'Z';
+	}
+	
+	
 	{
 		printChar('H');
 		printChar('e');

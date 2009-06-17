@@ -45,8 +45,6 @@ AstNode* ast;
 
 %token T_NAMESPACE
 %token T_VAR
-%token T_PROCEDURE
-%token T_FUNCTION
 
 %token T_IF
 %token T_ELSE
@@ -71,6 +69,8 @@ AstNode* ast;
 %token T_PRINT_BOOL
 %token T_PRINT_LINE
 
+%token T_BOGUS
+
 %token <type> TYPE_IDENTIFIER
 %token <lexeme> IDENTIFIER
 %token <integer> INT_LITERAL
@@ -87,11 +87,9 @@ AstNode* ast;
 %type <astnode> MultiIdentifier
 %type <astnode> SingleIdentifier
 
-%type <astnode> ProcFuncList
-%type <astnode> MultiProcFuncDecl
-%type <astnode> ProcFuncDecl
-%type <astnode> ProcDecl
-%type <astnode> FuncDecl
+%type <astnode> FunctionList
+%type <astnode> MultiFunctionDecl
+%type <astnode> FunctionDecl
 %type <astnode> ParamList
 %type <astnode> SingleParam
 %type <astnode> MultiParam
@@ -148,7 +146,7 @@ TranslationUnit:
 	;
 
 NamespaceDecl:
-	T_NAMESPACE Identifier T_LBRACK VarDeclList ProcFuncList ProgramBody T_RBRACK
+	T_NAMESPACE Identifier T_LBRACK VarDeclList FunctionList ProgramBody T_RBRACK
 	{
 		AstNode* ast_node = ast_node_new("NamespaceDecl", NAMESPACE_DECL, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $2);	// Namespace Identifier
@@ -213,61 +211,41 @@ SingleIdentifier:
 	Identifier { $$ = $1; }
 	;
 
-ProcFuncList:
+FunctionList:
 	/* empty */ { $$ = NULL; }
-	| ProcFuncDecl MultiProcFuncDecl
+	| FunctionDecl MultiFunctionDecl
 	{
-		AstNode* ast_node = ast_node_new("ProcFuncList", PROCFUNC_LIST, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = ast_node_new("FunctionList", FUNCTION_LIST, VOID, yylloc.last_line, NULL);
 		ast_node_add_sibling($1, $2);
 		ast_node_add_child(ast_node, $1);
 		$$ = ast_node;
 	}
 	;
 	
-MultiProcFuncDecl:
+MultiFunctionDecl:
 	/* empty */ { $$ = NULL; }
-	| ProcFuncDecl MultiProcFuncDecl
+	| FunctionDecl MultiFunctionDecl
 	{
 		ast_node_add_sibling($1, $2);
 		$$ = $1;
 	}
 	;
 	
-ProcFuncDecl:
-	ProcDecl { $$ = $1; }
-	| FuncDecl { $$ = $1; }	 
-	;
-	
-ProcDecl:
-	T_PROCEDURE Identifier T_LPAR ParamList T_RPAR T_SEMICOLON VarDeclList
-	T_LBRACK StatementList T_RBRACK T_SEMICOLON
+FunctionDecl:
+	Identifier T_COLON TYPE_IDENTIFIER T_LPAR ParamList T_RPAR
+	T_LBRACK VarDeclList StatementList T_RBRACK
 	{
 		Symbol* symtab;
-		AstNode* ast_node = ast_node_new("ProcDecl", PROCEDURE, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $2);	// Identifier
-		ast_node_add_child(ast_node, $4);	// ParamList
-		ast_node_add_child(ast_node, $7);	// VarDeclList
+		AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, $3, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $1);	// Identifier
+		ast_node_add_child(ast_node, $5);	// ParamList
+		ast_node_add_child(ast_node, $8);	// VarDeclList
 		ast_node_add_child(ast_node, $9);	// Statements
-		
-		ast_node->symbol = symbol_new(NULL);
-		$$ = ast_node;
-	}
-	;
-	
-FuncDecl:
-	T_FUNCTION Identifier T_LPAR ParamList T_RPAR T_COLON TYPE_IDENTIFIER
-	T_SEMICOLON VarDeclList T_LBRACK StatementList T_RBRACK T_SEMICOLON
-	{
-		Symbol* symtab;
-		AstNode* ast_node = ast_node_new("FuncDecl", FUNCTION, $7, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $2);	// Identifier
-		ast_node_add_child(ast_node, $4);	// ParamList
-		ast_node_add_child(ast_node, $9);	// VarDeclList
-		ast_node_add_child(ast_node, $11);	// Statements
 
 		ast_node->symbol = symbol_new(NULL);
 		$$ = ast_node;
 	}
+	| Identifier T_BOGUS { $$ = NULL; }
 	;
 	
 ParamList:

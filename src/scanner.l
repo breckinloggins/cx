@@ -46,8 +46,6 @@
 							  						yylval->type = type_get_from_lexeme(yytext); 
 							  						return TYPE_IDENTIFIER; 
 													}
-"procedure"					{ uploc; return T_PROCEDURE; }
-"function"					{ uploc; return T_FUNCTION; }
 
 "printInt"					{ uploc; return T_PRINT_INT; }
 "printBool"					{ uploc; return T_PRINT_BOOL; }

@@ -16,8 +16,8 @@ void context_cleanup();
 
 CTX_VISITOR(TranslationUnit);
 CTX_VISITOR(NamespaceDecl);
-CTX_VISITOR(procfunc_list);
-CTX_VISITOR(procfunc);
+CTX_VISITOR(function_list);
+CTX_VISITOR(function);
 CTX_VISITOR(vardecl_list);
 CTX_VISITOR(vardecl);
 CTX_VISITOR(param_list);

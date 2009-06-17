@@ -24,9 +24,8 @@ Visitor* context_new()
 	V_INIT(NamespaceDecl, NamespaceDecl);
 	V_INIT(vardecl_list, vardecl_list);
 	V_INIT(vardecl, vardecl);
-	V_INIT(procfunc_list, procfunc_list);
-	V_INIT(procedure, procfunc);
-	V_INIT(function, procfunc);
+	V_INIT(function_list, function_list);
+	V_INIT(function, function);
 	V_INIT(param_list, param_list);
 	V_INIT(parameter, parameter);
 	V_INIT(statement_list, statement_list);
@@ -80,7 +79,7 @@ CTX_VISITOR(NamespaceDecl)
 	ast_node_accept_children(node->children->sibling, visitor);
 }
 
-CTX_VISITOR(procfunc_list)
+CTX_VISITOR(function_list)
 {
 	symtab = global_symtab;
 	
@@ -90,7 +89,7 @@ CTX_VISITOR(procfunc_list)
 	_inside_procfunc = NULL;
 }
 
-CTX_VISITOR(procfunc)
+CTX_VISITOR(function)
 {
 	AstNode* ident;
 	AstNode* child;

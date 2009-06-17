@@ -44,34 +44,33 @@
      T_NOT = 270,
      T_NAMESPACE = 271,
      T_VAR = 272,
-     T_PROCEDURE = 273,
-     T_FUNCTION = 274,
-     T_IF = 275,
-     T_ELSE = 276,
-     T_WHILE = 277,
-     T_FOR = 278,
-     T_TO = 279,
-     T_DO = 280,
-     T_ASSIGNMENT = 281,
-     T_LPAR = 282,
-     T_RPAR = 283,
-     T_LBRACK = 284,
-     T_RBRACK = 285,
-     T_SEMICOLON = 286,
-     T_COLON = 287,
-     T_COMMA = 288,
-     T_DOT = 289,
-     T_PRINT_INT = 290,
-     T_PRINT_CHAR = 291,
-     T_PRINT_BOOL = 292,
-     T_PRINT_LINE = 293,
-     TYPE_IDENTIFIER = 294,
-     IDENTIFIER = 295,
-     INT_LITERAL = 296,
-     BOOL_LITERAL = 297,
-     CHAR_LITERAL = 298,
-     DOUBLE_LITERAL = 299,
-     FLOAT_LITERAL = 300
+     T_IF = 273,
+     T_ELSE = 274,
+     T_WHILE = 275,
+     T_FOR = 276,
+     T_TO = 277,
+     T_DO = 278,
+     T_ASSIGNMENT = 279,
+     T_LPAR = 280,
+     T_RPAR = 281,
+     T_LBRACK = 282,
+     T_RBRACK = 283,
+     T_SEMICOLON = 284,
+     T_COLON = 285,
+     T_COMMA = 286,
+     T_DOT = 287,
+     T_PRINT_INT = 288,
+     T_PRINT_CHAR = 289,
+     T_PRINT_BOOL = 290,
+     T_PRINT_LINE = 291,
+     T_BOGUS = 292,
+     TYPE_IDENTIFIER = 293,
+     IDENTIFIER = 294,
+     INT_LITERAL = 295,
+     BOOL_LITERAL = 296,
+     CHAR_LITERAL = 297,
+     DOUBLE_LITERAL = 298,
+     FLOAT_LITERAL = 299
    };
 #endif
 #define T_OR 258
@@ -89,34 +88,33 @@
 #define T_NOT 270
 #define T_NAMESPACE 271
 #define T_VAR 272
-#define T_PROCEDURE 273
-#define T_FUNCTION 274
-#define T_IF 275
-#define T_ELSE 276
-#define T_WHILE 277
-#define T_FOR 278
-#define T_TO 279
-#define T_DO 280
-#define T_ASSIGNMENT 281
-#define T_LPAR 282
-#define T_RPAR 283
-#define T_LBRACK 284
-#define T_RBRACK 285
-#define T_SEMICOLON 286
-#define T_COLON 287
-#define T_COMMA 288
-#define T_DOT 289
-#define T_PRINT_INT 290
-#define T_PRINT_CHAR 291
-#define T_PRINT_BOOL 292
-#define T_PRINT_LINE 293
-#define TYPE_IDENTIFIER 294
-#define IDENTIFIER 295
-#define INT_LITERAL 296
-#define BOOL_LITERAL 297
-#define CHAR_LITERAL 298
-#define DOUBLE_LITERAL 299
-#define FLOAT_LITERAL 300
+#define T_IF 273
+#define T_ELSE 274
+#define T_WHILE 275
+#define T_FOR 276
+#define T_TO 277
+#define T_DO 278
+#define T_ASSIGNMENT 279
+#define T_LPAR 280
+#define T_RPAR 281
+#define T_LBRACK 282
+#define T_RBRACK 283
+#define T_SEMICOLON 284
+#define T_COLON 285
+#define T_COMMA 286
+#define T_DOT 287
+#define T_PRINT_INT 288
+#define T_PRINT_CHAR 289
+#define T_PRINT_BOOL 290
+#define T_PRINT_LINE 291
+#define T_BOGUS 292
+#define TYPE_IDENTIFIER 293
+#define IDENTIFIER 294
+#define INT_LITERAL 295
+#define BOOL_LITERAL 296
+#define CHAR_LITERAL 297
+#define DOUBLE_LITERAL 298
+#define FLOAT_LITERAL 299
 
 
 
@@ -134,7 +132,7 @@ typedef union YYSTYPE {
 	struct AstNode_tag* astnode;
 } YYSTYPE;
 /* Line 1274 of yacc.c.  */
-#line 138 "parser.tab.h"
+#line 136 "parser.tab.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1

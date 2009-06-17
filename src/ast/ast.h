@@ -31,8 +31,7 @@ typedef struct Visitor_tag	{
 	VISITOR_PFN(visit_vardecl);
 	VISITOR_PFN(visit_identifier_list);
 	VISITOR_PFN(visit_identifier);
-	VISITOR_PFN(visit_procfunc_list);
-	VISITOR_PFN(visit_procedure);
+	VISITOR_PFN(visit_function_list);
 	VISITOR_PFN(visit_function);
 	VISITOR_PFN(visit_param_list);
 	VISITOR_PFN(visit_parameter);

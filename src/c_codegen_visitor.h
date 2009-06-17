@@ -10,8 +10,8 @@ Visitor* c_codegen_new(FILE*);
 
 C_VISITOR(TranslationUnit);
 C_VISITOR(NamespaceDecl);
-C_VISITOR(procfunc_list);
-C_VISITOR(procfunc);
+C_VISITOR(function_list);
+C_VISITOR(function);
 C_VISITOR(vardecl_list);
 C_VISITOR(vardecl);
 C_VISITOR(identifier_list);

@@ -27,9 +27,8 @@ Visitor* c_codegen_new(FILE* output)
 	V_INIT(vardecl_list, vardecl_list);
 	V_INIT(vardecl, vardecl);
 	V_INIT(identifier_list, identifier_list);
-	V_INIT(procfunc_list, procfunc_list);
-	V_INIT(procedure, procfunc);
-	V_INIT(function, procfunc);
+	V_INIT(function_list, function_list);
+	V_INIT(function, function);
 	V_INIT(param_list, param_list);
 	V_INIT(parameter, parameter);
 	V_INIT(statement_list, statement_list);
@@ -96,12 +95,12 @@ C_VISITOR(NamespaceDecl)
 	}
 }
 
-C_VISITOR(procfunc_list)
+C_VISITOR(function_list)
 {
 	ast_node_accept_children(node->children, visitor);
 }
 
-C_VISITOR(procfunc)
+C_VISITOR(function)
 {
 	const char* type;
 	AstNode* child;
