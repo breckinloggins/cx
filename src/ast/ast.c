@@ -125,8 +125,8 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 		case PROGRAM:
 			visit = visitor->visit_program;
 			break;
-		case PROGRAM_DECL:
-			visit = visitor->visit_programdecl;
+		case NAMESPACE_DECL:
+			visit = visitor->visit_NamespaceDecl;
 			break;
 		case VARDECL_LIST:
 			visit = visitor->visit_vardecl_list;

@@ -18,7 +18,7 @@ graphprinter_new(FILE* output)
     Visitor *visitor = (Visitor *) malloc (sizeof(Visitor));
 
     visitor->visit_program = &graphprinter_visit_program;
-    visitor->visit_programdecl = &graphprinter_visit_programdecl;
+    visitor->visit_NamespaceDecl = &graphprinter_visit_NamespaceDecl;
     visitor->visit_vardecl_list = &graphprinter_visit_vardecl_list;
     visitor->visit_vardecl = &graphprinter_visit_simplenode;
     visitor->visit_identifier_list = &graphprinter_visit_identifier_list;
@@ -89,7 +89,7 @@ graphprinter_visit_simplenode (Visitor *visitor, AstNode *node)
 }
 
 void
-graphprinter_visit_programdecl(Visitor *visitor, AstNode *node)
+graphprinter_visit_NamespaceDecl(Visitor *visitor, AstNode *node)
 {
     _print_arrow(node);
     fprintf(out,"\tnode_%x [label=\"%s\\n[line: %d]\",style=filled,",
@@ -97,6 +97,8 @@ graphprinter_visit_programdecl(Visitor *visitor, AstNode *node)
     fprintf(out,"color="COLOR_EDGE_GROUP",fillcolor="COLOR_FILL_COMMON"];\n");
     ast_node_accept(node->children, visitor);
     fprintf(out,"\tnode_%x -> symbol_%x [color=lightgray];\n", node->children, node->children->symbol);
+
+	ast_node_accept_children(node->children->sibling, visitor);
 }
 
 void

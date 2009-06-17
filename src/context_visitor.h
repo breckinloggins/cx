@@ -15,7 +15,7 @@ Visitor* context_new();
 void context_cleanup();
 
 CTX_VISITOR(program);
-CTX_VISITOR(programdecl);
+CTX_VISITOR(NamespaceDecl);
 CTX_VISITOR(procfunc_list);
 CTX_VISITOR(procfunc);
 CTX_VISITOR(vardecl_list);

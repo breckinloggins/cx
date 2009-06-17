@@ -41,7 +41,7 @@ AstNode* ast;
 %left <lexeme> T_STAR T_SLASH
 %left <lexeme> T_NOT
 
-%token T_PROGRAM
+%token T_NAMESPACE
 %token T_VAR
 %token T_PROCEDURE
 %token T_FUNCTION
@@ -76,7 +76,7 @@ AstNode* ast;
 %token <character> CHAR_LITERAL
 
 %type <astnode> Program
-%type <astnode> ProgramDecl
+%type <astnode> NamespaceDecl
 %type <astnode> VarDeclList
 %type <astnode> MultiVarDecl
 %type <astnode> VarDecl
@@ -135,25 +135,25 @@ AstNode* ast;
 %%
 
 Program:
-	ProgramDecl VarDeclList ProcFuncList ProgramBody
+	NamespaceDecl
 	{
 		AstNode* ast_node = ast_node_new("Program", PROGRAM, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $1);	// ProgramDecl
-		ast_node_add_child(ast_node, $2);	// VarDeclList
-		ast_node_add_child(ast_node, $3);	// ProcFuncList
-		ast_node_add_child(ast_node, $4);	// ProgramBody
-		
+		ast_node_add_child(ast_node, $1);	// NamespaceDecl
 		$$ = ast_node;
 		
 		ast = ast_node;
 	}
 	;
 
-ProgramDecl:
-	T_PROGRAM Identifier T_SEMICOLON
+NamespaceDecl:
+	T_NAMESPACE Identifier T_LBRACK VarDeclList ProcFuncList ProgramBody T_RBRACK
 	{
-		AstNode* ast_node = ast_node_new("ProgramDecl", PROGRAM_DECL, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $2);
+		AstNode* ast_node = ast_node_new("NamespaceDecl", NAMESPACE_DECL, VOID, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $2);	// Namespace Identifier
+		ast_node_add_child(ast_node, $4);	// VarDeclList
+		ast_node_add_child(ast_node, $5);	// ProcFuncList
+		ast_node_add_child(ast_node, $6);	// ProgramBody
+	
 		$$ = ast_node;
 	}
 	;

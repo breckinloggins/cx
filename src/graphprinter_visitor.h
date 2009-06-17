@@ -17,7 +17,7 @@
 Visitor *graphprinter_new(FILE*);
 
 void graphprinter_visit_program (Visitor *, AstNode *);
-void graphprinter_visit_programdecl (Visitor *, AstNode *);
+void graphprinter_visit_NamespaceDecl (Visitor *, AstNode *);
 void graphprinter_visit_vardecl_list (Visitor *, AstNode *);
 void graphprinter_visit_identifier_list (Visitor *, AstNode *);
 void graphprinter_visit_procfunc_list (Visitor *, AstNode *);

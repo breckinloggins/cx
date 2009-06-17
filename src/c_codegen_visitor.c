@@ -23,7 +23,7 @@ Visitor* c_codegen_new(FILE* output)
 	Visitor* visitor = (Visitor*)malloc(sizeof(Visitor));
 	
 	V_INIT(program, program);
-	V_INIT(programdecl, programdecl);
+	V_INIT(NamespaceDecl, NamespaceDecl);
 	V_INIT(vardecl_list, vardecl_list);
 	V_INIT(vardecl, vardecl);
 	V_INIT(identifier_list, identifier_list);
@@ -60,34 +60,40 @@ Visitor* c_codegen_new(FILE* output)
 } 
 
 C_VISITOR(program)
-{
-	AstNode* child;
-	
+{	
 	fprintf(out, "/* Generated with cxc */\n");
-	for (child = node->children; 
-	child != NULL && child->kind != STATEMENT_LIST; 
-	child = child->sibling)	{
-		ast_node_accept(child, visitor);
-		fprintf(out, "\n");
-	}
 	
-	if (child)	{
-		fprintf(out, "int main(int argc, char** argv)\n{\n");
-		ast_node_accept(child, visitor);
-		fprintf(out, "\n"TAB"return 0;\n}\n\n");
-	}
-	
+	ast_node_accept_children(node->children, visitor);
 	
 }
 
-C_VISITOR(programdecl)
+C_VISITOR(NamespaceDecl)
 {
-	fprintf(out, "/* program ");
-	ast_node_accept(node->children, visitor);
-	fprintf(out, "; */\n\n");
+	AstNode* namespace_identifier = node->children;
+	fprintf(out, "/* namespace ");
+	ast_node_accept(namespace_identifier, visitor);
+	fprintf(out, " */\n\n");
 	fprintf(out, "#include <stdio.h>\n\n");
 	fprintf(out, "#ifndef FALSE\n#define FALSE\t0\n#endif\n\n");
 	fprintf(out, "#ifndef TRUE\n#define TRUE\t1\n#endif\n");
+	
+	AstNode* child;
+	for (child = namespace_identifier->sibling; (child); child = child->sibling)	{
+		if (child->kind == STATEMENT_LIST)	{
+			// HACK: This is temporary until we get rid of the "ProgramBody" stuff!
+			fprintf(out, "int main(int argc, char** argv)\n");
+			fprintf(out, "{\n");
+			
+			ast_node_accept(child, visitor);
+			
+			fprintf(out, "}\n");
+			
+		} else {
+			ast_node_accept(child, visitor);
+		}
+		
+		fprintf(out, "\n");
+	}
 }
 
 C_VISITOR(procfunc_list)

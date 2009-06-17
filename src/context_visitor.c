@@ -21,7 +21,7 @@ Visitor* context_new()
 	Visitor* visitor = (Visitor*)malloc(sizeof(Visitor));
 	
 	V_INIT(program, program);
-	V_INIT(programdecl, programdecl);
+	V_INIT(NamespaceDecl, NamespaceDecl);
 	V_INIT(vardecl_list, vardecl_list);
 	V_INIT(vardecl, vardecl);
 	V_INIT(procfunc_list, procfunc_list);
@@ -70,13 +70,14 @@ CTX_VISITOR(program)
 	symtab = global_symtab;
 	_inside_procfunc = NULL;
 	
-	ast_node_accept_children(node->children, visitor);
+	// Namespace
+	ast_node_accept(node->children, visitor);
 }
 
-CTX_VISITOR(programdecl)
+CTX_VISITOR(NamespaceDecl)
 {
 	node->children->symbol->decl_linenum = node->linenum;
-	ast_node_accept(node->children, visitor);
+	ast_node_accept_children(node->children->sibling, visitor);
 }
 
 CTX_VISITOR(procfunc_list)

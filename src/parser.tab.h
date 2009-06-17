@@ -42,7 +42,7 @@
      T_SLASH = 268,
      T_STAR = 269,
      T_NOT = 270,
-     T_PROGRAM = 271,
+     T_NAMESPACE = 271,
      T_VAR = 272,
      T_PROCEDURE = 273,
      T_FUNCTION = 274,
@@ -85,7 +85,7 @@
 #define T_SLASH 268
 #define T_STAR 269
 #define T_NOT 270
-#define T_PROGRAM 271
+#define T_NAMESPACE 271
 #define T_VAR 272
 #define T_PROCEDURE 273
 #define T_FUNCTION 274

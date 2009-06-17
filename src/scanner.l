@@ -40,7 +40,7 @@
 										break;
 								}
 							}
-"program"					{ uploc; return T_PROGRAM; }	
+"namespace"					{ uploc; return T_NAMESPACE; }	
 "var"						{ uploc; return T_VAR; }
 "integer"|"boolean"|"char"	{ uploc;
 							  yylval->type = type_get_from_lexeme(yytext); 
