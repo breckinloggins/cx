@@ -2,13 +2,29 @@
 [X] Change up a few tokens like Begin and End to make it more C-like
 [X] Add command line options
 [X]	Add pass-through compilation
-[]	Parse the input file name to create good output intermediate and executable names
 [X]	Change grammar to put parenthesis around things that require parenthesis in C
 [X]	Fix bug where variables aren't recognized as their types
-[]	Remove Var blocks, allow declaration of vars inside a statement block
 [X]	Modify Var declaration to be C-like instead of pascal-like
 [X]	Rename ProgramDecl to NamespaceDecl
-[]	Rename Program rule to TranslationUnit
 [X]	Add // style comment
+[X]	Rename Program rule to TranslationUnit
 []	Add /// comment that clings to closest program unit
 []	Fix the "last statement can't have a semicolon" grammar bug
+[]	Parse the input file name to create good output intermediate and executable names
+[]	Allow declaration of vars inside a statement block
+[]	Remove distinction between procedures and functions
+[]	Move to C-style function declaration syntax
+[]	Fix bug where compiler doesn't actually return the right value from a function
+[]	Remove ProgramBody element.  Programs will need to explicitly declare a main function
+[]	Add float and double types
+[]	Add a string type/string literals
+[]	Add array type
+[]	Add struct type
+[]	Add class type
+[]	Add enum type
+[]	Add a temporary getLine statement
+[]	Test and fix issues with if statments/for loops/while loops
+[]	Add do/while
+[]	Add break/continue statements
+[]	Add switch statement
+[]	Add goto/labels

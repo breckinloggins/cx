@@ -75,7 +75,7 @@ AstNode* ast;
 %token <boolean> BOOL_LITERAL
 %token <character> CHAR_LITERAL
 
-%type <astnode> Program
+%type <astnode> TranslationUnit
 %type <astnode> NamespaceDecl
 %type <astnode> VarDeclList
 %type <astnode> MultiVarDecl
@@ -130,14 +130,14 @@ AstNode* ast;
 %type <astnode> RelOp
 %type <astnode> NotOp
 
-%start Program
+%start TranslationUnit
 
 %%
 
-Program:
+TranslationUnit:
 	NamespaceDecl
 	{
-		AstNode* ast_node = ast_node_new("Program", PROGRAM, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = ast_node_new("TranslationUnit", TRANSLATIONUNIT, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $1);	// NamespaceDecl
 		$$ = ast_node;
 		

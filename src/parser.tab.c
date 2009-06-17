@@ -447,18 +447,18 @@ static const char *const yytname[] =
   "T_RBRACK", "T_SEMICOLON", "T_COLON", "T_COMMA", "T_DOT", "T_PRINT_INT",
   "T_PRINT_CHAR", "T_PRINT_BOOL", "T_PRINT_LINE", "TYPE_IDENTIFIER",
   "IDENTIFIER", "INT_LITERAL", "BOOL_LITERAL", "CHAR_LITERAL", "$accept",
-  "Program", "NamespaceDecl", "VarDeclList", "MultiVarDecl", "VarDecl",
-  "IdentifierList", "MultiIdentifier", "SingleIdentifier", "ProcFuncList",
-  "MultiProcFuncDecl", "ProcFuncDecl", "ProcDecl", "FuncDecl", "ParamList",
-  "MultiParam", "SingleParam", "ProgramBody", "Statements",
-  "StatementList", "MultiStatement", "Statement", "StatementMatched",
-  "StatementUnmatched", "IfStatement", "IfStatementMatched",
-  "PrintStatement", "PrintIntStatement", "PrintCharStatement",
-  "PrintBoolStatement", "PrintLineStatement", "Assignment",
-  "WhileStatement", "ForStatement", "Expression", "SimpleExpression",
-  "Term", "NotFactor", "Factor", "Call", "CallParamList",
-  "MultiCallParameter", "CallParameter", "AddOp", "MulOp", "RelOp",
-  "NotOp", "Identifier", "Literal", 0
+  "TranslationUnit", "NamespaceDecl", "VarDeclList", "MultiVarDecl",
+  "VarDecl", "IdentifierList", "MultiIdentifier", "SingleIdentifier",
+  "ProcFuncList", "MultiProcFuncDecl", "ProcFuncDecl", "ProcDecl",
+  "FuncDecl", "ParamList", "MultiParam", "SingleParam", "ProgramBody",
+  "Statements", "StatementList", "MultiStatement", "Statement",
+  "StatementMatched", "StatementUnmatched", "IfStatement",
+  "IfStatementMatched", "PrintStatement", "PrintIntStatement",
+  "PrintCharStatement", "PrintBoolStatement", "PrintLineStatement",
+  "Assignment", "WhileStatement", "ForStatement", "Expression",
+  "SimpleExpression", "Term", "NotFactor", "Factor", "Call",
+  "CallParamList", "MultiCallParameter", "CallParameter", "AddOp", "MulOp",
+  "RelOp", "NotOp", "Identifier", "Literal", 0
 };
 #endif
 
@@ -1309,7 +1309,7 @@ yyreduce:
         case 2:
 #line 139 "parser.y"
     {
-		AstNode* ast_node = ast_node_new("Program", PROGRAM, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = ast_node_new("TranslationUnit", TRANSLATIONUNIT, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, (yyvsp[0].astnode));	// NamespaceDecl
 		(yyval.astnode) = ast_node;
 		

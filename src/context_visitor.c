@@ -20,7 +20,7 @@ Visitor* context_new()
 {
 	Visitor* visitor = (Visitor*)malloc(sizeof(Visitor));
 	
-	V_INIT(program, program);
+	V_INIT(TranslationUnit, TranslationUnit);
 	V_INIT(NamespaceDecl, NamespaceDecl);
 	V_INIT(vardecl_list, vardecl_list);
 	V_INIT(vardecl, vardecl);
@@ -63,7 +63,7 @@ void context_cleanup()
 		symbol_table_destroy(global_symtab);
 }
 
-CTX_VISITOR(program)
+CTX_VISITOR(TranslationUnit)
 {
 	node->symbol = symbol_new(NULL);
 	global_symtab = node->symbol;

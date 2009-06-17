@@ -25,7 +25,7 @@ typedef enum TypeEnum	{
 
 typedef enum KindEnum	{
 	NONE_KIND = -1,
-	PROGRAM,
+	TRANSLATIONUNIT,
 	NAMESPACE_DECL,
 	VARDECL_LIST,
 	VARDECL,

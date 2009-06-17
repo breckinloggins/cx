@@ -122,8 +122,8 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 	self->child_counter = 1;
 	
 	switch(self->kind)	{
-		case PROGRAM:
-			visit = visitor->visit_program;
+		case TRANSLATIONUNIT:
+			visit = visitor->visit_TranslationUnit;
 			break;
 		case NAMESPACE_DECL:
 			visit = visitor->visit_NamespaceDecl;

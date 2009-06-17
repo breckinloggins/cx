@@ -17,7 +17,7 @@ graphprinter_new(FILE* output)
 	
     Visitor *visitor = (Visitor *) malloc (sizeof(Visitor));
 
-    visitor->visit_program = &graphprinter_visit_program;
+    visitor->visit_TranslationUnit = &graphprinter_visit_TranslationUnit;
     visitor->visit_NamespaceDecl = &graphprinter_visit_NamespaceDecl;
     visitor->visit_vardecl_list = &graphprinter_visit_vardecl_list;
     visitor->visit_vardecl = &graphprinter_visit_simplenode;
@@ -54,7 +54,7 @@ graphprinter_new(FILE* output)
 }
 
 void
-graphprinter_visit_program(Visitor *visitor, AstNode *node)
+graphprinter_visit_TranslationUnit(Visitor *visitor, AstNode *node)
 {
     fprintf(out,"/* Cx AST graph. */\n");
     fprintf(out,"digraph {\n");

@@ -25,7 +25,7 @@ typedef struct AstNode_tag	{
 } AstNode;
 
 typedef struct Visitor_tag	{
-	VISITOR_PFN(visit_program);
+	VISITOR_PFN(visit_TranslationUnit);
 	VISITOR_PFN(visit_NamespaceDecl);
 	VISITOR_PFN(visit_vardecl_list);
 	VISITOR_PFN(visit_vardecl);

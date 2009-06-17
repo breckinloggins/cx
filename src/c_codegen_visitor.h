@@ -8,7 +8,7 @@
 
 Visitor* c_codegen_new(FILE*);
 
-C_VISITOR(program);
+C_VISITOR(TranslationUnit);
 C_VISITOR(NamespaceDecl);
 C_VISITOR(procfunc_list);
 C_VISITOR(procfunc);

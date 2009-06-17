@@ -22,7 +22,7 @@ Visitor* c_codegen_new(FILE* output)
 	out = output;
 	Visitor* visitor = (Visitor*)malloc(sizeof(Visitor));
 	
-	V_INIT(program, program);
+	V_INIT(TranslationUnit, TranslationUnit);
 	V_INIT(NamespaceDecl, NamespaceDecl);
 	V_INIT(vardecl_list, vardecl_list);
 	V_INIT(vardecl, vardecl);
@@ -59,7 +59,7 @@ Visitor* c_codegen_new(FILE* output)
 	return visitor;
 } 
 
-C_VISITOR(program)
+C_VISITOR(TranslationUnit)
 {	
 	fprintf(out, "/* Generated with cxc */\n");
 	
