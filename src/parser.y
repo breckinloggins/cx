@@ -178,9 +178,9 @@ MultiVarDecl:
 	;
 	
 VarDecl:
-	T_VAR IdentifierList T_COLON TYPE_IDENTIFIER T_SEMICOLON
+	TYPE_IDENTIFIER IdentifierList T_SEMICOLON
 	{
-		AstNode* ast_node = ast_node_new("VarDecl", VARDECL, $4, yylloc.last_line, NULL);
+		AstNode* ast_node = ast_node_new("VarDecl", VARDECL, $1, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $2);
 		$$ = ast_node;
 	}

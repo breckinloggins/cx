@@ -6,8 +6,9 @@
 [X]	Change grammar to put parenthesis around things that require parenthesis in C
 [X]	Fix bug where variables aren't recognized as their types
 []	Remove Var blocks, allow declaration of vars inside a statement block
-[]	Modify Var declaration to be C-like instead of pascal-like
+[X]	Modify Var declaration to be C-like instead of pascal-like
 [X]	Rename ProgramDecl to NamespaceDecl
 []	Rename Program rule to TranslationUnit
 [X]	Add // style comment
 []	Add /// comment that clings to closest program unit
+[]	Fix the "last statement can't have a semicolon" grammar bug

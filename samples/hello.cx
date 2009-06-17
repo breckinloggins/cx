@@ -4,12 +4,12 @@
  * Testing multiline comment
  */ 
 
-// Here we're testing a single line commen
+// Here we're testing a single line comment
 
 namespace helloworld	
 {
 
-	var someChar : char;
+	char someChar;
 
 	{
 		printChar('H');
