@@ -1,1 +1,1 @@
-add_library(common memory.c list.c)
+add_library(common memory.c)

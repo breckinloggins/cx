@@ -6,8 +6,10 @@
  */
 
 #define VOID(var)		((void *)&var)
-#define IS_LITERAL(k)	( k == BOOL_LITERAL || \
-						  k == CHAR_LITERAL || \
+#define IS_LITERAL(k)	( k == BOOL_LITERAL   || \
+					   	  k == DOUBLE_LITERAL || \
+					      k == FLOAT_LITERAL  || \
+						  k == CHAR_LITERAL   || \
 						  k == INT_LITERAL)
 
 typedef enum	{
@@ -19,6 +21,8 @@ typedef enum TypeEnum	{
 	ERROR = -1,
 	VOID,
 	INTEGER,
+	DOUBLE,
+	FLOAT,
 	BOOLEAN,
 	CHAR
 } Type;
@@ -52,11 +56,13 @@ typedef enum KindEnum	{
 	CALLPARAM_LIST,
 	CALLPARAM,
 	// IDENTIFIER is defined as a token
-	// INT_LITERAL, BOOL_LITERAL, CHAR_LITERAL are defined as tokens
+	// INT_LITERAL, BOOL_LITERAL, CHAR_LITERAL, ... are defined as tokens
 } Kind;
 
 typedef union	{
 	int integer;
+	double dbl;
+	float flt;
 	bool boolean;
 	char character;
 } Value;
@@ -70,6 +76,8 @@ void value_set(Value* value, Type type, void* val);
 void value_set_from_int(Value* value, int val);
 void value_set_from_bool(Value* value, bool val);
 void value_set_from_char(Value* value, char val);
+void value_set_from_double(Value* value, double val);
+void value_set_from_float(Value* value, float val);
 
 void value_print(FILE* file, Value* value, Type type);
 

@@ -206,6 +206,8 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 		case INT_LITERAL:
 		case BOOL_LITERAL:
 		case CHAR_LITERAL:
+		case DOUBLE_LITERAL:
+		case FLOAT_LITERAL:
 			visit = visitor->visit_literal;
 			break;
 		case T_PLUS:

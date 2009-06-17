@@ -363,8 +363,15 @@ static char* _get_type_string(Type type)
 			return "int";
 		case CHAR:
 			return "char";
-		default:
+		case DOUBLE:
+			return "double";
+		case FLOAT:
+			return "float";
+		case VOID:
 			return "void";
+		default:
+			fprintf(stderr, "Inernal Compiler Error: _get_type_string: Unknown type %d\n", type);
+			exit(1);
 	}
 }
 

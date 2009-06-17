@@ -10,6 +10,8 @@ namespace helloworld
 {
 
 	char someChar;
+	double someDouble;
+	float someFloat;
 
 	{
 		printChar('H');
@@ -26,6 +28,8 @@ namespace helloworld
 		printChar('a');
 	
 		someChar = '!';
+		someDouble = 0.9d;
+		someFloat = -12.5;
 		printChar(someChar);
 	
 		// Note: notice there is no semicolon here.  This is due to a bug in the grammar

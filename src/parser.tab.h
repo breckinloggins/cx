@@ -69,7 +69,9 @@
      IDENTIFIER = 295,
      INT_LITERAL = 296,
      BOOL_LITERAL = 297,
-     CHAR_LITERAL = 298
+     CHAR_LITERAL = 298,
+     DOUBLE_LITERAL = 299,
+     FLOAT_LITERAL = 300
    };
 #endif
 #define T_OR 258
@@ -113,6 +115,8 @@
 #define INT_LITERAL 296
 #define BOOL_LITERAL 297
 #define CHAR_LITERAL 298
+#define DOUBLE_LITERAL 299
+#define FLOAT_LITERAL 300
 
 
 
@@ -123,12 +127,14 @@ typedef union YYSTYPE {
 	char* lexeme;
 	int integer;
 	int boolean;
+	double dbl;
+	float flt;
 	char character;
 	int type;
 	struct AstNode_tag* astnode;
 } YYSTYPE;
 /* Line 1274 of yacc.c.  */
-#line 132 "parser.tab.h"
+#line 138 "parser.tab.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1

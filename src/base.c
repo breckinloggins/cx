@@ -13,6 +13,10 @@ Type type_get_from_lexeme(const char* lexeme)
 		return BOOLEAN;
 	else if (!strcasecmp(lexeme, "char"))
 		return CHAR;
+	else if (!strcasecmp(lexeme, "double"))
+		return DOUBLE;
+	else if (!strcasecmp(lexeme, "float"))
+		return FLOAT;
 	else return VOID;
 }
 
@@ -23,6 +27,10 @@ char* type_get_lexeme(Type type)
 			return "void";
 		case INTEGER:
 			return "integer";
+		case DOUBLE:
+			return "double";
+		case FLOAT:
+			return "float";
 		case BOOLEAN:
 			return "boolean";
 		case CHAR:
@@ -42,6 +50,10 @@ void value_print(FILE* file, Value* value, Type type)
 		fprintf(file, "%s", value->boolean? "true" : "false");
 	} else if (type == CHAR)	{
 		fprintf(file, "'%c'", value->character);
+	} else if (type == DOUBLE)	{
+		fprintf(file, "%f", value->dbl);
+	} else if (type == FLOAT)	{
+		fprintf(file, "%f", value->flt);
 	}
 }
 
@@ -58,6 +70,10 @@ void value_get(Value* value, Type type, void* val)
 		*((bool *) val) = value->boolean;
 	} else if (type == CHAR)	{
 		*((char *) val) = value->character;
+	} else if (type == DOUBLE)	{
+		*((double *) val) = value->dbl;
+	} else if (type == FLOAT)	{
+		*((float *) val) = value->flt;
 	} else {
 		fprintf(stderr, "%s: value_get: unknown type\n", __FILE__);
 		exit(1);
@@ -79,6 +95,10 @@ void value_set(Value* value, Type type, void* val)
 		value->boolean = *((bool *)val);
 	} else if (type == CHAR)	{
 		value->character = *((char *)val);
+	} else if (type == DOUBLE)	{
+		value->dbl = *((double *)val);
+	} else if (type == FLOAT)	{
+		value->flt = *((float *)val);
 	} else	{
 		fprintf(stderr, "%s: value_set: unknown type\n", __FILE__);
 		exit(1);
@@ -98,4 +118,14 @@ void value_set_from_bool(Value* value, bool val)
 void value_set_from_char(Value* value, char val)
 {
 	value_set(value, CHAR, VOID(val));
+}
+
+void value_set_from_double(Value* value, double val)
+{
+	value_set(value, DOUBLE, VOID(val));
+}
+
+void value_set_from_float(Value* value, float val)
+{
+	value_set(value, FLOAT, VOID(val));
 }

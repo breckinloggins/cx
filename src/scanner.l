@@ -42,10 +42,10 @@
 							}
 "namespace"					{ uploc; return T_NAMESPACE; }	
 "var"						{ uploc; return T_VAR; }
-"integer"|"boolean"|"char"	{ uploc;
-							  yylval->type = type_get_from_lexeme(yytext); 
-							  return TYPE_IDENTIFIER; 
-							}
+"integer"|"boolean"|"char"|"double"|"float"			{ uploc;
+							  						yylval->type = type_get_from_lexeme(yytext); 
+							  						return TYPE_IDENTIFIER; 
+													}
 "procedure"					{ uploc; return T_PROCEDURE; }
 "function"					{ uploc; return T_FUNCTION; }
 
@@ -90,6 +90,8 @@
 "'"."'"						{uploc; yylval->character=yytext[1]; return CHAR_LITERAL; }
 [0-9]+						{uploc; yylval->integer=atoi(yytext); return INT_LITERAL; }
 [A-Za-z][A-Za-z0-9_]*		{uploc; yylval->lexeme=strdup(yytext); return IDENTIFIER; }
+\-?[0-9]*\.[0-9]+f?			{uploc; yylval->flt=atof(yytext); return FLOAT_LITERAL; }
+\-?[0-9]*\.[0-9]+d			{uploc; yylval->dbl=atof(yytext); return DOUBLE_LITERAL; }
 
 [ \t]+						/* ignore whitespace */
 [\n]						{ yylloc->first_line = yylloc->last_line = yylineno; 

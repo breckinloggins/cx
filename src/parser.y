@@ -27,6 +27,8 @@ AstNode* ast;
 	char* lexeme;
 	int integer;
 	int boolean;
+	double dbl;
+	float flt;
 	char character;
 	int type;
 	struct AstNode_tag* astnode;
@@ -74,11 +76,12 @@ AstNode* ast;
 %token <integer> INT_LITERAL
 %token <boolean> BOOL_LITERAL
 %token <character> CHAR_LITERAL
+%token <dbl> DOUBLE_LITERAL
+%token <flt> FLOAT_LITERAL
 
 %type <astnode> TranslationUnit
 %type <astnode> NamespaceDecl
 %type <astnode> VarDeclList
-%type <astnode> MultiVarDecl
 %type <astnode> VarDecl
 %type <astnode> IdentifierList
 %type <astnode> MultiIdentifier
@@ -160,20 +163,13 @@ NamespaceDecl:
 
 VarDeclList:
 	/* empty */	{ $$ = NULL; }
-	| VarDecl MultiVarDecl
+	| VarDecl VarDeclList
 	{
 		AstNode* ast_node = ast_node_new("VarDeclList", VARDECL_LIST, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $1);
-		$$ = ast_node;
-	}
-	;
-	
-MultiVarDecl:
-	/* empty */ { $$ = NULL; }
-	| VarDecl MultiVarDecl
-	{
 		ast_node_add_sibling($1, $2);
-		$$ = $1;
+		ast_node_add_child(ast_node, $1);
+	
+		$$ = ast_node;
 	}
 	;
 	
@@ -639,6 +635,18 @@ Literal:
 	{
 		AstNode* ast_node = ast_node_new("CharLiteral", CHAR_LITERAL, CHAR, yylloc.last_line, NULL);
 		value_set_from_char(&ast_node->value, $1);
+		$$ = ast_node;
+	}
+	| FLOAT_LITERAL
+	{
+		AstNode* ast_node = ast_node_new("FloatLiteral", FLOAT_LITERAL, FLOAT, yylloc.last_line, NULL);
+		value_set_from_float(&ast_node->value, $1);
+		$$ = ast_node;
+	}
+	| DOUBLE_LITERAL
+	{
+		AstNode* ast_node = ast_node_new("DoubleLiteral", DOUBLE_LITERAL, DOUBLE, yylloc.last_line, NULL);
+		value_set_from_double(&ast_node->value, $1);
 		$$ = ast_node;
 	}
 	;

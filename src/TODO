@@ -8,7 +8,10 @@
 [X]	Rename ProgramDecl to NamespaceDecl
 [X]	Add // style comment
 [X]	Rename Program rule to TranslationUnit
+[X] Fix bug where only one variable gets translated in the vardecl_list
+[X]	Add float and double types
 []	Add /// comment that clings to closest program unit
+[]	Add Flex/Bison support to CMake file
 []	Fix the "last statement can't have a semicolon" grammar bug
 []	Parse the input file name to create good output intermediate and executable names
 []	Allow declaration of vars inside a statement block
@@ -16,7 +19,7 @@
 []	Move to C-style function declaration syntax
 []	Fix bug where compiler doesn't actually return the right value from a function
 []	Remove ProgramBody element.  Programs will need to explicitly declare a main function
-[]	Add float and double types
+[]	Add hexadecimal and octal literals
 []	Add a string type/string literals
 []	Add array type
 []	Add struct type
@@ -28,3 +31,4 @@
 []	Add break/continue statements
 []	Add switch statement
 []	Add goto/labels
+[]	Add support for IEEE floating point notation (e notation)
