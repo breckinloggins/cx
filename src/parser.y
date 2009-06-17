@@ -99,7 +99,6 @@ AstNode* ast;
 %type <astnode> ProgramBody
 %type <astnode> Statements
 %type <astnode> StatementList
-%type <astnode> MultiStatement
 %type <astnode> Statement
 %type <astnode> StatementMatched
 %type <astnode> StatementUnmatched
@@ -162,19 +161,28 @@ NamespaceDecl:
 	;
 
 VarDeclList:
-	/* empty */	{ $$ = NULL; }
-	| VarDecl VarDeclList
+	/* empty */ { $$ = NULL; }
+	| VarDecl
 	{
 		AstNode* ast_node = ast_node_new("VarDeclList", VARDECL_LIST, VOID, yylloc.last_line, NULL);
-		ast_node_add_sibling($1, $2);
 		ast_node_add_child(ast_node, $1);
-	
+
+		$$ = ast_node;
+	}
+	| VarDecl T_SEMICOLON VarDeclList
+	{
+		AstNode* ast_node = $3;
+		if (!ast_node)	{
+			ast_node = ast_node_new("VarDeclList", VARDECL_LIST, VOID, yylloc.last_line, NULL);
+		}
+		ast_node_add_child(ast_node, $1);
 		$$ = ast_node;
 	}
 	;
-	
+
+
 VarDecl:
-	TYPE_IDENTIFIER IdentifierList T_SEMICOLON
+	TYPE_IDENTIFIER IdentifierList
 	{
 		AstNode* ast_node = ast_node_new("VarDecl", VARDECL, $1, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $2);
@@ -302,21 +310,21 @@ Statements:
 
 StatementList:
 	/* empty */ { $$ = NULL; }
-	| Statement MultiStatement
+	| Statement
 	{
 		AstNode* ast_node = ast_node_new("StatementList", STATEMENT_LIST, VOID, yylloc.last_line, NULL);
-		ast_node_add_sibling($1, $2);
 		ast_node_add_child(ast_node, $1);
+
 		$$ = ast_node;
 	}
-	;
-	
-MultiStatement:
-	/* empty */ { $$ = NULL; }
-	| T_SEMICOLON Statement MultiStatement
+	| Statement T_SEMICOLON StatementList
 	{
-		ast_node_add_sibling($2, $3);
-		$$ = $2;
+		AstNode* ast_node = $3;
+		if (!ast_node)	{
+			ast_node = ast_node_new("StatementList", STATEMENT_LIST, VOID, yylloc.last_line, NULL);
+		}
+		ast_node_add_child(ast_node, $1);
+		$$ = ast_node;
 	}
 	;
 

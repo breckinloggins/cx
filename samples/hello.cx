@@ -32,8 +32,17 @@ namespace helloworld
 		someFloat = -12.5;
 		printChar(someChar);
 	
-		// Note: notice there is no semicolon here.  This is due to a bug in the grammar
-		printLn()
+		/* -- This doesn't work
+		if (someChar == '!')	{
+			printChar('#');
+			printLn();
+		}
+		*/
+		
+		// But this does
+		if (someChar == '!') printChar('#');
+			
+		printLn();
 	}.
 }
 

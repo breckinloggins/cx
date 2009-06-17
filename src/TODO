@@ -10,9 +10,9 @@
 [X]	Rename Program rule to TranslationUnit
 [X] Fix bug where only one variable gets translated in the vardecl_list
 [X]	Add float and double types
+[X]	Fix the "last statement can't have a semicolon" grammar bug
 []	Add /// comment that clings to closest program unit
 []	Add Flex/Bison support to CMake file
-[]	Fix the "last statement can't have a semicolon" grammar bug
 []	Parse the input file name to create good output intermediate and executable names
 []	Allow declaration of vars inside a statement block
 []	Remove distinction between procedures and functions
@@ -27,6 +27,7 @@
 []	Add enum type
 []	Add a temporary getLine statement
 []	Test and fix issues with if statments/for loops/while loops
+	[] if statement doesn't allow blocks
 []	Add do/while
 []	Add break/continue statements
 []	Add switch statement
