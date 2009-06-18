@@ -164,6 +164,9 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 		case PRINTLINE_STMT:
 			visit = visitor->visit_printline_stmt;
 			break;
+		case RETURN_STMT:
+			visit = visitor->visit_return_stmt;
+			break;
 		case ASSIGNMENT_STMT:
 			visit = visitor->visit_assignment_stmt;
 			break;

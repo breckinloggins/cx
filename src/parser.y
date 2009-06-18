@@ -46,6 +46,8 @@ AstNode* ast;
 %token T_NAMESPACE
 %token T_VAR
 
+%token T_RETURN
+
 %token T_IF
 %token T_ELSE
 %token T_WHILE
@@ -109,6 +111,7 @@ AstNode* ast;
 %type <astnode> PrintIntStatement
 %type <astnode> PrintBoolStatement
 %type <astnode> PrintLineStatement
+%type <astnode> ReturnStatement
 
 %type <astnode> Expression
 %type <astnode> SimpleExpression
@@ -319,6 +322,7 @@ StatementMatched:
 	| ForStatement { $$ = $1; }
 	| Call { $$ = $1; }
 	| PrintStatement { $$ = $1; }
+	| ReturnStatement { $$ = $1; }
 	;
 
 StatementUnmatched:
@@ -392,6 +396,20 @@ PrintLineStatement:
 	T_PRINT_LINE T_LPAR T_RPAR
 	{
 		AstNode* ast_node = ast_node_new("PrintLineStatement", PRINTLINE_STMT, VOID, yylloc.last_line, NULL);
+		$$ = ast_node;
+	}
+	;
+
+ReturnStatement:
+	T_RETURN
+	{
+		AstNode* ast_node = ast_node_new("ReturnStatement", RETURN_STMT, VOID, yylloc.last_line, NULL);
+		$$ = ast_node;
+	}
+	| T_RETURN Expression
+	{
+		AstNode* ast_node = ast_node_new("ReturnStatement", RETURN_STMT, VOID, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $2);
 		$$ = ast_node;
 	}
 	;

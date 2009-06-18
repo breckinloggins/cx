@@ -12,12 +12,16 @@
 [X]	Add float and double types
 [X]	Fix the "last statement can't have a semicolon" grammar bug
 [X]	Remove distinction between procedures and functions
+[X]	Fix bug where compiler doesn't actually return the right value from a function
+[X] Add return statement
+[]	Fix bug where functions cannot be called
 []	Add /// comment that clings to closest program unit
 []	Add Flex/Bison support to CMake file
 []	Parse the input file name to create good output intermediate and executable names
 []	Allow declaration of vars inside a statement block
 []	Move to C-style function declaration syntax
-[]	Fix bug where compiler doesn't actually return the right value from a function
+[] Add feature where type of last expression in function will be the return value of
+	that function
 []	Remove ProgramBody element.  Programs will need to explicitly declare a main function
 []	Add hexadecimal and octal literals
 []	Add a string type/string literals

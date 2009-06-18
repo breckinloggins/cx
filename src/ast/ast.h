@@ -41,6 +41,7 @@ typedef struct Visitor_tag	{
 	VISITOR_PFN(visit_printbool_stmt);
 	VISITOR_PFN(visit_printline_stmt);
 	VISITOR_PFN(visit_assignment_stmt);
+	VISITOR_PFN(visit_return_stmt);
 	VISITOR_PFN(visit_if_stmt);
 	VISITOR_PFN(visit_while_stmt);
 	VISITOR_PFN(visit_for_stmt);

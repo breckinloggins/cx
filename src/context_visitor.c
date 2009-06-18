@@ -32,6 +32,7 @@ Visitor* context_new()
 	V_INIT(printint_stmt, printint_stmt);
 	V_INIT(printchar_stmt, printchar_stmt);
 	V_INIT(printbool_stmt, printbool_stmt);
+	V_INIT(return_stmt, return_stmt);
 	V_INIT(assignment_stmt, assignment_stmt);
 	V_INIT(if_stmt, if_stmt);
 	V_INIT(while_stmt, while_stmt);
@@ -181,6 +182,27 @@ CTX_VISITOR(printbool_stmt)
 	_typecheck_print_stmt(node, BOOLEAN, "Bool");	
 }
 
+CTX_VISITOR(return_stmt)
+{
+	Type return_type = VOID;
+	if (node->children)	{
+		ast_node_accept(node->children, visitor);
+		return_type = node->children->type;
+	}
+	
+	if (!_inside_procfunc)	{
+		node->type = ERROR;
+		fprintf(stderr, "Error (line %d): Keyword \"return\" is only valid inside a function or method\n", node->linenum);
+	}
+	else if (_inside_procfunc->type != return_type)	{
+		node->type = ERROR;
+		fprintf(stderr, "Error (line %d): Incompatible return type\n", node->linenum);
+	}
+	else	{
+		node->type = return_type;
+	}
+}
+
 CTX_VISITOR(assignment_stmt)
 {
 	AstNode* lnode = node->children;
@@ -189,12 +211,11 @@ CTX_VISITOR(assignment_stmt)
 	ast_node_accept(lnode, visitor);
 	ast_node_accept(rnode, visitor);
 	
-	if (symbol_is_function(lnode->symbol) && (_inside_procfunc == NULL ||
-		strcmp(_inside_procfunc->children->symbol->name, lnode->symbol->name)))	{
+	if (symbol_is_function(lnode->symbol))	{
 		
 		node->type = ERROR;
 		fprintf(stderr, "Error (line %d): Symbol '%s' is a function identifier, you cannot "
-			"assign a value to it from outside the function.\n", node->linenum, lnode->symbol->name);
+			"assign a value to it\n", node->linenum, lnode->symbol->name);
 	} else if (lnode->type != ERROR && rnode->type != ERROR && lnode->type != rnode->type)	{
 		node->type = ERROR;
 		fprintf(stderr, "Error (line %d): Incompatible types on assignment\n", node->linenum);

@@ -47,6 +47,8 @@
 							  						return TYPE_IDENTIFIER; 
 													}
 
+"return"					{ uploc; return T_RETURN; }
+
 "printInt"					{ uploc; return T_PRINT_INT; }
 "printBool"					{ uploc; return T_PRINT_BOOL; }
 "printChar"					{ uploc; return T_PRINT_CHAR; }

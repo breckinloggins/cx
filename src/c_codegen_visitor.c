@@ -36,6 +36,7 @@ Visitor* c_codegen_new(FILE* output)
 	V_INIT(printchar_stmt, printchar_stmt);
 	V_INIT(printbool_stmt, printbool_stmt);
 	V_INIT(printline_stmt, printline_stmt);
+	V_INIT(return_stmt, return_stmt);
 	V_INIT(assignment_stmt, assignment_stmt);
 	V_INIT(if_stmt, if_stmt);
 	V_INIT(while_stmt, while_stmt);
@@ -106,8 +107,6 @@ C_VISITOR(function)
 	AstNode* child;
 	
 	type = _get_type_string(node->type);
-	pf_name = _create_temporary();				// TODO: This isn't gonna work for Cx, we want
-												//		non-random function names!
 	
 	fprintf(out, "%s ", type);
 	
@@ -123,10 +122,7 @@ C_VISITOR(function)
 	}
 	
 	fprintf(out, ")\n{\n");
-	
-	if (node->kind == FUNCTION)
-		fprintf(out, TAB"%s %s;\n", type, pf_name);
-	
+		
 	if (child->kind == VARDECL_LIST)	{
 		ast_node_accept(child, visitor);
 		child = child->sibling;
@@ -136,11 +132,7 @@ C_VISITOR(function)
 	
 	ast_node_accept(child, visitor);
 	
-	if (node->kind == FUNCTION)
-		fprintf(out, "\n"TAB"return %s;\n", pf_name);
 	fprintf(out, "}\n\n");
-	
-	free(pf_name);	
 }
 
 C_VISITOR(vardecl_list)
@@ -221,6 +213,17 @@ C_VISITOR(printbool_stmt)
 C_VISITOR(printline_stmt)
 {
 	fprintf(out, "printf(\"\\n\");");
+}
+
+C_VISITOR(return_stmt)
+{
+	fprintf(out, "return");
+	if (node->children)	{
+		fprintf(out, " ");
+		ast_node_accept(node->children, visitor);
+	}
+	
+	fprintf(out, ";");
 }
 
 C_VISITOR(assignment_stmt)

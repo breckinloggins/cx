@@ -15,9 +15,8 @@ namespace helloworld
 	
 	getchar : char()
 	{
-		getchar = 'Z';
+		return 'Z';
 	}
-	
 	
 	{
 		printChar('H');
@@ -37,6 +36,7 @@ namespace helloworld
 		someDouble = 0.9d;
 		someFloat = -12.5;
 		printChar(someChar);
+		printChar(getChar());
 	
 		/* -- This doesn't work
 		if (someChar == '!')	{
