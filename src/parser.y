@@ -46,6 +46,7 @@ AstNode* ast;
 %token T_NAMESPACE
 %token T_VAR
 
+%token T_PUBLIC
 %token T_RETURN
 
 %token T_IF
@@ -191,6 +192,7 @@ VarDecl:
 	}
 	;
 
+
 IdentifierList:
 	SingleIdentifier MultiIdentifier
 	{
@@ -235,12 +237,13 @@ MultiFunctionDecl:
 	;
 	
 FunctionDecl:
-	Identifier T_COLON TYPE_IDENTIFIER T_LPAR ParamList T_RPAR
+	/* HACK: T_PUBLIC is here just to avoid some shift/reduce conflicts for the time being */
+	T_PUBLIC TYPE_IDENTIFIER SingleIdentifier T_LPAR ParamList T_RPAR
 	T_LBRACK VarDeclList StatementList T_RBRACK
 	{
 		Symbol* symtab;
-		AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, $3, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $1);	// Identifier
+		AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, $2, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $3);	// Identifier
 		ast_node_add_child(ast_node, $5);	// ParamList
 		ast_node_add_child(ast_node, $8);	// VarDeclList
 		ast_node_add_child(ast_node, $9);	// Statements
@@ -248,7 +251,6 @@ FunctionDecl:
 		ast_node->symbol = symbol_new(NULL);
 		$$ = ast_node;
 	}
-	| Identifier T_BOGUS { $$ = NULL; }
 	;
 	
 ParamList:

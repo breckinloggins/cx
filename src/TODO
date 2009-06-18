@@ -15,12 +15,13 @@
 [X]	Fix bug where compiler doesn't actually return the right value from a function
 [X] Add return statement
 [X]	Fix bug where functions cannot be called
+[X]	Move to C-style function declaration syntax
+[]	Fix grammar so access modifiers on function declarations are optional
 []	Add /// comment that clings to closest program unit
 []	Add Flex/Bison support to CMake file
 []	Parse the input file name to create good output intermediate and executable names
 []	Allow declaration of vars inside a statement block
-[]	Move to C-style function declaration syntax
-[] Add feature where type of last expression in function will be the return value of
+[]  Add feature where type of last expression in function will be the return value of
 	that function
 []	Remove ProgramBody element.  Programs will need to explicitly declare a main function
 []	Add hexadecimal and octal literals

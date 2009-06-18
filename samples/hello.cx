@@ -13,7 +13,9 @@ namespace helloworld
 	double someDouble;
 	float someFloat;
 	
-	getchar : char()
+	// HACK: Right now you HAVE to specify an access modifer because of shift/reduce
+	//			bugs in the grammar.  *sigh*
+	public char getchar()
 	{
 		return 'Z';
 	}

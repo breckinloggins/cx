@@ -47,6 +47,7 @@
 							  						return TYPE_IDENTIFIER; 
 													}
 
+"public"					{ uploc; return T_PUBLIC; }
 "return"					{ uploc; return T_RETURN; }
 
 "printInt"					{ uploc; return T_PRINT_INT; }
