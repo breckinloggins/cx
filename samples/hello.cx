@@ -15,12 +15,13 @@ namespace helloworld
 	
 	// HACK: Right now you HAVE to specify an access modifer because of shift/reduce
 	//			bugs in the grammar.  *sigh*
-	public char getchar()
+	public char getSomeChar()
 	{
 		return 'Z';
 	}
 	
 	{
+		readChar();
 		printChar('H');
 		printChar('e');
 		printChar('l');
@@ -38,7 +39,7 @@ namespace helloworld
 		someDouble = 0.9d;
 		someFloat = -12.5;
 		printChar(someChar);
-		printChar(getchar());
+		printChar(getSomeChar());
 	
 		/* -- This doesn't work
 		if (someChar == '!')	{

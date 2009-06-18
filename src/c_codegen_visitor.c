@@ -36,6 +36,7 @@ Visitor* c_codegen_new(FILE* output)
 	V_INIT(printchar_stmt, printchar_stmt);
 	V_INIT(printbool_stmt, printbool_stmt);
 	V_INIT(printline_stmt, printline_stmt);
+	V_INIT(readchar_stmt, readchar_stmt);
 	V_INIT(return_stmt, return_stmt);
 	V_INIT(assignment_stmt, assignment_stmt);
 	V_INIT(if_stmt, if_stmt);
@@ -213,6 +214,11 @@ C_VISITOR(printbool_stmt)
 C_VISITOR(printline_stmt)
 {
 	fprintf(out, "printf(\"\\n\");");
+}
+
+C_VISITOR(readchar_stmt)
+{
+	fprintf(out, "getchar();");
 }
 
 C_VISITOR(return_stmt)

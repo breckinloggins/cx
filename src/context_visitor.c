@@ -32,6 +32,7 @@ Visitor* context_new()
 	V_INIT(printint_stmt, printint_stmt);
 	V_INIT(printchar_stmt, printchar_stmt);
 	V_INIT(printbool_stmt, printbool_stmt);
+	V_INIT(readchar_stmt, readchar_stmt);
 	V_INIT(return_stmt, return_stmt);
 	V_INIT(assignment_stmt, assignment_stmt);
 	V_INIT(if_stmt, if_stmt);
@@ -180,6 +181,11 @@ CTX_VISITOR(printbool_stmt)
 {
 	ast_node_accept(node->children, visitor);
 	_typecheck_print_stmt(node, BOOLEAN, "Bool");	
+}
+
+CTX_VISITOR(readchar_stmt)
+{
+	//_typecheck_print_stmt(node, CHAR, "Char");
 }
 
 CTX_VISITOR(return_stmt)

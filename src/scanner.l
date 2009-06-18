@@ -54,6 +54,7 @@
 "printBool"					{ uploc; return T_PRINT_BOOL; }
 "printChar"					{ uploc; return T_PRINT_CHAR; }
 "printLn"					{ uploc; return T_PRINT_LINE; }
+"readChar"					{ uploc; return T_READ_CHAR; }
 
 "if"						{ uploc; return T_IF; }
 "else"						{ uploc; return T_ELSE; }

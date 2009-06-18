@@ -65,7 +65,7 @@
      T_PRINT_CHAR = 291,
      T_PRINT_BOOL = 292,
      T_PRINT_LINE = 293,
-     T_BOGUS = 294,
+     T_READ_CHAR = 294,
      TYPE_IDENTIFIER = 295,
      IDENTIFIER = 296,
      INT_LITERAL = 297,
@@ -111,7 +111,7 @@
 #define T_PRINT_CHAR 291
 #define T_PRINT_BOOL 292
 #define T_PRINT_LINE 293
-#define T_BOGUS 294
+#define T_READ_CHAR 294
 #define TYPE_IDENTIFIER 295
 #define IDENTIFIER 296
 #define INT_LITERAL 297

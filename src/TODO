@@ -16,6 +16,9 @@
 [X] Add return statement
 [X]	Fix bug where functions cannot be called
 [X]	Move to C-style function declaration syntax
+[X]	Add a readChar() statement to make things more interesting
+[]	Fix bug where statements are inserted into the AST backward
+[]	Properly support function parameters
 []	Fix grammar so access modifiers on function declarations are optional
 []	Add /// comment that clings to closest program unit
 []	Add Flex/Bison support to CMake file
@@ -42,3 +45,4 @@
 []  Add support for symbols (: syntax)
 []	Add support for named parameters (parameterName => value syntax)
 []	Allow declarations and statements to be intermingled
+[]	Replace built in I/O statements with a standard environment

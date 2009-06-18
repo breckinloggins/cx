@@ -71,8 +71,7 @@ AstNode* ast;
 %token T_PRINT_CHAR
 %token T_PRINT_BOOL
 %token T_PRINT_LINE
-
-%token T_BOGUS
+%token T_READ_CHAR
 
 %token <type> TYPE_IDENTIFIER
 %token <lexeme> IDENTIFIER
@@ -112,6 +111,7 @@ AstNode* ast;
 %type <astnode> PrintIntStatement
 %type <astnode> PrintBoolStatement
 %type <astnode> PrintLineStatement
+%type <astnode> ReadCharStatement
 %type <astnode> ReturnStatement
 
 %type <astnode> Expression
@@ -325,6 +325,7 @@ StatementMatched:
 	| Call { $$ = $1; }
 	| PrintStatement { $$ = $1; }
 	| ReturnStatement { $$ = $1; }
+	| ReadCharStatement { $$ = $1; }
 	;
 
 StatementUnmatched:
@@ -401,6 +402,13 @@ PrintLineStatement:
 		$$ = ast_node;
 	}
 	;
+
+ReadCharStatement:
+	T_READ_CHAR T_LPAR T_RPAR
+	{
+		AstNode* ast_node = ast_node_new("ReadCharStatement", READCHAR_STMT, CHAR, yyloc.last_line, NULL);
+		$$ = ast_node;
+	}
 
 ReturnStatement:
 	T_RETURN
