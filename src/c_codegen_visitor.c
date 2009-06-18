@@ -80,19 +80,7 @@ C_VISITOR(NamespaceDecl)
 	
 	AstNode* child;
 	for (child = namespace_identifier->sibling; (child); child = child->sibling)	{
-		if (child->kind == STATEMENT_LIST)	{
-			// HACK: This is temporary until we get rid of the "ProgramBody" stuff!
-			fprintf(out, "int main(int argc, char** argv)\n");
-			fprintf(out, "{\n");
-			
-			ast_node_accept(child, visitor);
-			
-			fprintf(out, "}\n");
-			
-		} else {
-			ast_node_accept(child, visitor);
-		}
-		
+		ast_node_accept(child, visitor);
 		fprintf(out, "\n");
 	}
 }
@@ -323,7 +311,7 @@ C_VISITOR(notfactor)
 
 C_VISITOR(call)
 {
-	fprintf(out, "%s ();\n", node->children->symbol->name);
+	fprintf(out, "%s ()\n", node->children->symbol->name);
 	//ast_node_accept(node->children, visitor);
 }
 

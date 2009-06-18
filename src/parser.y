@@ -96,7 +96,6 @@ AstNode* ast;
 %type <astnode> SingleParam
 %type <astnode> MultiParam
 
-%type <astnode> ProgramBody
 %type <astnode> Statements
 %type <astnode> StatementList
 %type <astnode> Statement
@@ -150,13 +149,12 @@ TranslationUnit:
 	;
 
 NamespaceDecl:
-	T_NAMESPACE Identifier T_LBRACK VarDeclList FunctionList ProgramBody T_RBRACK
+	T_NAMESPACE Identifier T_LBRACK VarDeclList FunctionList T_RBRACK
 	{
 		AstNode* ast_node = ast_node_new("NamespaceDecl", NAMESPACE_DECL, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $2);	// Namespace Identifier
 		ast_node_add_child(ast_node, $4);	// VarDeclList
 		ast_node_add_child(ast_node, $5);	// ProcFuncList
-		ast_node_add_child(ast_node, $6);	// ProgramBody
 	
 		$$ = ast_node;
 	}
@@ -279,11 +277,6 @@ SingleParam:
 		ast_node_add_child(ast_node, $1);	// Identifier
 		$$ = ast_node;
 	}
-	;
-
-ProgramBody:
-	/* empty */ { $$ = NULL; }
-	| T_LBRACK StatementList T_RBRACK T_DOT { $$ = $2; }
 	;
 	
 Statements:
