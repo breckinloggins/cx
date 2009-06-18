@@ -389,11 +389,10 @@ CTX_VISITOR(identifier)
 	Symbol* _sym = sym;
 	
 	if (sym == NULL)	{
-		
 		if (node->symbol->decl_linenum > 0)	{
 			node->symbol->type = node->type;
 			node->symbol->is_global = (symtab == global_symtab);
-			
+						
 			node->symbol = symbol_insert(symtab, node->symbol);
 		} else if ((sym = symbol_lookup(global_symtab, node->symbol->name)) != NULL)	{
 			_fetch_symbol(node, sym);
@@ -407,7 +406,7 @@ CTX_VISITOR(identifier)
 		node->symbol->type = node->type = ERROR;
 		fprintf(stderr, "Error (line %d): Identifier '%s' already defined on line %d\n", 
 			node->linenum, _sym->name, _sym->decl_linenum);
-	}
+	}	
 }
 
 static void _fetch_symbol(AstNode* node, Symbol *sym)
