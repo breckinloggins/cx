@@ -56,6 +56,8 @@
 "printLn"					{ uploc; return T_PRINT_LINE; }
 "readChar"					{ uploc; return T_READ_CHAR; }
 
+"_C_"						{ uploc; return T_C_BLOCK; //TODO: Read C-block here }
+
 "if"						{ uploc; return T_IF; }
 "else"						{ uploc; return T_ELSE; }
 "while"						{ uploc; return T_WHILE; }

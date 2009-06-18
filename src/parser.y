@@ -73,6 +73,8 @@ AstNode* ast;
 %token T_PRINT_LINE
 %token T_READ_CHAR
 
+%token T_C_BLOCK
+
 %token <type> TYPE_IDENTIFIER
 %token <lexeme> IDENTIFIER
 %token <integer> INT_LITERAL

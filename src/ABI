@@ -1,0 +1,12 @@
+Two of the primary goals of Cx are:
+	- Remain compatible with C to the highest extent possible
+	- Produce code as small as possible to accomplish the task
+	
+To meet these goals, the Cx Application Binary Interface (ABI) will be clearly and cleanly specified.  Cx language features will use the bare minimum of C code necessary to do the job.  The C code that is required will be wrapped in macros and functions so that they can be used by C modules to talk to Cx types and namespaces.
+
+Name mangling will be well-defined.   If you have a method of a class inside a namespace, the name of the method callable in C will be:
+	namespace_class_methodname[_integer](...);
+
+Where [_integer] is tacked on if there are multiple method overloads.  We'll have to figure out what to do if these get too long, but I'm thinking we have a standard way of shortening the names.
+
+When a Cx application uses the standard library, it only pulls in the minimum needed to do the work.  Using Console.WriteLine() will NOT pull in 8mbs of crap into the binary.
