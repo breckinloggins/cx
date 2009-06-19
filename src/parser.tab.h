@@ -66,13 +66,14 @@
      T_PRINT_BOOL = 292,
      T_PRINT_LINE = 293,
      T_READ_CHAR = 294,
-     TYPE_IDENTIFIER = 295,
-     IDENTIFIER = 296,
-     INT_LITERAL = 297,
-     BOOL_LITERAL = 298,
-     CHAR_LITERAL = 299,
-     DOUBLE_LITERAL = 300,
-     FLOAT_LITERAL = 301
+     T_C_BLOCK = 295,
+     TYPE_IDENTIFIER = 296,
+     IDENTIFIER = 297,
+     INT_LITERAL = 298,
+     BOOL_LITERAL = 299,
+     CHAR_LITERAL = 300,
+     DOUBLE_LITERAL = 301,
+     FLOAT_LITERAL = 302
    };
 #endif
 #define T_OR 258
@@ -112,13 +113,14 @@
 #define T_PRINT_BOOL 292
 #define T_PRINT_LINE 293
 #define T_READ_CHAR 294
-#define TYPE_IDENTIFIER 295
-#define IDENTIFIER 296
-#define INT_LITERAL 297
-#define BOOL_LITERAL 298
-#define CHAR_LITERAL 299
-#define DOUBLE_LITERAL 300
-#define FLOAT_LITERAL 301
+#define T_C_BLOCK 295
+#define TYPE_IDENTIFIER 296
+#define IDENTIFIER 297
+#define INT_LITERAL 298
+#define BOOL_LITERAL 299
+#define CHAR_LITERAL 300
+#define DOUBLE_LITERAL 301
+#define FLOAT_LITERAL 302
 
 
 
@@ -127,6 +129,7 @@
 #line 26 "parser.y"
 typedef union YYSTYPE {
 	char* lexeme;
+	char* literal_content;
 	int integer;
 	int boolean;
 	double dbl;
@@ -136,7 +139,7 @@ typedef union YYSTYPE {
 	struct AstNode_tag* astnode;
 } YYSTYPE;
 /* Line 1274 of yacc.c.  */
-#line 140 "parser.tab.h"
+#line 143 "parser.tab.h"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1

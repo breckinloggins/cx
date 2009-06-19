@@ -56,7 +56,45 @@
 "printLn"					{ uploc; return T_PRINT_LINE; }
 "readChar"					{ uploc; return T_READ_CHAR; }
 
-"_C_"						{ uploc; return T_C_BLOCK; //TODO: Read C-block here }
+"_C_"[ \t\n]+\{				{ 
+								int bracket_count = 1;
+								char* content = (char*)malloc(4096*sizeof(char));
+								memset(content, 0, 4096*sizeof(char));
+								int char_count = 0;
+								int in_single_quote = 0;
+								int in_double_quote = 0;
+								while (1)	{
+									char c = input();
+									if (c == '\'' && !in_double_quote)	{
+										in_single_quote = !in_single_quote;
+									}
+									
+									if (c == '"' && !in_single_quote)	{
+										in_double_quote = !in_double_quote;
+									}
+									
+									if (c == '}' && !in_single_quote && !in_double_quote)
+										--bracket_count;
+									else if (c == '{' && !in_single_quote && !in_double_quote)
+										++bracket_count;
+										
+									if (!bracket_count)
+										break;				// Brackets in balance.  Finished
+									
+									content[char_count++] = c;
+									
+									if (char_count > 0 && char_count % 4095 == 0)	{
+										// Definitely time for more string space
+										content = (char*)realloc(content, (char_count+4096)*sizeof(char));
+										memset(content+char_count, 0, 4096+sizeof(char));
+									}
+								}
+								
+								// The parser will take ownership of the pointer
+								yylval->literal_content = content;
+								uploc; 
+								return T_C_BLOCK; 
+							}
 
 "if"						{ uploc; return T_IF; }
 "else"						{ uploc; return T_ELSE; }

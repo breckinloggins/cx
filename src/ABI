@@ -7,6 +7,24 @@ To meet these goals, the Cx Application Binary Interface (ABI) will be clearly a
 Name mangling will be well-defined.   If you have a method of a class inside a namespace, the name of the method callable in C will be:
 	namespace_class_methodname[_integer](...);
 
-Where [_integer] is tacked on if there are multiple method overloads.  We'll have to figure out what to do if these get too long, but I'm thinking we have a standard way of shortening the names.
+Where [_integer] is tacked on if there are multiple method overloads.  We'll have to figure out what to do if these get too long, but I'm thinking we have a standard way of shortening the names.  I've looked into this, and some compilers really don't like it if you have identifiers more than 63 characters long.  What we might have to do is leave the method name alone, but encode the namespace/class prefix to be something like the first 7 characters of the SHA1 hash of that.  So for example you might see:
+	86c756b_methodname(...);
+	
+This is not preferable, but at least the name mangling is reproducible.  The other thing we could do is output some C-code to maintain a lookup by string to a function pointer entry:
+
+	SomeMethodPtr ptr = cxi_find_method("mynamespace.MyClass.SomeMethod");
+	ptr(...);
+	
+Or you might even see:
+	typedef int (SomeMethodPtr *)(...);
+	struct cxi_mynamespace	{
+		struct cxi_MyClass	{
+			SomeMethodPtr SomeMethod;
+		}
+	}
+	// Somewhere in an initilization routine
+	cxi_mynamespace.cxi_MyClass.SomeMethod = 86c756b_methodname;
+	
+(cxi stands for "Cx Interface")
 
 When a Cx application uses the standard library, it only pulls in the minimum needed to do the work.  Using Console.WriteLine() will NOT pull in 8mbs of crap into the binary.

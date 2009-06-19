@@ -44,6 +44,7 @@ typedef enum KindEnum	{
 	PRINTBOOL_STMT,
 	PRINTLINE_STMT,
 	READCHAR_STMT,
+	CBLOCK_STMT,
 	ASSIGNMENT_STMT,
 	RETURN_STMT,
 	IF_STMT,
@@ -66,6 +67,7 @@ typedef union	{
 	float flt;
 	bool boolean;
 	char character;
+	char* literal_content;
 } Value;
 
 char* type_get_lexeme(Type type);

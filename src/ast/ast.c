@@ -39,6 +39,10 @@ void ast_node_destroy(AstNode* self)
 		ast_node_destroy(self->children);
 		ast_node_destroy(self->sibling);
 		free(self->name);
+		
+		if (self->type == CBLOCK_STMT)
+			free(self->value.literal_content);
+		
 		free(self);
 	}
 }
@@ -166,6 +170,9 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 			break;
 		case READCHAR_STMT:
 			visit = visitor->visit_readchar_stmt;
+			break;
+		case CBLOCK_STMT:
+			visit = visitor->visit_cblock_stmt;
 			break;
 		case RETURN_STMT:
 			visit = visitor->visit_return_stmt;

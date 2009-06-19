@@ -22,7 +22,13 @@ namespace helloworld
 	
 	public integer main()
 	{
-		readChar();
+		_C_ {
+			int a = 0;
+			a += 1;
+			fprintf(stderr, "Number: %d\n", a);
+		};
+		
+		//readChar();
 		printChar('H');
 		printChar('e');
 		printChar('l');

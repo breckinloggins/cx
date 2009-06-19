@@ -37,6 +37,7 @@ Visitor* c_codegen_new(FILE* output)
 	V_INIT(printbool_stmt, printbool_stmt);
 	V_INIT(printline_stmt, printline_stmt);
 	V_INIT(readchar_stmt, readchar_stmt);
+	V_INIT(cblock_stmt, cblock_stmt);
 	V_INIT(return_stmt, return_stmt);
 	V_INIT(assignment_stmt, assignment_stmt);
 	V_INIT(if_stmt, if_stmt);
@@ -207,6 +208,13 @@ C_VISITOR(printline_stmt)
 C_VISITOR(readchar_stmt)
 {
 	fprintf(out, "getchar();");
+}
+
+C_VISITOR(cblock_stmt)
+{
+	// We just insert the code inside the block directly
+	// into the output and hope the user knows what he's doing
+	fprintf(out, "%s", node->value.literal_content);
 }
 
 C_VISITOR(return_stmt)

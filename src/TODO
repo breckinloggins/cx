@@ -18,6 +18,9 @@
 [X]	Move to C-style function declaration syntax
 [X]	Add a readChar() statement to make things more interesting
 [X]	Remove ProgramBody element.  Programs will need to explicitly declare a main function
+[X]	First pass for dropping to other languages with a _<language>_ {} syntax.  Start with _C_ { fprintf("hi!"); } and
+	directly output with the code generator
+[]	When generating C code, append namespace to variables and functions
 []	Collect all the feature specs from various sources, clean up, put in FEATURES document
 []	BUG: readChar() should be an expression, not a statement
 []	BUG: Functions are allowed to not have the right return type as the last statement
@@ -51,6 +54,4 @@
 []	Replace built in I/O statements with a standard environment
 []	Add more test files and create a testing framework with CMake/CTest
 []	Add /// comment that clings to closest program unit
-[]	First pass for dropping to other languages with a _<language>_ {} syntax.  Start with _C_ { fprintf("hi!"); } and
-	directly output with the code generator
 []	Define standard ABI, C-macros, etc.

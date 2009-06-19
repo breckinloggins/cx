@@ -23,6 +23,7 @@ C_VISITOR(printchar_stmt);
 C_VISITOR(printbool_stmt);
 C_VISITOR(printline_stmt);
 C_VISITOR(readchar_stmt);
+C_VISITOR(cblock_stmt);
 C_VISITOR(return_stmt);
 C_VISITOR(assignment_stmt);
 C_VISITOR(if_stmt);

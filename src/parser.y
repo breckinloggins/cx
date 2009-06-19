@@ -25,6 +25,7 @@ AstNode* ast;
 
 %union {
 	char* lexeme;
+	char* literal_content;
 	int integer;
 	int boolean;
 	double dbl;
@@ -73,7 +74,7 @@ AstNode* ast;
 %token T_PRINT_LINE
 %token T_READ_CHAR
 
-%token T_C_BLOCK
+%token <literal_content> T_C_BLOCK
 
 %token <type> TYPE_IDENTIFIER
 %token <lexeme> IDENTIFIER
@@ -113,6 +114,7 @@ AstNode* ast;
 %type <astnode> PrintBoolStatement
 %type <astnode> PrintLineStatement
 %type <astnode> ReadCharStatement
+%type <astnode> CBlockStatement
 %type <astnode> ReturnStatement
 
 %type <astnode> Expression
@@ -321,6 +323,7 @@ StatementMatched:
 	| PrintStatement { $$ = $1; }
 	| ReturnStatement { $$ = $1; }
 	| ReadCharStatement { $$ = $1; }
+	| CBlockStatement { $$ = $1; }
 	;
 
 StatementUnmatched:
@@ -402,6 +405,14 @@ ReadCharStatement:
 	T_READ_CHAR T_LPAR T_RPAR
 	{
 		AstNode* ast_node = ast_node_new("ReadCharStatement", READCHAR_STMT, CHAR, yyloc.last_line, NULL);
+		$$ = ast_node;
+	}
+
+CBlockStatement:
+	T_C_BLOCK
+	{
+		AstNode* ast_node = ast_node_new("CBlock", CBLOCK_STMT, VOID, yyloc.last_line, NULL);
+		ast_node->value.literal_content = $1;
 		$$ = ast_node;
 	}
 
