@@ -111,12 +111,12 @@ AstNode* ast;
 %type <astnode> PrintIntStatement
 %type <astnode> PrintBoolStatement
 %type <astnode> PrintLineStatement
-%type <astnode> ReadCharStatement
 %type <astnode> CBlockStatement
 %type <astnode> ReturnStatement
 %type <astnode> Block
 
 %type <astnode> Expression
+%type <astnode> ReadCharExpression
 %type <astnode> SimpleExpression
 %type <astnode> NotFactor
 %type <astnode> Factor
@@ -292,7 +292,6 @@ Statement:
 	| ForStatement { $$ = $1; }
 	| PrintStatement { $$ = $1; }
 	| ReturnStatement { $$ = $1; }
-	| ReadCharStatement { $$ = $1; }
 	| CBlockStatement { $$ = $1; }
 	| Block { $$ = $1; }
 	;
@@ -361,13 +360,6 @@ PrintLineStatement:
 	}
 	;
 
-ReadCharStatement:
-	T_READ_CHAR T_LPAR T_RPAR
-	{
-		AstNode* ast_node = ast_node_new("ReadCharStatement", READCHAR_STMT, CHAR, yyloc.last_line, NULL);
-		$$ = ast_node;
-	}
-
 CBlockStatement:
 	T_C_BLOCK
 	{
@@ -430,6 +422,7 @@ ExpressionStatement:
 	
 Expression:
 	SimpleExpression { $$ = $1; }
+	| ReadCharExpression { $$ = $1; }
 	| SimpleExpression RelOp SimpleExpression
 	{
 		AstNode* ast_node = ast_node_new("RelExpression", REL_EXPR, BOOLEAN, yylloc.last_line, NULL);
@@ -439,6 +432,14 @@ Expression:
 		$$ = ast_node;
 	}
 	;
+	
+ReadCharExpression:
+	T_READ_CHAR T_LPAR T_RPAR
+	{
+		AstNode* ast_node = ast_node_new("ReadCharExpression", READCHAR_EXPR, CHAR, yyloc.last_line, NULL);
+		$$ = ast_node;
+	}
+	
 	
 SimpleExpression:
 	Term { $$ = $1; }

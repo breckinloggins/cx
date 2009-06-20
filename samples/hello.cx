@@ -31,7 +31,25 @@ namespace helloworld
 		
 		someChar = ';';
 		
-		readChar();
+		_C_	{
+			fprintf(stderr, "Do you wish to see the rest of the output? [y/n]");
+		}
+		
+		char answer;
+		answer = readChar();
+		printLn();
+		
+		if (answer == 'y')	{
+			_C_ {
+				fprintf(stderr, "OK, here goes!\n");
+			}
+		} else {
+			_C_ { 
+				fprintf(stderr, "No problem, thanks for stopping by!\n");
+			}
+			return 0;
+		}
+		
 		printChar('H');
 		printChar('e');
 		printChar('l');

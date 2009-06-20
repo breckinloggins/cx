@@ -26,7 +26,7 @@ CTX_VISITOR(statement_list);
 CTX_VISITOR(printint_stmt);
 CTX_VISITOR(printchar_stmt);
 CTX_VISITOR(printbool_stmt);
-CTX_VISITOR(readchar_stmt);
+CTX_VISITOR(readchar_expr);
 CTX_VISITOR(cblock_stmt);
 CTX_VISITOR(return_stmt);
 CTX_VISITOR(assignment_stmt);

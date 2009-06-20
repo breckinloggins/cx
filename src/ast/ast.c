@@ -165,9 +165,6 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 		case PRINTLINE_STMT:
 			visit = visitor->visit_printline_stmt;
 			break;
-		case READCHAR_STMT:
-			visit = visitor->visit_readchar_stmt;
-			break;
 		case CBLOCK_STMT:
 			visit = visitor->visit_cblock_stmt;
 			break;
@@ -185,6 +182,9 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 			break;
 		case FOR_STMT:
 			visit = visitor->visit_for_stmt;
+			break;
+		case READCHAR_EXPR:
+			visit = visitor->visit_readchar_expr;
 			break;
 		case REL_EXPR:
 			visit = visitor->visit_rel_expr;

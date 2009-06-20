@@ -27,13 +27,16 @@
 	[X] BUG: Grammar has insane complexity on if/then statements
 [X]	BUG: statements are inserted into the AST backward
 [X]	Allow declarations and statements to be intermingled
-[]	BUG: Graph visitor complains about invalid return statements
-[]	Test all control and loop structures
+[X]	Better handling of semicolons in generated C-code
 []	BUG: readChar() should be an expression, not a statement
+[]	Refactor variable declaration syntax and add support for assignments on the same line
 []	BUG: Functions are allowed to not have the right return type as the last statement
 []	BUG: function parameters aren't supported and are still Pascal syntax
 []	BUG: access modifiers on function declarations should be optional
+[]	BUG: Graph visitor complains about invalid return statements
+[]	Test all control and loop structures
 []	When generating C code, append namespace to variables and functions
+[]	Add proper tabbing when generating C Code
 []	Rename base types to C-type names
 []	Add Flex/Bison support to CMake file
 []	Parse the input file name to create good output intermediate and executable names
@@ -56,6 +59,7 @@
 []	Add support for IEEE floating point notation (e notation)
 []  Add support for symbols (: syntax)
 []	Add support for named parameters (parameterName = value syntax)
+[]	Test (and fix) dangling else
 []	Replace built in I/O statements with a standard environment
 []	Add more test files and create a testing framework with CMake/CTest
 []	Add /// comment that clings to closest program unit

@@ -39,13 +39,13 @@ typedef struct Visitor_tag	{
 	VISITOR_PFN(visit_printchar_stmt);
 	VISITOR_PFN(visit_printbool_stmt);
 	VISITOR_PFN(visit_printline_stmt);
-	VISITOR_PFN(visit_readchar_stmt);
 	VISITOR_PFN(visit_cblock_stmt);
 	VISITOR_PFN(visit_assignment_stmt);
 	VISITOR_PFN(visit_return_stmt);
 	VISITOR_PFN(visit_if_stmt);
 	VISITOR_PFN(visit_while_stmt);
 	VISITOR_PFN(visit_for_stmt);
+	VISITOR_PFN(visit_readchar_expr);
 	VISITOR_PFN(visit_rel_expr);
 	VISITOR_PFN(visit_add_expr);
 	VISITOR_PFN(visit_mul_expr);

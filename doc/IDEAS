@@ -27,4 +27,3 @@ Automatic Meta generator:
 	- MetaClass has MetaFunctions, etc. so you can do:
 		
 		meta(SomeClass).Methods.DoSomething.Call(someClassInstance, ...);
-	

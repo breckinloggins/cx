@@ -35,7 +35,7 @@ Visitor* c_codegen_new(FILE* output)
 	V_INIT(printchar_stmt, printchar_stmt);
 	V_INIT(printbool_stmt, printbool_stmt);
 	V_INIT(printline_stmt, printline_stmt);
-	V_INIT(readchar_stmt, readchar_stmt);
+	V_INIT(readchar_expr, readchar_expr);
 	V_INIT(cblock_stmt, cblock_stmt);
 	V_INIT(return_stmt, return_stmt);
 	V_INIT(assignment_stmt, assignment_stmt);
@@ -158,7 +158,7 @@ C_VISITOR(statement_list)
 	for(child = node->children; (child); child = child->sibling)	{
 		_tab(child);
 		ast_node_accept(child, visitor);
-		fprintf(out, "\n");
+		fprintf(out, ";\n");
 	}
 }
 
@@ -166,38 +166,40 @@ C_VISITOR(printint_stmt)
 {
 	fprintf(out, "printf(\"%%d\", ");
 	ast_node_accept(node->children, visitor);
-	fprintf(out, ");");
+	fprintf(out, ")");
 }
 
 C_VISITOR(printchar_stmt)
 {
 	fprintf(out, "printf(\"%%c\", ");
 	ast_node_accept(node->children, visitor);
-	fprintf(out, ");");
+	fprintf(out, ")");
 }
 
 C_VISITOR(printbool_stmt)
 {
 	fprintf(out, "printf(\"%%s\", ");
 	ast_node_accept(node->children, visitor);
-	fprintf(out, ");");
+	fprintf(out, ")");
 }
 
 C_VISITOR(printline_stmt)
 {
-	fprintf(out, "printf(\"\\n\");");
+	fprintf(out, "printf(\"\\n\")");
 }
 
-C_VISITOR(readchar_stmt)
+C_VISITOR(readchar_expr)
 {
-	fprintf(out, "getchar();");
+	fprintf(out, "getchar()");
 }
 
 C_VISITOR(cblock_stmt)
 {
 	// We just insert the code inside the block directly
 	// into the output and hope the user knows what he's doing
+	fprintf(out, "{\n");
 	fprintf(out, "%s", node->value.literal_content);
+	fprintf(out, "\n}");
 }
 
 C_VISITOR(return_stmt)
@@ -207,8 +209,6 @@ C_VISITOR(return_stmt)
 		fprintf(out, " ");
 		ast_node_accept(node->children, visitor);
 	}
-	
-	fprintf(out, ";");
 }
 
 C_VISITOR(assignment_stmt)
@@ -216,7 +216,6 @@ C_VISITOR(assignment_stmt)
 	ast_node_accept(node->children, visitor);
 	fprintf(out, " = ");
 	ast_node_accept(node->children->sibling, visitor);
-	fprintf(out, ";");
 }
 
 C_VISITOR(if_stmt)
@@ -232,6 +231,10 @@ C_VISITOR(if_stmt)
 	child = child->sibling;					// If Statements
 	ast_node_accept(child, visitor);
 	
+	if (child->kind != STATEMENT_LIST)	{
+		fprintf(out, ";\n");
+	}
+	
 	fprintf(out, "\n");
 	_tab(node);
 	fprintf(out, "}");
@@ -240,12 +243,13 @@ C_VISITOR(if_stmt)
 	if (child)	{
 		fprintf(out, " else {\n");
 		ast_node_accept(child, visitor);
+		if (child->kind != STATEMENT_LIST)	{
+			fprintf(out, ";\n");
+		}
 		fprintf(out, "\n");
 		_tab(node);
 		fprintf(out, "}");
 	}
-	
-	fprintf(out, "\n");
 }
 
 C_VISITOR(while_stmt)
@@ -262,7 +266,7 @@ C_VISITOR(while_stmt)
 	ast_node_accept(child, visitor);
 	
 	_tab(node);
-	fprintf(out, "}\n");
+	fprintf(out, "}");
 }
 
 C_VISITOR(for_stmt)
@@ -287,7 +291,7 @@ C_VISITOR(for_stmt)
 	
 	fprintf(out, "\n");
 	_tab(node);
-	fprintf(out, "}\n");
+	fprintf(out, "}");
 }
 
 C_VISITOR(binary_expr)
@@ -302,7 +306,7 @@ C_VISITOR(notfactor)
 
 C_VISITOR(call)
 {
-	fprintf(out, "%s ()\n", node->children->symbol->name);
+	fprintf(out, "%s ()", node->children->symbol->name);
 	//ast_node_accept(node->children, visitor);
 }
 

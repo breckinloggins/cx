@@ -32,7 +32,7 @@ Visitor* context_new()
 	V_INIT(printint_stmt, printint_stmt);
 	V_INIT(printchar_stmt, printchar_stmt);
 	V_INIT(printbool_stmt, printbool_stmt);
-	V_INIT(readchar_stmt, readchar_stmt);
+	V_INIT(readchar_expr, readchar_expr);
 	V_INIT(cblock_stmt, cblock_stmt);
 	V_INIT(return_stmt, return_stmt);
 	V_INIT(assignment_stmt, assignment_stmt);
@@ -185,7 +185,7 @@ CTX_VISITOR(printbool_stmt)
 	_typecheck_print_stmt(node, BOOLEAN, "Bool");	
 }
 
-CTX_VISITOR(readchar_stmt)
+CTX_VISITOR(readchar_expr)
 {
 	//_typecheck_print_stmt(node, CHAR, "Char");
 }
