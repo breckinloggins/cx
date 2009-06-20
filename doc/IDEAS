@@ -1,0 +1,3 @@
+Parsing:
+	- Use a parser combinator approach
+	- Try a combined top down/bottom up approach.  As the lexer feeds tokens, a parser tree is searched to see if a parser already recognizes the incoming parser pattern.  If it can recognize it, it can consume the entire token stream whole-cloth, doing only small top-down parsing tasks on the token chunk.  This is sort of like tracing compilation, but for tokens

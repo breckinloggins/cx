@@ -1,0 +1,426 @@
+ Grammar like C# or Java
+ 
+ Overall Themes:
+	- Programming languages are for humans, not computers.  The computer doesn't care
+	- Prefer expressive over compact.  A compact language is not a virtue in practice
+	- BUT, don't throw in more crap in the output code than the bare minimum needed.  No harm, no foul
+		- The language should have performance warnings.  It should be able to give you a report about what it had to add to 
+			the executable so you could use that cool feature
+	- If you're going to make a strongly-typed language, the Typing support better kick ass
+	- We have native-platform bytecode: it's called "C"
+ 
+ Backend:
+	- Should be able to switch out backends
+		- C
+		- LLVM
+		- MSIL
+		- JVM Bytecode
+	- C backend should compile with TinyC
+		- Will probably want to fork TinyC and call it "tocc" (the "Tiny Optimizing C Compiler")
+			- Make libtcc it work in Windows without MSYS
+			- Implement more optimizations.  Particularly, the best optimizations that can be done in one and two passes
+			- -On option for number of passes.  -O1 is same as current tcc, -O2 uses two passes and sacrifices compile speed
+				for efficiency
+			- VScript would use -O1, and so would dynamically generated code inside a V# program (example: compiled expression trees)
+			- vsc itself would use -O2 by default
+			- Need to extend TinyC to know about MachO object format.  No PPC support on the Mac, too much work
+ 
+ Language extensions:
+	- Core of V# language should be small.  Barely larger than C99
+	- Most advanved functionalited implemented via "extensions"
+	- Standard extensions make up the "common V#", which is about as big as C# or Vala, maybe a little more
+	- Defined extensions in V# with an API
+	- Can modify and extend V# grammar in certain ways
+	- Can plug in to all compiler passes
+	- Extensions can depend on each other
+	- Extensions can be applied to files or namespaces, with "extension" keyword
+	- Editors and plugins should be able to see extensions and apply syntax highlighting, intellisense properly
+	- "goto" should be implemented as an extension and not included in standard extensions!
+	- Files with .vtiny extensions only use core language and cannot have extensions
+	- Also can pass --no-standard-extensions to the compiler
+ 
+ MethodNames in place of delegates:
+	Resolves to a new Delegate(M), which is a 
+	Delegate that inherits the signature of the given method name.  This will cause a problem
+	with methods with multiple signatures (method overloading) so we'll have to work that out
+  
+ Ability to replace ANY object with your own subclass of that object's type.  This would be
+ supported at the Type level.  You could do:
+	Type.InplaceSubclass(SomeType, MyType) -- ANY time SomeType is created, replace with MyType instead
+	Type.InplaceSubclass(instance, MyType) -- Find the given instance of SomeType and replace with a new MyType
+	[SubtypePolicyAttribute] to allow Types to prohibity Subclassing.  We're HOPING people only use this when
+		there's a genuine security concern
+	- This WOULD use a meta-runtime framework that modified the executable image to rewrite the pointers, but this would land
+	us in hot water with the security police, so instead:
+		- Restriction: overridable properties and methods can be subclassed (or newed), but not private methods or fields
+		- Restriction: You can't replace an object's STATE, only its vtable
+		- This means that every instance uses a void** to its classdef, and not just a void*.  This lets us swap classdefs out
+		  from under the class without it noticing.  We should find a way to do this with no performance hit
+		- BUT, this has security implications, so as part of the deal:
+			- The type that's about to be subclassed will get a message to that effect.  The class can cancel the subclass, which
+				will cause InplaceSubclass() to throw an exception
+			- The SubclassPolicyAttribute just does this declaratively
+		- Subclass types can optionally override the DidSubclassType method.  This could be considered a "constructor" for the subclass
+ 
+ Symbols:
+	- Like in Ruby
+	- Atomic strings.  Only one instance of that string in the whole system
+	- Syntax highlighting and intellisense should pick them up
+	- What notation?
+		- :foo - like Ruby, but clashes with the named parameter syntax.  Foo(myParam::someSymbol) is amiguous to the
+			scope resolution operator and looks ugly anyway
+		- $foo - possible, but then we'll start looking like perl
+		- @foo - better
+		- !foo - too alarming
+		- ^foo - too technical looking
+		- Leaning towards @foo
+
+Enums that don't suck:
+	- If you just use enums like normal, that's fine, but it'd also be nice if:
+	- enums could be subclassed
+	- there was a nice notation for bitfields so you wouldn't have to manually assign them power-of-two identifiers
+	- Enums could essentially be classes, they could have methods
+	- We could have a bitfield testing syntax better than "if ((value & enum.TestValue) == enum.TestValue)".  How about &== and |==?
+	
+Remove stupid C# restrictions:
+	- No extension Properties.  Why?
+	- Lambdas are not allowed in anonymous types.  Why?
+	- if you have a delegate of "void d(int foo, int bar)" and a instance of that delegate, you should be able to do () => //whatever
+		with no arguments if the delgate has default paramater values
+	- Anonymous methods cannot be strongly returned from methods.  Why?  I can understand not being able to pass them as parameters, 
+	but a method defined as var Foo() should be able to infer its anonymous type by the type of the return.  You simply make a restriction
+	that ALL return values must resolve to the same anonymous type
+ 
+ Active Attributes:
+	- If I decorate a method with a subclass of MethodAttribute, I should get nice BeforeCall() and AfterCall() methods
+	- If I decorate a property with a subclass of PropertyAttribute, I should get a nice BeforeSet(), AfterSet(), BeforeGet(), AfterGet() methods
+	- If I decorate a class with a subclass of ClassAttribute, I should get nice BeforeNew() AfterNew() BeforeMethodCall() AfterMethodCall() BeforeDispose() AfterDispose(), etc.
+	- Now we support aspect-oriented programming!  Logging a method call is as simple as:
+		[Log(LogOptions.ErrorOnly)]
+		public void DoFoo() {}
+ 
+ refs to almost everything:
+	Property refs
+	Method refs
+	Typerefs
+ 
+ typeof() not needed:
+	typeof(foo) == String instead of typeof(foo) == typeof(String)
+ 
+Typedef support with "alias":
+	alias MyCollection = List<SomeObject>;
+ 
+ Limited prototype support with alias:
+	void SomeMethod()
+	{
+		// I need a quick type
+		alias State { Name:string, Age:int };
+     
+		State s = new State();
+		s.Name = "Bob";
+		s.Age = 21;
+	}   // State no longer valid outside of enclosing scope
+	? Can we implement anonymous types internally as aliased types?
+ 
+ Expression trees (whole blocks as well as expressions)
+ 
+ Interface default implementations
+	- Two competing implementation ideas.  One is to be able to specify a 
+		default implementation when defining the interface, but this is a somewhat "impure" aproach
+	- Other idea is the following:
+		class SomeClass()
+		{
+			void NonInterfaceMethod() { /// }
+			
+			interface IFoo {
+				void DoFoo { // Actually do some foo here }
+				...
+			}
+			
+			interface IBar {
+			{
+				string Bar { get; protected set; }
+				string MakeBar() { return "bar"; }
+			}
+		}
+		Now the compiler generates IFoo and IBar interfaces.  Developer can factor them out into "proper" interfaces later
+	- Shortcut to above:
+		interface<SomeClass> IFooAndBar;	// Generates interface based on all public methods and properties of the given class
+		- Respects nester interface constructs, so IFooAndBar implicitly implements both IFoo and IBar in this example
+  
+ "this" modification:
+	using (this = myNewThis)
+	{
+		this.Foo();     // Refers to myNewThis.Foo();
+		Bar();          // Refers to myNewThis.Bar();
+		outer.Baz();    // Refers to original this.Baz();
+	} // This is restored here
+ 
+ mixins:
+	- Like extension methods but can apply to a particular object or collection of object only
+	mixin LinkedList(T)
+	{
+		T Next { get; set; }
+	}
+ 
+	string symbol = "foo";
+	mixin(symbol, LinkedList);
+	// Now I can do...
+	symbol.Next;
+ 
+ Optional last statement is return value
+ 
+ Message Passing (parenthesis less) style on function calls:
+	public void DoFoo(someDelegate d)
+	{
+		d();
+	}
+ 
+	// Now I can do this:
+	DoFoo {
+		// doing something that DoFoo will invoke
+	};
+ 
+ Named Parameters:
+	public void AddTwo(int first, int second);
+	AddTwo(first:1, second:2);
+	// Works great with message passing syntax
+	AddTwo first:1 second:2;
+ 
+ Return values for any scope block
+	The main use case for this is when you want to break out of multiply nested control structures.
+	Most of the time you either have to use an ugly goto or have control variables at each layer.  Failing that, 
+	you would have to extract into a function.  It would be nice to be able to do this:
+ 
+	void MyMethod()
+	{
+		//
+		// doing some stuff
+		//
+     
+		bool succeeded = {
+			foreach (var f in coll)
+			{
+				foreach (var g in f.coll)
+				{
+					while (true)
+					{
+						g = g.next;
+						if (g == null) return false;
+					}
+				}
+			}
+		}
+     
+		if (!succeeded) return;
+     
+		//
+		// Do some more stuff
+		//
+	}
+	
+A really cool preprocessor:
+	- Like C's preprocessor but on crack
+	- Supports regular expressions
+	- Hopefully more readable
+	- Use lessons learned from cool web templating engines
+		
+
+Bring back incremental building!
+	- New Linker: vlink, if necessary.  It's just a frontend to link that provides netter error messages
+	- vsc SomeFile.vs -> SomeFile.h, SomeFile.c -> SomeFile.o
+	- vsc OtherFile.vs -> OtherFile.h, OtherFile.c -> OtherFile.o
+	- vlink -o Program.exe SomeFile.o OtherFile.o -> Program.exe
+	- vlink can take regular object files, but knows if it's build from V# source and can provide better error messages, help fix things up,
+		or even provide V# proxy object files for cool stuff like COM-interop, DBus, XPCom, whatever
+
+Should we provide one "vs" switching exe, like git?
+	- vs [compile] sourcefiles [options]
+	- vs link ...
+	- vs test...
+	- etc...
+
+Duck Typing:
+	- Uses "as" specifier
+	// In some class:
+	public void ConfirmPrint(as IPrintable p)
+	{
+		if (!Alert("Are you sure you wish to print %s pages?", p.Pages))
+			return;
+			
+		p.PrintAll();
+	}
+	
+	// Somewhere else
+	ConfirmPrint(myObj);	// myObj's class doesn't need to be an IPrintable, it just needs to support
+							// the same properties and methods as an IPrintable
+
+	- Why can't we move the "as" into a cast, instead of having to specify it per method?
+		Because you want to let the method know that it can't possibly cast IPrintable to a real
+		object that inherits IPrintable
+		
+		- I don't know if this is correct.  I'm starting to think we may not need to do anything special
+			to support this.
+
+interface() operator:
+	- Used to treat a concrete class type as its own interface.  This will create an interface shim that will expose only the public properties and methods of the given concrete class
+	- Should we do deep analysis or shallow?
+		I'd imagine we'd need both.  We can have a "deep interface(FooClass)" keyword that goes all the way to the 
+		base class
+	- Can be used to quickly define interfaces:
+	
+		// Quickly create a synonym for an interface
+		typedef interface(MyClass) IMyClass;			// IMyClass can now be used as a real interface
+	
+		// Create the IMyClassPlus interface by automatically creating a MyClass interface, then extending it with another method
+		interface IMyClassPlus : interface(MyClass)	{
+			void SomeNewMethod()
+		}
+	
+	- VERY useful for duck typing.  When defining a method, you can specifiy that the class will only use the class as
+		an interface of itself and will not se fields, or weird casting, or such
+		
+		public void DoSomething(interface(MyClass) myClassInterface)	{
+			myClassInterface.SomeMethod();
+			myClassInterface.someField = true;		// Error: myClassInterface is not actually a reference to
+													//	a MyClass instance
+		}
+	
+		
+		
+Symbols:
+	- Just like in Ruby, use ":symbol" where a string is expected:
+		IPrintable myPrintableObject = printableObjectMap[:defaultViewObject];
+	- Show up in intellisense in their enclosing scope
+	- Kept in the _SYMBOLS table
+
+Automatic Properties:
+	- Like in C# 3.0, but with additional functionality
+	
+	// Normal automatic property
+	public string FirstName { get; set; }
+	
+	// Use of "field" keyword to get to the backing field
+	public string FirstName { get; set { FirePropertyChanged(); field = value; }}
+	
+	- This lets you incrementally build up a property.  With C#, it's all or nothing :-(
+	
+Special features for DSLs:
+	- The last statement of a block is implicitly its return
+	- Blocks can set their "this" pointer
+	- If a block is the last argument to a method call, it can be placed AFTER the parenthesis
+	- If a method only has one argument, the parenthesis can be left off
+	- Named parameters
+	
+	// Allows such syntax as:
+	HTML	{
+		Head { Title "My Webpage"; }
+		Body	{
+			P "Hello and welcome to my webpage";
+			BR;
+			P "I hope you like what you see";
+			
+			Table (BackColor = :green, Padding = "3px")	{
+				// More table stuff here
+			}
+		}
+	}
+	
+Support for IDynamicObject as in C# 4.0:
+	- Compiler doesn't complain about missing identifiers when method/property/field access is made to a
+		descendent of IDynamicObject.  Makes hard calls when possible, passes all others to IDynamicObject.* methods
+		
+NOTES FROM GOOGLE NOTEBOOK:
+
+- "Quick Reflection"
+    - Allows fieldref, propertyref, methodref, classref types
+    - Can pass in these with a natural syntax
+    - Quick because it just builds an index into the V-table
+    - Expression trees
+- Limited Duck Typing support with "as" modifier:
+    - void Print(as IPrintable printer) { printer.Print(); }
+    - Similar to Dynamic feature, but much faster, as the "as-ness" is checked at compile time.  Anything that
+        supports the same Properties and Methods of IPrintable can be passed in
+- Interfaces can have a "default" implementation.  Makes for fewer factory classes:
+	- TODO: Merge this concept with the "interface" keyword concept, above
+    - interface IPrintable (default BasePrinter)
+    - can specify the constructors needed to build the default IPrintable
+    - interfaces can have static methods
+    - in interface implementation, can call default.Method() to punt to default
+    - now you can say "IPrintable printer = new IPrintable(device, context);
+- Generic type constraints can include parameterized constructors
+- Implicit var (someNewVariable = 3; as well as var someNewVariable = 3;)
+- C# 4.0 syntax (including LINQ)
+- Better syntactical support for creation of DSLs (some ideas below)
+- JSON-style initialization of hash structures
+- Optional "last statement of method is return when type matches"
+- Simplify Lambda expressions for blocks with no parameters (can just use { ... }).  This combined with message passing (parenthesis-less calling) can give you stuff like:
+        HTML    {
+            Title "My Document";
+            Body    {
+                P "Where my bitches at?";
+            }
+        }
+        - For this to work, you need to be able to "rewrite" the this pointer when calling a block
+- Completely extendable and replaceable classes
+- Multiple return values (both named and positional?)
+- Native support for Ruby style symbols (:symbol)
+- Nested methods (with closures)
+- Support for message passing syntax as well as hard call syntax.  Message passing syntax uses named parameters.  Given:
+
+SomeObject MyFunc(int withCount:count, string byAppendingString:stringToAppend){}
+
+Can call:
+    - SomeObject obj = MyFunc(1, "three");
+    - SomeObject obj = MyFunc(withCount:3, "Four");
+    - SomeObject obj = MyFunc withCount:3 byAppendingString:"Four";
+
+- Immutable instances
+   Often, you want to declare certain instances of an object as read-only, rather than having to declare the class itself as readonly.
+   SomeObject o1 = new immutable SomeObject();
+   o1.SomeProperty = "Foo";        // Error: o1 is immutable
+   o2.SomeMethod();
+
+- Non-nullability.  Since we can drop to pointers when necessary, let's save the NULLs for that.  
+    - By default, all references are initialized to "default:
+        SomeObject obj = default;    // Same as "SomeObject obj";
+    - All classes have a default instance.  The one provided for you is just made up of the defaults of all its members
+    - Defaults are immutable, and we need language support for that.  See "immutable instances"
+
+	- We need to have full compatibility with C types, perhaps under the "C" namespace
+
+	- We can keep heap reference semantics, but there must be a way to declare objects on the stack.
+	    SomeObject obj = stackalloc SomeObject();
+	    obj.Whatever();
+	    return obj;    // What do we do here?
+
+	    I don't like this syntax.  What I'd like to do is:
+	        - Separate reference vs value semantics from heap vs stack semantics
+	        - ALL variables are "references", but ValueTypes overload the copy constructor, etc. so they always act like value types
+	        - ValueTypes can always be allocated on the stack, since they'd be copied out of the stack frame anyway (unless declared as ref?)
+	        - ReferenceTypes will be allowed to be declared on the stack with the "local" keyword.  This is better than "stackalloc" because it is declaring what we mean semantically: that this variable's influence never leaves the function.  Stack allocation is just a good optimization that the compiler can make because of that fact.  It's also harmless to use it on value types and non conforming compilers, for example, since it doesn't actually promise an allocation strategy:
+
+	            SomeObject obj = new SomeObject();            // Obj is allocated on the heap
+	            local SomeObject o2 = new SomeObject();     // Obj is "most likely" allocated on the stack
+	            obj.Parent = o2;                                            // Error: cannot assign a local object to a non-local reference    
+
+
+	- Is there some middle ground between "managed" and "unsafe"?
+	    - Can we "drop to pointer semantics" whenever we want?  Or do we have to do that inside an "unsafe"-type block?
+	    - Why call it unsafe?  Why not just allow you to declare a pinned object and then do pointer arithmetic on it?
+	        unmanaged SomeObject obj = new SomeObject();    // SomeObject is allocated in the unmanaged store.  It will not be garbage collected or moved
+	        SomeObject* pObj = &obj;
+	        pObj->SomeMethod();
+	        (pObj + 2)->SomeMethod();                                     // Will probably crash, but we'll assume the user knows what they're doing
+
+- Standard Library
+    - What would be nice is if there could be different "standard libraries" that shared some common base types
+    - For example:
+        -    Posix.stdio.printf()
+        -    JVM.system.out.WriteLn()
+        -    CLR.System.Console.WriteLine()
+        -    CF.NSLog()
+    - There is no "preferred" standard library, but there would be some standard types:
+        - int, char, double, float, long, bool, string, void, etc.
+        - These wouldn't be objects, but they could behave like objects with extension methods (an int is an int)
+    

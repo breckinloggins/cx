@@ -20,8 +20,9 @@
 [X]	Remove ProgramBody element.  Programs will need to explicitly declare a main function
 [X]	First pass for dropping to other languages with a _<language>_ {} syntax.  Start with _C_ { fprintf("hi!"); } and
 	directly output with the code generator
+[X]	Create GitHub repository
+[X]	Collect all the feature specs from various sources, clean up, put in FEATURES document
 []	When generating C code, append namespace to variables and functions
-[]	Collect all the feature specs from various sources, clean up, put in FEATURES document
 []	BUG: readChar() should be an expression, not a statement
 []	BUG: Functions are allowed to not have the right return type as the last statement
 []	Rename base types to C-type names
@@ -55,3 +56,7 @@
 []	Add more test files and create a testing framework with CMake/CTest
 []	Add /// comment that clings to closest program unit
 []	Define standard ABI, C-macros, etc.
+[]	Define way to expose a C function interface manually.
+		// Define C convenience function
+		"C" string accessFoo()	{ // Do some Cx stuff here.  C caller will see the return as an ARRAY struct }
+[]	Rewrite README to be more public-oriented

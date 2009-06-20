@@ -1,0 +1,28 @@
+Cx - C' (C Prime) was unfortunately taken, and even though the project is dead, I don't want to steal the name
+
+Vala - Coolest idea ever, but has some downsides: Unix-centric, Gnome-centric
+
+I want to replace C as the systems programming language of choice, so my idea is C#:
+    - Fully Open Source
+    - Compiles to plain C (as terse yet readable as possible [ideas should be terse, identifiers readable])
+    - Generates the smallest and most equivalent C Code possible
+        - One thing we need for this is layered functionality.  As an example, if a programmer declares an int, it should just be an "int" if we never do anything super fancy.  Or we could use extension methods to extend basic types.
+    - Native support on Linux, Windows, and Mac OS X
+    - Small, efficient runtime built in to emitted C code
+    - Runtime can be disabled, resulting in reduced feature set but faster code
+    - Backward compatible with Vala and C.  Can write C anywhere and it will Do The Right Thing - UPDATE: This may cause more trouble than it's worth
+    - Produces small executables.  If using the V# Libraries, only pulls in the bare minimum it needs ("using System" doesn't pull in 8MB of crap)
+    - Originally written in vala but should be self-hosting.
+    - Should be able to compile V# and use the native libraries anywhere there's a C compiler and a POSIX subsystem.  Windows will be treated specifically at the start, so there are no issues with that platform
+    - Doesn't throw out the baby with the bath water.  We have enough "safe" languages.  Cx is defined for real programmers who do real programming.  Among the examples of this:
+        - statements can go in if statements.  If you want to do if ((p = alloc_new_p()) != null) { // ... } you can.  Note that if statements must still evaulate to bool, so you'll have to do the explicit comparison, but you don't have to put the assignment on another line
+        - case statements can fall through with no issues.  If you miss a break, that's your fault
+        - you can drop into pointers if you need
+        - type punning will still be possible, because struct and class layouts will be well-defined and reliable
+        - the general guiding principle is: safe by default, but no straightjackets
+
+Compactness:
+
+		I read an article today about D.  It was a counterpoint to an earlier piece arguing in favor of the language.  One of the best things out of the article was its argument against the assertion that D was the next "systems programming language."  The point was made that you would never think of writing a kernel in D or using it for embedded systems, because the executables it produces are much too large.
+
+		This, to me, re-emphasizes one of the primary goals of Cx: stay close to C.  The point of Cx is to bring a modern feel and modern capabilities to C, without all the baggage of C++.  But, in general, it's extremely important to structure the runtime of Cx to be as small as possible, and to only pull in the bare minimum requested by the programmer.
