@@ -22,13 +22,13 @@
 	directly output with the code generator
 [X]	Create GitHub repository
 [X]	Collect all the feature specs from various sources, clean up, put in FEATURES document
-[]	When generating C code, append namespace to variables and functions
+[]	BUG: statements are inserted into the AST backward
 []	BUG: readChar() should be an expression, not a statement
 []	BUG: Functions are allowed to not have the right return type as the last statement
-[]	Rename base types to C-type names
-[]	BUG: statements are inserted into the AST backward
 []	BUG: function parameters aren't supported and are still Pascal syntax
 []	BUG: access modifiers on function declarations should be optional
+[]	When generating C code, append namespace to variables and functions
+[]	Rename base types to C-type names
 []	Add Flex/Bison support to CMake file
 []	Parse the input file name to create good output intermediate and executable names
 []	Allow declaration of vars inside a statement block
@@ -44,6 +44,8 @@
 []	Test and fix issues with if statments/for loops/while loops
 	[] BUG: if statement doesn't allow blocks
 	[] BUG: Grammar has insane complexity on if/then statements
+[]	Add bitwise operators
+[]	Add ternary operator
 []	Add do/while
 []	Add break/continue statements
 []	Add switch statement
