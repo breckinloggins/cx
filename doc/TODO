@@ -68,3 +68,4 @@
 		// Define C convenience function
 		"C" string accessFoo()	{ // Do some Cx stuff here.  C caller will see the return as an ARRAY struct }
 []	Rewrite README to be more public-oriented
+[]	Get Cx compiling under Windows
