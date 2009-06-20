@@ -22,13 +22,16 @@ namespace helloworld
 	
 	public integer main()
 	{
+		
 		_C_ {
 			int a = 0;
 			a += 1;
 			fprintf(stderr, "Number: %d\n", a);
 		};
 		
-		//readChar();
+		someChar = ';';
+		
+		readChar();
 		printChar('H');
 		printChar('e');
 		printChar('l');
@@ -48,17 +51,18 @@ namespace helloworld
 		printChar(someChar);
 		printChar(getSomeChar());
 	
-		/* -- This doesn't work
 		if (someChar == '!')	{
 			printChar('#');
 			printLn();
 		}
-		*/
 		
-		// But this does
-		if (someChar == '!') printChar('#');
+		char otherChar;
+		otherChar = 'f';
+		if (otherChar == 'f') printChar('#');
 			
 		printLn();
+		
+		return 0;
 	}
 }
 

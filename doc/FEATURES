@@ -423,4 +423,62 @@ Can call:
     - There is no "preferred" standard library, but there would be some standard types:
         - int, char, double, float, long, bool, string, void, etc.
         - These wouldn't be objects, but they could behave like objects with extension methods (an int is an int)
+
+Sections (fine-grained scope resultion):
+
+	- Idea from: http://blog.mozilla.com/nnethercote/2009/06/19/what-i-currently-hate-most-about-c/
+	- Problem is that, as classes get big, each field in the class is essentially a global variable to the class, 
+		but sometimes you have whole parts of the class that are concerned only with each other, but you don't really 
+		want to break them out into a separate class
+
+	- Sections are scope delimiters within classes
+
+	public class MyBigClass
+	{
+		// Implicit outer section starts here
+
+		// All of the class can see these
+		private bool m_bIsInitialized;
+		private int m_nAccessorCount;
+
+		// "Explicit" means outside access must happen through myBigClass.SectionName.Method()
+		//	rather than myBigClass.Method()
+		explicit section Initialization	{
+			private bool m_bIsInitializedWithState;			// Can only be seen within this section
+			protected string m_strSecurityToken;			// Can be seen by this section and
+																	// 	the enclosing section, but not outside that
+			public bool IsInitializedWithState { get; set; }// Can be seen by the outside world
+
+			private void DoInitializationDirtyWork() {...}	// Can only be used inside this section
+			protected bool InitializeCore() {...}			// Can be seen outside the helper and overridden
+			public void InitializeWithToken(string token)...// Can be seen by the outside world
+		}
+	}
+
+	- These would take the place of C#'s "regions".  Why have a region that does nothing when you could add semantic
+		behavior?
+		
+	- Sections can be nested.  Why not?  
+	- Sections can be put inside statement blocks and can return values when that is done
+	- Sections can be anonymous
+	
+	This allows the other feature I wanted, albeit with different syntax:
     
+	bool foundIt = section	{
+		bool found = false;		// Default is private
+		while (!found)	{
+			// Some
+				// Deeply
+					// Nested
+						// Loop
+							// Logic
+								// Here
+								if (found) 
+									local return true;
+		}
+		
+		local return false;
+	}
+	
+	if (found)
+		Console.WriteLine("I found it!");

@@ -88,9 +88,6 @@ AstNode* ast;
 %type <astnode> NamespaceDecl
 %type <astnode> VarDeclList
 %type <astnode> VarDecl
-%type <astnode> IdentifierList
-%type <astnode> MultiIdentifier
-%type <astnode> SingleIdentifier
 
 %type <astnode> FunctionList
 %type <astnode> MultiFunctionDecl
@@ -99,13 +96,14 @@ AstNode* ast;
 %type <astnode> SingleParam
 %type <astnode> MultiParam
 
-%type <astnode> Statements
-%type <astnode> StatementList
+%type <astnode> LocalVariableDeclarationsAndStatements
+%type <astnode> LocalVariableDeclarationOrStatement
+
 %type <astnode> Statement
-%type <astnode> StatementMatched
-%type <astnode> StatementUnmatched
+%type <astnode> EmptyStatement
+%type <astnode> AssignmentStatement
+%type <astnode> ExpressionStatement
 %type <astnode> IfStatement
-%type <astnode> IfStatementMatched
 %type <astnode> WhileStatement
 %type <astnode> ForStatement
 %type <astnode> PrintStatement
@@ -116,6 +114,7 @@ AstNode* ast;
 %type <astnode> ReadCharStatement
 %type <astnode> CBlockStatement
 %type <astnode> ReturnStatement
+%type <astnode> Block
 
 %type <astnode> Expression
 %type <astnode> SimpleExpression
@@ -124,9 +123,7 @@ AstNode* ast;
 %type <astnode> Term
 
 %type <astnode> Call
-%type <astnode> CallParamList
-%type <astnode> CallParameter
-%type <astnode> MultiCallParameter
+%type <astnode> ParameterList
 
 %type <astnode> Assignment
 %type <astnode> Identifier
@@ -186,36 +183,12 @@ VarDeclList:
 
 
 VarDecl:
-	TYPE_IDENTIFIER IdentifierList
+	TYPE_IDENTIFIER Identifier
 	{
 		AstNode* ast_node = ast_node_new("VarDecl", VARDECL, $1, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $2);
 		$$ = ast_node;
 	}
-	;
-
-
-IdentifierList:
-	SingleIdentifier MultiIdentifier
-	{
-		AstNode* ast_node = ast_node_new("IdentifierList", IDENT_LIST, VOID, yylloc.last_line, NULL);
-		ast_node_add_sibling($1, $2);
-		ast_node_add_child(ast_node, $1);
-		$$ = ast_node;
-	}
-	;
-
-MultiIdentifier:
-	/* empty */	 { $$ = NULL; }
-	| T_COMMA SingleIdentifier MultiIdentifier
-	{
-		ast_node_add_sibling($2, $3);
-		$$ = $2;
-	}
-	;
-	
-SingleIdentifier:
-	Identifier { $$ = $1; }
 	;
 
 FunctionList:
@@ -240,15 +213,13 @@ MultiFunctionDecl:
 	
 FunctionDecl:
 	/* HACK: T_PUBLIC is here just to avoid some shift/reduce conflicts for the time being */
-	T_PUBLIC TYPE_IDENTIFIER SingleIdentifier T_LPAR ParamList T_RPAR
-	T_LBRACK VarDeclList StatementList T_RBRACK
+	T_PUBLIC TYPE_IDENTIFIER Identifier T_LPAR ParamList T_RPAR Block
 	{
 		Symbol* symtab;
 		AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, $2, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $3);	// Identifier
 		ast_node_add_child(ast_node, $5);	// ParamList
-		ast_node_add_child(ast_node, $8);	// VarDeclList
-		ast_node_add_child(ast_node, $9);	// Statements
+		ast_node_add_child(ast_node, $7);	// Block
 
 		ast_node->symbol = symbol_new(NULL);
 		$$ = ast_node;
@@ -282,74 +253,63 @@ SingleParam:
 		$$ = ast_node;
 	}
 	;
-	
-Statements:
-	Statement { $$ = $1; }
-	| T_LBRACK StatementList T_RBRACK { $$ = $2; }
+
+Block:
+	T_LBRACK LocalVariableDeclarationsAndStatements T_RBRACK { $$ = $2; }
+	| T_LBRACK T_RBRACK {$$ = NULL; }
 	;
-
-StatementList:
-	/* empty */ { $$ = NULL; }
-	| Statement
-	{
-		AstNode* ast_node = ast_node_new("StatementList", STATEMENT_LIST, VOID, yylloc.last_line, NULL);
+	
+LocalVariableDeclarationsAndStatements:
+	LocalVariableDeclarationOrStatement 
+	{ 
+		AstNode* ast_node = ast_node = ast_node_new("StatementList", STATEMENT_LIST, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $1);
-
-		$$ = ast_node;
+		$$ = ast_node; 
 	}
-	| Statement T_SEMICOLON StatementList
+	| LocalVariableDeclarationsAndStatements LocalVariableDeclarationOrStatement 
 	{
-		AstNode* ast_node = $3;
+		AstNode* ast_node = $1;
 		if (!ast_node)	{
 			ast_node = ast_node_new("StatementList", STATEMENT_LIST, VOID, yylloc.last_line, NULL);
 		}
-		ast_node_add_child(ast_node, $1);
+		
+		ast_node_add_child(ast_node, $2);
 		$$ = ast_node;
 	}
 	;
 
-Statement:
-	StatementMatched { $$ = $1; }
-	| StatementUnmatched { $$ = $1; }
-	| T_SEMICOLON	{ $$ = NULL; }
+LocalVariableDeclarationOrStatement:
+	VarDecl T_SEMICOLON { $$ = $1; }
+	| Statement { $$ = $1; }
 	;
-
-StatementMatched:
-	Assignment { $$ = $1; }
-	| IfStatementMatched { $$ = $1; }
+	
+Statement:
+	EmptyStatement { $$ = NULL; }
+	| AssignmentStatement { $$ = $1; }
+	| ExpressionStatement { $$ = $1; }
+	| IfStatement { $$ = $1; }
 	| WhileStatement { $$ = $1; }
 	| ForStatement { $$ = $1; }
-	| Call { $$ = $1; }
 	| PrintStatement { $$ = $1; }
 	| ReturnStatement { $$ = $1; }
 	| ReadCharStatement { $$ = $1; }
 	| CBlockStatement { $$ = $1; }
+	| Block { $$ = $1; }
 	;
 
-StatementUnmatched:
-	IfStatement { $$ = $1; }
-	| T_IF T_LPAR Expression T_RPAR StatementMatched T_ELSE StatementUnmatched
-	{
-		AstNode* ast_node = ast_node_new("IfStatement", IF_STMT, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $3);	// Expression
-		ast_node_add_child(ast_node, $5);	// StatementMatched
-		ast_node_add_child(ast_node, $7);	// StatementUnmatched
-		$$ = ast_node;
-	}
+EmptyStatement:
+	T_SEMICOLON	{ $$ = NULL; }
 	;
 
 IfStatement:
-	T_IF T_LPAR Expression T_RPAR Statements
+	T_IF T_LPAR Expression T_RPAR Statement
 	{
 		AstNode* ast_node = ast_node_new("IfStatement", IF_STMT, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $3);	// Expression
 		ast_node_add_child(ast_node, $5);	// Statements
 		$$ = ast_node;
 	}
-	;
-	
-IfStatementMatched:
-	T_IF T_LPAR Expression T_RPAR StatementMatched T_ELSE StatementMatched
+	| T_IF T_LPAR Expression T_RPAR Statement T_ELSE Statement
 	{
 		AstNode* ast_node = ast_node_new("IfStatement", IF_STMT, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $3);	// Expression
@@ -358,7 +318,7 @@ IfStatementMatched:
 		$$ = ast_node;
 	}
 	;
-	
+		
 PrintStatement:
 	PrintIntStatement { $$ = $1; }
 	| PrintCharStatement { $$ = $1; }
@@ -417,17 +377,21 @@ CBlockStatement:
 	}
 
 ReturnStatement:
-	T_RETURN
+	T_RETURN T_SEMICOLON
 	{
 		AstNode* ast_node = ast_node_new("ReturnStatement", RETURN_STMT, VOID, yylloc.last_line, NULL);
 		$$ = ast_node;
 	}
-	| T_RETURN Expression
+	| T_RETURN Expression T_SEMICOLON
 	{
 		AstNode* ast_node = ast_node_new("ReturnStatement", RETURN_STMT, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $2);
 		$$ = ast_node;
 	}
+	;
+
+AssignmentStatement:
+	Assignment T_SEMICOLON { $$ = $1; }
 	;
 	
 Assignment:
@@ -441,7 +405,7 @@ Assignment:
 	;
 
 WhileStatement:
-	T_WHILE T_LPAR Expression T_RPAR Statements
+	T_WHILE T_LPAR Expression T_RPAR Statement
 	{
 		AstNode* ast_node = ast_node_new("WhileStatement", WHILE_STMT, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $3);
@@ -451,7 +415,7 @@ WhileStatement:
 	;
 	
 ForStatement:
-	T_FOR T_LPAR Assignment T_TO Expression T_RPAR Statements
+	T_FOR T_LPAR Assignment T_TO Expression T_RPAR Statement
 	{
 		AstNode* ast_node = ast_node_new("ForStatement", FOR_STMT, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $3);	// Assignment
@@ -459,6 +423,10 @@ ForStatement:
 		ast_node_add_child(ast_node, $7);	// Statements
 		$$ = ast_node;
 	}
+	
+ExpressionStatement:
+	Expression T_SEMICOLON	{ $$ = $1; }
+	;
 	
 Expression:
 	SimpleExpression { $$ = $1; }
@@ -518,40 +486,39 @@ Factor:
 	;
 	
 Call:
-	Identifier T_LPAR CallParamList T_RPAR
+	Identifier T_LPAR ParameterList T_RPAR
 	{
 		AstNode* ast_node = ast_node_new("Call", CALL, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $1);	// Identifier
 		ast_node_add_child(ast_node, $3);	// Parameters
 		$$ = ast_node;
 	}
-	;
-	
-CallParamList:
-	/* empty */	 { $$ = NULL; }
-	| CallParameter MultiCallParameter
+	| Identifier T_LPAR T_RPAR
 	{
-		AstNode* ast_node = ast_node_new("CallParamList", CALLPARAM_LIST, VOID, yylloc.last_line, NULL);
-		ast_node_add_sibling($1, $2);
-		ast_node_add_child(ast_node, $1);
+		AstNode* ast_node = ast_node_new("Call", CALL, VOID, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $1);	// Identifier
 		$$ = ast_node;
 	}
 	;
 	
-MultiCallParameter:
-	/* empty */ { $$ = NULL; }
-	| T_COMMA CallParameter MultiCallParameter
-	{
-		ast_node_add_sibling($2, $3);
-		$$ = $2;
-	}
-	;
-	
-CallParameter:
+ParameterList:
 	Expression
 	{
 		AstNode* ast_node = ast_node_new("CallParameter", CALLPARAM, ((AstNode*)$1)->type, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $1);
+		$$ = ast_node;
+	}
+	| ParameterList T_COMMA Expression
+	{
+		AstNode* ast_node = $1;
+		if (!ast_node)	{
+			ast_node = ast_node_new("CallParamList", CALLPARAM_LIST, VOID, yylloc.last_line, NULL);
+		}
+		
+		// TODO: Is this extra bit of indirection really necessary?
+		AstNode* param_node = ast_node_new("CallParameter", CALLPARAM, ((AstNode*)$1)->type, yylloc.last_line, NULL);
+		ast_node_add_child(param_node, $3);
+		ast_node_add_child(ast_node, param_node);
 		$$ = ast_node;
 	}
 	;

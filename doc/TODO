@@ -22,7 +22,13 @@
 	directly output with the code generator
 [X]	Create GitHub repository
 [X]	Collect all the feature specs from various sources, clean up, put in FEATURES document
-[]	BUG: statements are inserted into the AST backward
+[X]	Test and fix issues with if statments
+	[X] BUG: if statement doesn't allow blocks
+	[X] BUG: Grammar has insane complexity on if/then statements
+[X]	BUG: statements are inserted into the AST backward
+[X]	Allow declarations and statements to be intermingled
+[]	BUG: Graph visitor complains about invalid return statements
+[]	Test all control and loop structures
 []	BUG: readChar() should be an expression, not a statement
 []	BUG: Functions are allowed to not have the right return type as the last statement
 []	BUG: function parameters aren't supported and are still Pascal syntax
@@ -41,9 +47,6 @@
 []	Add class type
 []	Add enum type
 []	Add a temporary getLine statement
-[]	Test and fix issues with if statments/for loops/while loops
-	[] BUG: if statement doesn't allow blocks
-	[] BUG: Grammar has insane complexity on if/then statements
 []	Add bitwise operators
 []	Add ternary operator
 []	Add do/while
@@ -53,7 +56,6 @@
 []	Add support for IEEE floating point notation (e notation)
 []  Add support for symbols (: syntax)
 []	Add support for named parameters (parameterName = value syntax)
-[]	Allow declarations and statements to be intermingled
 []	Replace built in I/O statements with a standard environment
 []	Add more test files and create a testing framework with CMake/CTest
 []	Add /// comment that clings to closest program unit

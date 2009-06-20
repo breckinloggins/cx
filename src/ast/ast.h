@@ -29,7 +29,6 @@ typedef struct Visitor_tag	{
 	VISITOR_PFN(visit_NamespaceDecl);
 	VISITOR_PFN(visit_vardecl_list);
 	VISITOR_PFN(visit_vardecl);
-	VISITOR_PFN(visit_identifier_list);
 	VISITOR_PFN(visit_identifier);
 	VISITOR_PFN(visit_function_list);
 	VISITOR_PFN(visit_function);

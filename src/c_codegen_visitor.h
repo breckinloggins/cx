@@ -14,7 +14,6 @@ C_VISITOR(function_list);
 C_VISITOR(function);
 C_VISITOR(vardecl_list);
 C_VISITOR(vardecl);
-C_VISITOR(identifier_list);
 C_VISITOR(param_list);
 C_VISITOR(parameter);
 C_VISITOR(statement_list);

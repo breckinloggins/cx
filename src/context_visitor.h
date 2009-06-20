@@ -38,7 +38,6 @@ CTX_VISITOR(notfactor);
 CTX_VISITOR(call);
 CTX_VISITOR(callparam_list);
 CTX_VISITOR(callparam);
-CTX_VISITOR(identifier_list);
 CTX_VISITOR(identifier);
 
 #endif	// CONTEXT_VISITOR_H

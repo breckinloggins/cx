@@ -138,9 +138,6 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 		case VARDECL:
 			visit = visitor->visit_vardecl;
 			break;
-		case IDENT_LIST:
-			visit = visitor->visit_identifier_list;
-			break;
 		case FUNCTION_LIST:
 			visit = visitor->visit_function_list;
 			break;

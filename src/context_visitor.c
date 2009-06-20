@@ -46,7 +46,6 @@ Visitor* context_new()
 	V_INIT(call, call);
 	V_INIT(callparam_list, callparam_list);
 	V_INIT(callparam, callparam);
-	V_INIT(identifier_list, identifier_list);
 	V_INIT(identifier, identifier);
 	
 	visitor->visit_printline_stmt = NULL;
@@ -130,7 +129,9 @@ CTX_VISITOR(vardecl_list)
 CTX_VISITOR(vardecl)
 {
 	node->children->type = node->type;
+	node->children->symbol->decl_linenum = node->linenum;
 	ast_node_accept(node->children, visitor);
+	
 }
 
 CTX_VISITOR(param_list)
@@ -385,17 +386,6 @@ CTX_VISITOR(callparam)
 {
 	ast_node_accept(node->children, visitor);
 	node->type = node->children->type;
-}
-
-CTX_VISITOR(identifier_list)
-{
-	AstNode* child;
-	
-	for (child = node->children; (child); child = child->sibling)	{
-		child->type = node->type;
-		child->symbol->decl_linenum = node->linenum;
-		ast_node_accept(child, visitor);
-	}
 }
 
 CTX_VISITOR(identifier)

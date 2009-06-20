@@ -26,7 +26,6 @@ Visitor* c_codegen_new(FILE* output)
 	V_INIT(NamespaceDecl, NamespaceDecl);
 	V_INIT(vardecl_list, vardecl_list);
 	V_INIT(vardecl, vardecl);
-	V_INIT(identifier_list, identifier_list);
 	V_INIT(function_list, function_list);
 	V_INIT(function, function);
 	V_INIT(param_list, param_list);
@@ -113,16 +112,11 @@ C_VISITOR(function)
 	
 	fprintf(out, ")\n{\n");
 		
-	if (child->kind == VARDECL_LIST)	{
-		ast_node_accept(child, visitor);
-		child = child->sibling;
-	}
-	
 	fprintf(out, "\n");
-	
+
 	ast_node_accept(child, visitor);
 	
-	fprintf(out, "}\n\n");
+	fprintf(out, "\n}\n\n");
 }
 
 C_VISITOR(vardecl_list)
@@ -135,20 +129,9 @@ C_VISITOR(vardecl)
 {
 	const char* type = _get_type_string(node->type);
 	
-	fprintf(out, TAB"%s ", type);
+	fprintf(out, "%s ", type);
 	ast_node_accept(node->children, visitor);
 	fprintf(out, ";\n");
-}
-
-C_VISITOR(identifier_list)
-{
-	AstNode* child;
-	
-	for (child = node->children; (child); child = child->sibling)	{
-		ast_node_accept(child, visitor);
-		if (child->sibling != NULL)
-			fprintf(out, ", ");
-	}
 }
 
 C_VISITOR(param_list)
@@ -354,9 +337,12 @@ C_VISITOR(not_op)
 
 static void _tab(AstNode* node)
 {
+	// TODO: Replace with sane tabbing
+	/*
 	AstNode* parent;
 	for (parent = node->parent; parent->parent != NULL; parent = parent->parent)
 		fprintf(out, TAB);
+	*/
 }
 
 static char* _get_type_string(Type type)
