@@ -28,7 +28,7 @@
 [X]	BUG: statements are inserted into the AST backward
 [X]	Allow declarations and statements to be intermingled
 [X]	Better handling of semicolons in generated C-code
-[]	BUG: readChar() should be an expression, not a statement
+[X]	BUG: readChar() should be an expression, not a statement
 []	Refactor variable declaration syntax and add support for assignments on the same line
 []	BUG: Functions are allowed to not have the right return type as the last statement
 []	BUG: function parameters aren't supported and are still Pascal syntax
