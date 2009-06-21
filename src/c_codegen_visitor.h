@@ -1,7 +1,7 @@
 #ifndef C_CODEGEN_VISITOR_H
 #define C_CODEGEN_VISITOR_H
 
-#include "ast/ast.h"
+#include "ast.h"
 
 #define TAB			"    "
 #define	C_VISITOR(kind)		void c_codegen_visit_##kind(Visitor* visitor, AstNode* node)

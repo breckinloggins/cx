@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "common/memory.h"
-#include "parser.tab.h"
+#include "parser.h"
 #include "c_codegen_visitor.h"
 
 #define V_INIT(lhs, rhs)	visitor->visit_##lhs = &c_codegen_visit_##rhs			

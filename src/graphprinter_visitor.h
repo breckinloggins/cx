@@ -1,7 +1,7 @@
 #ifndef GRAPHPRINTER_VISITOR_H
 #define GRAPHPRINTER_VISITOR_H
 
-#include "ast/ast.h"
+#include "ast.h"
 
 #define COLOR_FILL_GLOBAL  "\"#EEEEEE\""
 #define COLOR_FILL_LOCAL   "\"#CAE7FF\""

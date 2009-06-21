@@ -5,8 +5,8 @@
  *	Routines for construction and manipulation of the Cx Abstract Syntax Tree
  */
 
-#include "../base.h"
-#include "../symbol_table.h"
+#include "base.h"
+#include "symbol_table.h"
 
 #define VISITOR_PFN(fn)		void (*fn) (struct Visitor_tag*, struct AstNode_tag *)
 

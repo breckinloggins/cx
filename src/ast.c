@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/memory.h"
+#include "common/memory.h"
 #include "ast.h"
-#include "../parser.tab.h"
+#include "parser.h"
 
 AstNode* ast_node_new(const char* name, Kind kind, Type type, int linenum, Symbol* symbol)
 {

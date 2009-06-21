@@ -6,8 +6,8 @@
 #include <string.h>
 
 #include "common/memory.h"
-#include "ast/ast.h"
-#include "parser.tab.h"
+#include "ast.h"
+#include "parser.h"
 #include "context_visitor.h"
 #include "c_codegen_visitor.h"
 #include "graphprinter_visitor.h"

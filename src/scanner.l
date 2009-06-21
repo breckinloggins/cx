@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include "base.h"
-#include "parser.tab.h"
+#include "parser.h"
 
 #define uploc	{ yylloc->first_column = yylloc->last_column + 1; yylloc->last_column += yyleng; }
 

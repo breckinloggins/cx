@@ -5,7 +5,7 @@
  *  AST Visitor that performs contextual analysis like type checking
  */
 
-#include "ast/ast.h"
+#include "ast.h"
 #include "base.h"
 #include "symbol_table.h"
 

@@ -4,8 +4,8 @@
 #include <string.h>
 #include <unistd.h>
 #include "base.h"
-#include "parser.tab.h"
-#include "ast/ast.h"
+#include "parser.h"
+#include "ast.h"
 #include "symbol_table.h"
 
 #define YYDEBUG 1
@@ -15,7 +15,6 @@ extern FILE *yyin;
 static void yyerror(const char* msg);
 
 AstNode* ast;
-	
 %}
 
 %defines

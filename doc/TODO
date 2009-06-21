@@ -35,13 +35,13 @@
 [X]	BUG: Functions are allowed to not have the right return type as the last statement
 [X]	BUG: Graph visitor complains about invalid return statements
 [X]	Rename base types to C-type names
+[X]	Add Flex/Bison support to CMake file
 []	BUG: function parameters aren't supported and are still Pascal syntax
 []	BUG: access modifiers on function declarations should be optional
 []	Refactor variable declaration syntax and add support for assignments on the same line
 []	Test all control and loop structures
 []	When generating C code, append namespace to variables and functions
 []	Add proper tabbing when generating C Code
-[]	Add Flex/Bison support to CMake file
 []	Parse the input file name to create good output intermediate and executable names
 []  Add feature where type of last expression in function will be the return value of
 	that function

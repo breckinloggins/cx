@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include "common/memory.h"
-#include "parser.tab.h"
+#include "parser.h"
 #include "context_visitor.h"
 
 static Type declared_type = VOID;
