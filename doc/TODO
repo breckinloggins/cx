@@ -34,7 +34,7 @@
 [X]	Don't allow void variables
 [X]	BUG: Functions are allowed to not have the right return type as the last statement
 [X]	BUG: Graph visitor complains about invalid return statements
-[]	Rename base types to C-type names
+[X]	Rename base types to C-type names
 []	BUG: function parameters aren't supported and are still Pascal syntax
 []	BUG: access modifiers on function declarations should be optional
 []	Refactor variable declaration syntax and add support for assignments on the same line
