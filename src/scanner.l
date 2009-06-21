@@ -42,7 +42,7 @@
 							}
 "namespace"					{ uploc; return T_NAMESPACE; }	
 "var"						{ uploc; return T_VAR; }
-"integer"|"boolean"|"char"|"double"|"float"			{ uploc;
+"int"|"bool"|"char"|"double"|"float"|"void"			{ uploc;
 							  						yylval->type = type_get_from_lexeme(yytext); 
 							  						return TYPE_IDENTIFIER; 
 													}

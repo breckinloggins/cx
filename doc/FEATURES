@@ -234,14 +234,21 @@ Bring back incremental building!
 	- vlink can take regular object files, but knows if it's build from V# source and can provide better error messages, help fix things up,
 		or even provide V# proxy object files for cool stuff like COM-interop, DBus, XPCom, whatever
 
-Should we provide one "vs" switching exe, like git?
-	- vs [compile] sourcefiles [options]
-	- vs link ...
-	- vs test...
-	- etc...
+Support multiple return values:
+	- The syntax should be something like
+	<int, bool> SomeMethod()	{ ... }
+	
+	<int, bool> foo = SomeMethod();
+	if (foo<bool>)	{
+		print(foo<int>);
+	}
+	
+	- So obviously what we really want to do is come up with some primitive type construct in the language for which
+	this falls out more-or-less naturally.  But there's nothing firm at this point
+	
 
 Duck Typing:
-	- Uses "as" specifier
+	- Uses "as" specifier (maybe)  see below
 	// In some class:
 	public void ConfirmPrint(as IPrintable p)
 	{

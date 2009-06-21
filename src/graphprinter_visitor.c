@@ -34,6 +34,7 @@ graphprinter_new(FILE* output)
     visitor->visit_if_stmt = &graphprinter_visit_simplenode;
     visitor->visit_while_stmt = &graphprinter_visit_simplenode;
     visitor->visit_for_stmt = &graphprinter_visit_simplenode;
+	visitor->visit_return_stmt = &graphprinter_visit_simplenode;
 	visitor->visit_readchar_expr = &graphprinter_visit_simplenode;
 	visitor->visit_rel_expr = &graphprinter_visit_binary_expr;
     visitor->visit_add_expr = &graphprinter_visit_binary_expr;

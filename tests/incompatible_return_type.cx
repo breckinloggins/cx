@@ -1,0 +1,25 @@
+namespace incompatible_return_type_test	{
+	
+	public void doNothing()	{
+		// Shouldn't throw an error, as the compiler knows that void functions don't need returns
+	}
+	
+	public char doesReturnChar()	{
+		return 'C';			// This should be fine
+	}
+	
+	public char doesntReturnChar()	{
+		return 77;			// Error: return must be of type char
+	}
+	
+	public int multiReturns()	{
+		
+		if (true)	{
+			return 7;
+		} else if (false) {
+			return 'a';		// Should get error here
+		}
+		
+		return 42;
+	}
+}

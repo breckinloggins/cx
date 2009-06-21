@@ -88,7 +88,6 @@ CTX_VISITOR(function_list)
 	ast_node_accept_children(node->children, visitor);
 	
 	symtab = global_symtab;
-	_inside_procfunc = NULL;
 }
 
 CTX_VISITOR(function)
@@ -109,13 +108,34 @@ CTX_VISITOR(function)
 	
 	ast_node_accept(ident, visitor);
 	
+	int has_return = 0;
+	
 	// ParamList, VarDeclList, Statements
 	symtab = node->symbol;
 	for (child = ident->sibling; (child); child = child->sibling)	{
 		if (child->kind == PARAM_LIST)
 			child->symbol = ident->symbol;
 		ast_node_accept(child, visitor);
+	
+		if (child->kind == STATEMENT_LIST)	{
+			// It is important that all the "returns" in the function have a return
+			// type compatible with the function itself
+			AstNode* stmt;
+			for (stmt = child->children; (stmt); stmt = stmt->sibling)	{
+				if (stmt->kind == RETURN_STMT)	{
+					has_return = 1;
+					break;
+				}			
+			}
+		}
 	}
+	
+	if (!has_return && node->type != ERROR && node->type != VOID)	{
+		fprintf(stderr, "Error (line %d): Function '%s' does not return a value\n", node->linenum, ident->symbol->name);
+		node->type = ERROR;
+	}
+	
+	_inside_procfunc = NULL;
 }
 
 CTX_VISITOR(vardecl_list)
@@ -128,6 +148,11 @@ CTX_VISITOR(vardecl_list)
 
 CTX_VISITOR(vardecl)
 {
+	if (node->type == VOID)	{
+		fprintf(stderr, "Error (line %d): Type 'void' is not valid here\n", node->linenum);
+		node->type = ERROR;
+	}
+	
 	node->children->type = node->type;
 	node->children->symbol->decl_linenum = node->linenum;
 	ast_node_accept(node->children, visitor);
@@ -245,6 +270,11 @@ CTX_VISITOR(if_stmt)
 	
 	ast_node_accept(expr, visitor);
 	ast_node_accept(stmt, visitor);
+	
+	if (stmt && stmt->sibling)	{
+		// This is the else part
+		ast_node_accept(stmt->sibling, visitor);
+	}
 	
 	if (expr->type != BOOLEAN)	{
 		node->type = ERROR;

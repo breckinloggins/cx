@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 	free(context_visitor);
 	
 	if (ast_node_check_errors(ast) && !graph_flag)	{
-		fprintf(stderr, "Too many errors to compile\n");
+		fprintf(stderr, "Errors in compilation\n");
 		ast_node_destroy(ast);
 		context_cleanup();
 		free(cfile);

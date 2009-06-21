@@ -105,7 +105,7 @@ C_VISITOR(function)
 	fprintf(out, " (");
 	
 	child = child->sibling;
-	if (child->kind == PARAM_LIST)	{
+	if (child && child->kind == PARAM_LIST)	{
 		ast_node_accept(child, visitor);
 		child = child->sibling;
 	}
