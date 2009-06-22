@@ -10,7 +10,7 @@
 #include "ast.h"
 #include "parser.h"
 
-AstNode* ast_node_new(const char* name, Kind kind, Type type, int linenum, Symbol* symbol)
+AstNode* ast_node_new(const char* name, Kind kind, Type type, int linenum, Identifier* identifier)
 {
 	//printf("Created a node of type %s\n", name);
 	
@@ -25,7 +25,7 @@ AstNode* ast_node_new(const char* name, Kind kind, Type type, int linenum, Symbo
 	node->type = type;
 	node->linenum = linenum;
 	node->child_counter = 0;
-	node->symbol = symbol;
+	node->identifier = identifier;
 	node->parent = NULL;
 	node->children = NULL;
 	node->sibling = NULL;
@@ -50,7 +50,7 @@ void ast_node_destroy(AstNode* self)
 Value ast_node_get_value(AstNode* self)
 {
 	if (self->kind == IDENTIFIER)	{
-		return self->symbol->value;
+		return self->identifier->value;
 	}
 	
 	return self->value;

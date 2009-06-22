@@ -5,8 +5,8 @@
 #include "graphprinter_visitor.h"
 
 static void _print_arrow(AstNode *node);
-static void _print_symbol_table(AstNode *node);
-static void _print_symbols(Symbol *symbol);
+static void _print_identifier_table(AstNode *node);
+static void _print_identifiers(Identifier *identifier);
 
 static FILE* out;
 
@@ -70,7 +70,7 @@ graphprinter_visit_TranslationUnit(Visitor *visitor, AstNode *node)
            node, node->name);
     fprintf(out,"style=filled,color=black,fillcolor="COLOR_FILL_GLOBAL"];\n");
 
-    _print_symbol_table(node);
+    _print_identifier_table(node);
 
     ast_node_accept_children(node->children, visitor);
 
@@ -96,7 +96,7 @@ graphprinter_visit_NamespaceDecl(Visitor *visitor, AstNode *node)
            node, node->name, node->linenum);
     fprintf(out,"color="COLOR_EDGE_GROUP",fillcolor="COLOR_FILL_COMMON"];\n");
     ast_node_accept(node->children, visitor);
-    fprintf(out,"\tnode_%x -> symbol_%x [color=lightgray];\n", node->children, node->children->symbol);
+    fprintf(out,"\tnode_%x -> identifier_%x [color=lightgray];\n", node->children, node->children->identifier);
 
 	ast_node_accept_children(node->children->sibling, visitor);
 }
@@ -130,7 +130,7 @@ graphprinter_visit_function (Visitor *visitor, AstNode *node)
     fprintf(out,"color=blue,fillcolor="COLOR_EDGE_FUNCT"];\n");
     fprintf(out,"\nsubgraph cluster_%x {\n\tstyle=dotted;\n", node);
 
-    _print_symbol_table(node);
+    _print_identifier_table(node);
     ast_node_accept_children(node->children, visitor);
     fprintf(out,"}\n\n");
 }
@@ -203,9 +203,9 @@ graphprinter_visit_callparam_list (Visitor *visitor, AstNode *node)
     _print_arrow(node);
     fprintf(out,"\tnode_%x [label=\"%s\\n<", node, node->name);
 
-    for (i = 0; i < node->symbol->params; i++) {
-        fprintf(out,"%s", type_get_lexeme(node->symbol->param_types[i]));
-        if (i + 1 < node->symbol->params)
+    for (i = 0; i < node->identifier->params; i++) {
+        fprintf(out,"%s", type_get_lexeme(node->identifier->param_types[i]));
+        if (i + 1 < node->identifier->params)
             fprintf(out,", ");
     }
 
@@ -234,22 +234,22 @@ graphprinter_visit_identifier (Visitor *visitor, AstNode *node)
 
     fprintf(out,"\tnode_%x [label=\"", node);
 
-    if (node->symbol->decl_linenum == 0)
+    if (node->identifier->decl_linenum == 0)
         fprintf(out,"UNDECLARED\\n");
 
     fprintf(out,"%s\\n'%s'\\n<%s>\",style=filled,color=",
-           node->name, node->symbol->name, type_get_lexeme(node->type));
+           node->name, node->identifier->name, type_get_lexeme(node->type));
 
-    if (node->symbol->decl_linenum == 0)
+    if (node->identifier->decl_linenum == 0)
         fprintf(out,COLOR_EDGE_ERROR);
-    else if (node->symbol->is_global)
+    else if (node->identifier->is_global)
         fprintf(out,COLOR_FILL_GLOBAL);
     else
         fprintf(out,COLOR_FILL_LOCAL);
 
     fprintf(out,",fillcolor=");
 
-    if (node->symbol->is_global)
+    if (node->identifier->is_global)
         fprintf(out,COLOR_FILL_GLOBAL);
     else
         fprintf(out,COLOR_FILL_LOCAL);
@@ -279,19 +279,19 @@ _print_arrow(AstNode *node)
 }
 
 static void
-_print_symbol_table(AstNode *node)
+_print_identifier_table(AstNode *node)
 {
-	if (node->symbol == NULL || node->symbol->next == NULL)
+	if (node->identifier == NULL || node->identifier->next == NULL)
         return;
 
-    fprintf(out,"\tnode_%x -> symbol_%x [lhead=cluster_symtab_%x,color=",
-           node, node->symbol->next, node);
+    fprintf(out,"\tnode_%x -> identifier_%x [lhead=cluster_idtable_%x,color=",
+           node, node->identifier->next, node);
     if (node->parent == NULL)
         fprintf(out,"black];\n");
     else
         fprintf(out,"blue];\n");
 
-    fprintf(out,"\n\tsubgraph cluster_symtab_%x {\n", node);
+    fprintf(out,"\n\tsubgraph cluster_idtable_%x {\n", node);
 
     if (node->parent == NULL)
         fprintf(out,"\t\tcolor=black;\n");
@@ -301,27 +301,27 @@ _print_symbol_table(AstNode *node)
     fprintf(out,"\t\tstyle=filled;\n\t\tfillcolor="COLOR_FILL_GLOBAL";\n\t\tfontname=Courier;\n");
     fprintf(out,"\t\tnode [style=filled,color=white,fillcolor="COLOR_FILL_SYMBOL"];\n");
 
-    _print_symbols(node->symbol->next);
+    _print_identifiers(node->identifier->next);
 
     fprintf(out,"\t}\n\n");
 }
 
 static void
-_print_symbols(Symbol *symbol)
+_print_identifiers(Identifier *identifier)
 {
-    if (symbol == NULL)
+    if (identifier == NULL)
         return;
 
-    if (symbol->name != NULL) {
-        fprintf(out,"\t\tsymbol_%x [shape=record,label=\"{", symbol);
-        fprintf(out,"Symbol|Address: 0x%x\\l|lexeme: %s\\l|", symbol, symbol->name);
-        fprintf(out,"type: %s\\l}\"", type_get_lexeme(symbol->type));
+    if (identifier->name != NULL) {
+        fprintf(out,"\t\tidentifier_%x [shape=record,label=\"{", identifier);
+        fprintf(out,"Identifier|Address: 0x%x\\l|lexeme: %s\\l|", identifier, identifier->name);
+        fprintf(out,"type: %s\\l}\"", type_get_lexeme(identifier->type));
         fprintf(out,",style=filled,color=white,fillcolor="COLOR_FILL_SYMBOL"];\n");
 
-        if (symbol->next != NULL)
-            fprintf(out,"\tsymbol_%x -> symbol_%x;\n", symbol, symbol->next);
+        if (identifier->next != NULL)
+            fprintf(out,"\tidentifier_%x -> identifier_%x;\n", identifier, identifier->next);
 
     }
 
-    _print_symbols(symbol->next);
+    _print_identifiers(identifier->next);
 }

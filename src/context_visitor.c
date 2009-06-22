@@ -6,13 +6,14 @@
 #include "context_visitor.h"
 
 static Type declared_type = VOID;
-static Symbol* symtab;
-static Symbol* global_symtab;
+static Identifier* idtable;
+static Identifier* global_idtable;
 static AstNode* _inside_procfunc = NULL;
 
 static void _typecheck_print_stmt(AstNode* node, Type type, const char* ptype_str);
-static Symbol* _complete_symbol_lookup(Symbol* sym);
-static void _fetch_symbol(AstNode* node, Symbol* sym);
+static Identifier* _complete_identifier_lookup(Identifier* id);
+static void _fetch_identifier(AstNode* node, Identifier* id);
+static AstNode* _get_nearest_scope_node(AstNode* node);
 
 #define V_INIT(lhs, rhs)	visitor->visit_##lhs = &context_visit_##rhs
 
@@ -60,15 +61,15 @@ Visitor* context_new()
 
 void context_cleanup()
 {
-	if (global_symtab)
-		symbol_table_destroy(global_symtab);
+	if (global_idtable)
+		identifier_table_destroy(global_idtable);
 }
 
 CTX_VISITOR(TranslationUnit)
 {
-	node->symbol = symbol_new(NULL);
-	global_symtab = node->symbol;
-	symtab = global_symtab;
+	node->identifier = identifier_new(NULL);
+	global_idtable = node->identifier;
+	idtable = global_idtable;
 	_inside_procfunc = NULL;
 	
 	// Namespace
@@ -77,17 +78,17 @@ CTX_VISITOR(TranslationUnit)
 
 CTX_VISITOR(NamespaceDecl)
 {
-	node->children->symbol->decl_linenum = node->linenum;
+	node->children->identifier->decl_linenum = node->linenum;
 	ast_node_accept_children(node->children->sibling, visitor);
 }
 
 CTX_VISITOR(function_list)
 {
-	symtab = global_symtab;
+	idtable = global_idtable;
 	
 	ast_node_accept_children(node->children, visitor);
 	
-	symtab = global_symtab;
+	idtable = global_idtable;
 }
 
 CTX_VISITOR(function)
@@ -98,23 +99,23 @@ CTX_VISITOR(function)
 	_inside_procfunc = node;
 	
 	// Identifier
-	symtab = global_symtab;
+	idtable = global_idtable;
 	ident = node->children;
 	ident->type = node->type;
 	
 	// Let other code know we're dealing with a function
-	ident->symbol->params = 0;
-	ident->symbol->decl_linenum = node->linenum;
+	ident->identifier->params = 0;
+	ident->identifier->decl_linenum = node->linenum;
 	
 	ast_node_accept(ident, visitor);
 	
 	int has_return = 0;
 	
 	// ParamList, VarDeclList, Statements
-	symtab = node->symbol;
+	idtable = node->identifier;
 	for (child = ident->sibling; (child); child = child->sibling)	{
 		if (child->kind == PARAM_LIST)
-			child->symbol = ident->symbol;
+			child->identifier = ident->identifier;
 		ast_node_accept(child, visitor);
 	
 		if (child->kind == STATEMENT_LIST)	{
@@ -131,7 +132,7 @@ CTX_VISITOR(function)
 	}
 	
 	if (!has_return && node->type != ERROR && node->type != VOID)	{
-		fprintf(stderr, "Error (line %d): Function '%s' does not return a value\n", node->linenum, ident->symbol->name);
+		fprintf(stderr, "Error (line %d): Function '%s' does not return a value\n", node->linenum, ident->identifier->name);
 		node->type = ERROR;
 	}
 	
@@ -154,7 +155,7 @@ CTX_VISITOR(vardecl)
 	}
 	
 	node->children->type = node->type;
-	node->children->symbol->decl_linenum = node->linenum;
+	node->children->identifier->decl_linenum = node->linenum;
 	ast_node_accept(node->children, visitor);
 	
 }
@@ -170,11 +171,11 @@ CTX_VISITOR(param_list)
 		node->child_counter++;
 	}
 	
-	symbol_create_params(node->symbol, node->child_counter);
+	identifier_create_params(node->identifier, node->child_counter);
 	
 	i = 0;
 	for (child = node->children; (child); child = child->sibling)	{
-		node->symbol->param_types[i] = child->type;
+		node->identifier->param_types[i] = child->type;
 		i++;
 	}
 }
@@ -182,7 +183,7 @@ CTX_VISITOR(param_list)
 CTX_VISITOR(parameter)
 {
 	node->children->type = node->type;
-	node->children->symbol->decl_linenum = node->linenum;
+	node->children->identifier->decl_linenum = node->linenum;
 	
 	ast_node_accept(node->children, visitor);
 }
@@ -252,11 +253,11 @@ CTX_VISITOR(assignment_stmt)
 	ast_node_accept(lnode, visitor);
 	ast_node_accept(rnode, visitor);
 	
-	if (symbol_is_function(lnode->symbol))	{
+	if (identifier_is_function(lnode->identifier))	{
 		
 		node->type = ERROR;
-		fprintf(stderr, "Error (line %d): Symbol '%s' is a function identifier, you cannot "
-			"assign a value to it\n", node->linenum, lnode->symbol->name);
+		fprintf(stderr, "Error (line %d): Identifier '%s' is a function identifier, you cannot "
+			"assign a value to it\n", node->linenum, lnode->identifier->name);
 	} else if (lnode->type != ERROR && rnode->type != ERROR && lnode->type != rnode->type)	{
 		node->type = ERROR;
 		fprintf(stderr, "Error (line %d): Incompatible types on assignment\n", node->linenum);
@@ -309,7 +310,7 @@ CTX_VISITOR(for_stmt)
 	if (id_node->type != INTEGER)	{
 		node->type = ERROR;
 		fprintf(stderr, "Error (line %d): Identifier '%s' is of %s type; it must be Integer\n", 
-			id_node->linenum, id_node->symbol->name, type_get_lexeme(id_node->type));
+			id_node->linenum, id_node->identifier->name, type_get_lexeme(id_node->type));
 	}
 	
 	if (expr->type != INTEGER)	{
@@ -356,10 +357,10 @@ CTX_VISITOR(call)
 	if (ident->type == ERROR)
 		return;
 	
-	node->type = ident->symbol->type;
+	node->type = ident->identifier->type;
 	
 	if (plist != NULL)	{
-		plist->symbol = ident->symbol;
+		plist->identifier = ident->identifier;
 		
 		ast_node_accept(plist, visitor);
 		params = plist->child_counter;
@@ -367,9 +368,9 @@ CTX_VISITOR(call)
 		params = 0;
 	}
 	
-	if (params != ident->symbol->params)	{
+	if (params != ident->identifier->params)	{
 		node->type = ERROR;
-		fprintf(stderr, "Error (line %d): Expecting %d parameters, received %d\n", node->linenum, ident->symbol->params, params);
+		fprintf(stderr, "Error (line %d): Expecting %d parameters, received %d\n", node->linenum, ident->identifier->params, params);
 	}
 }
 
@@ -382,7 +383,7 @@ CTX_VISITOR(callparam_list)
 	for (child = node->children; (child); child = child->sibling)	
 		node->child_counter++;
 	
-	if (node->symbol->params != node->child_counter)	{
+	if (node->identifier->params != node->child_counter)	{
 		node->type = ERROR;
 		return;
 	}
@@ -392,17 +393,17 @@ CTX_VISITOR(callparam_list)
 		ast_node_accept(child, visitor);
 		
 		if (child->type != ERROR && 
-			child->type != node->symbol->param_types[i])	{
+			child->type != node->identifier->param_types[i])	{
 				
 			node->type = ERROR;
-			child->type = node->symbol->param_types[i];
+			child->type = node->identifier->param_types[i];
 			
 			fprintf(stderr, "Error (line %d): Call '%s' expecting %s on parameter %d (",
-				node->linenum, node->symbol->name, type_get_lexeme(node->symbol->param_types[i]),
+				node->linenum, node->identifier->name, type_get_lexeme(node->identifier->param_types[i]),
 				i+1);
 			
 			if (child->children->kind == IDENTIFIER)
-				fprintf(stderr, "'%s'", child->children->symbol->name);
+				fprintf(stderr, "'%s'", child->children->identifier->name);
 			else
 				value_print(stderr, &child->value, child->type);
 			
@@ -420,35 +421,35 @@ CTX_VISITOR(callparam)
 
 CTX_VISITOR(identifier)
 {
-	Symbol* sym = symbol_lookup(symtab, node->symbol->name);
-	Symbol* _sym = sym;
+	Identifier* id = identifier_lookup(idtable, node->identifier->name);
+	Identifier* _id = id;
 	
-	if (sym == NULL)	{
-		if (node->symbol->decl_linenum > 0)	{
-			node->symbol->type = node->type;
-			node->symbol->is_global = (symtab == global_symtab);
-						
-			node->symbol = symbol_insert(symtab, node->symbol);
-		} else if ((sym = symbol_lookup(global_symtab, node->symbol->name)) != NULL)	{
-			_fetch_symbol(node, sym);
+	if (id == NULL)	{
+		if (node->identifier->decl_linenum > 0)	{
+			node->identifier->type = node->type;
+			node->identifier->is_global = (idtable == global_idtable);
+			node->identifier->decl_scope_node = _get_nearest_scope_node(node);			
+			node->identifier = identifier_insert(idtable, node->identifier);
+		} else if ((id = identifier_lookup(global_idtable, node->identifier->name)) != NULL)	{
+			_fetch_identifier(node, id);
 		} else {
-			node->symbol->type = node->type = ERROR;
-			fprintf(stderr, "Error (line %d): Undeclared identifier '%s'\n", node->linenum, node->symbol->name);
+			node->identifier->type = node->type = ERROR;
+			fprintf(stderr, "Error (line %d): Undeclared identifier '%s'\n", node->linenum, node->identifier->name);
 		}
-	} else if (node->symbol->decl_linenum == 0)	{
-		_fetch_symbol(node, sym);
+	} else if (node->identifier->decl_linenum == 0)	{
+		_fetch_identifier(node, id);
 	} else {
-		node->symbol->type = node->type = ERROR;
+		node->identifier->type = node->type = ERROR;
 		fprintf(stderr, "Error (line %d): Identifier '%s' already defined on line %d\n", 
-			node->linenum, _sym->name, _sym->decl_linenum);
+			node->linenum, _id->name, _id->decl_linenum);
 	}	
 }
 
-static void _fetch_symbol(AstNode* node, Symbol *sym)
+static void _fetch_identifier(AstNode* node, Identifier *id)
 {
-	symbol_table_destroy(node->symbol);
-	node->symbol = sym;
-	node->type = sym->type;
+	identifier_table_destroy(node->identifier);
+	node->identifier = id;
+	node->type = id->type;
 }
 
 static void _typecheck_print_stmt(AstNode* node, Type type, const char* ptype_str)
@@ -458,4 +459,37 @@ static void _typecheck_print_stmt(AstNode* node, Type type, const char* ptype_st
 		fprintf(stderr, "Error (line %d): Expression print%s statement must be of %s type\n",
 			node->linenum, ptype_str, type_get_lexeme(type));
 	}
+}
+
+/* Returns the nearest node that represents the scope that encloses the given node */
+/*	In the special case that the node given is an outer node, returns NULL */
+static AstNode* _get_nearest_scope_node(AstNode* node)
+{
+	// NOTE: Even if the current node IS a scoping node, we still return the next outer scoping node
+	// 		so that the behavior is consistent
+	if (!node || !node->parent)	{
+		return NULL;
+	}
+	
+	if (node->parent->kind == NAMESPACE_DECL && node->parent->children == node)	{
+		// We are the declaration node for the namespace, we have no next outer scope
+		return NULL;
+	}
+	
+	if (node->parent->kind == FUNCTION && node->parent->children == node)	{
+		// We are the declaration node for the function, the next scope is 
+		// the function's next scope
+		return _get_nearest_scope_node(node->parent);
+	}
+	
+	while (node->parent)	{
+		node = node->parent;
+		if (node->kind == NAMESPACE_DECL ||
+			node->kind == FUNCTION)	{
+				
+			return node;
+		}
+	}
+	
+	return NULL;
 }

@@ -7,8 +7,7 @@
 #include "c_codegen_visitor.h"
 
 #define V_INIT(lhs, rhs)	visitor->visit_##lhs = &c_codegen_visit_##rhs			
-	
-static char *pf_name;
+
 static int tmp_var = 0;
 static FILE* out;
 
@@ -16,6 +15,7 @@ static void _tab(AstNode* node);
 static char* _get_type_string(Type type);
 static char* _create_temporary();
 static void _print_op_symbol(AstNode* node);
+static char* _identifier_get_cname(Identifier* identifier);
 
 Visitor* c_codegen_new(FILE* output)
 {
@@ -77,7 +77,7 @@ C_VISITOR(NamespaceDecl)
 	fprintf(out, "#include <stdio.h>\n\n");
 	fprintf(out, "#ifndef FALSE\n#define FALSE\t0\n#endif\n\n");
 	fprintf(out, "#ifndef TRUE\n#define TRUE\t1\n#endif\n");
-	
+		
 	AstNode* child;
 	for (child = namespace_identifier->sibling; (child); child = child->sibling)	{
 		ast_node_accept(child, visitor);
@@ -278,7 +278,7 @@ C_VISITOR(for_stmt)
 	child = node->children;					// Assignment
 	ast_node_accept(child, visitor);
 	
-	var = child->children->symbol->name;
+	var = _identifier_get_cname(child->children->identifier);
 	fprintf(out, " %s < ", var);			// TODO: WTF?
 	
 	child = child->sibling;					// Stop condition
@@ -306,7 +306,7 @@ C_VISITOR(notfactor)
 
 C_VISITOR(call)
 {
-	fprintf(out, "%s ()", node->children->symbol->name);
+	fprintf(out, "%s ()", _identifier_get_cname(node->children->identifier));
 	//ast_node_accept(node->children, visitor);
 }
 
@@ -317,7 +317,8 @@ C_VISITOR(callparam_list)
 
 C_VISITOR(identifier)
 {
-	fprintf(out, "%s", node->symbol->name);
+	char* cname = _identifier_get_cname(node->identifier);
+	fprintf(out, "%s", cname);
 }
 
 C_VISITOR(literal)
@@ -413,4 +414,104 @@ static void _print_op_symbol(AstNode* node)
 		case T_SLASH:
 			fprintf(out, " %s ", node->name);
 	}
+}
+
+/*
+ *	CName handling: As we go through the code we generate names for the related C identifiers.  We want to 
+ *	cache these when possible so we don't spend all our time making the same strings over and over again
+ */
+
+typedef struct CName_tag {
+	Identifier* id;
+	char* cname;
+	struct CName_tag* next;
+} CName;
+
+static CName* _cname_cache = NULL;
+
+CName* _cname_new(Identifier* id, char* cname)
+{
+	CName* cn = (CName*)malloc(sizeof(CName));
+	cn->id = id;
+	cn->cname = cname;
+	
+	return cn;
+}
+
+void _cname_insert(CName* cname)
+{
+	if (!_cname_cache)	{
+		_cname_cache = cname;
+	} else {
+		CName* cn = _cname_cache;
+		while (1)	{
+			if (!cn->next)	{
+				cn->next = cname;
+				break;
+			}
+			
+			cn = cn->next;
+		}
+	}
+}
+
+CName* _cname_lookup(Identifier* id)
+{
+	CName* cn = _cname_cache;
+	if (!id || !cn)	{
+		return NULL;
+	}
+	
+	while (cn)	{
+		if (cn->id == id)	{
+			return cn;
+		}
+		
+		cn = cn->next;
+	}
+	
+	return NULL;
+}
+
+/* Gets the name that will be used for code generation */
+char* _identifier_get_cname(Identifier* identifier)
+{
+	AstNode* scope = identifier->decl_scope_node;
+	if (!scope)	{
+		return identifier->name;
+	}
+	
+	CName* cn = _cname_lookup(identifier);
+	if (!cn)	{
+		char *scope_name = NULL;
+		if (scope->kind == NAMESPACE_DECL)	{
+			scope_name = scope->children->identifier->name;
+		} else if (scope->kind == FUNCTION)	{
+			// Do nothing... stuff inside functions are scoped just just fine
+			// inside C itself
+		} else {
+			fprintf(stderr, "Fatal Compiler Error: Unrecognized scope type %d in _identifer_get_cname\n", scope->kind);
+			exit(1);
+		}
+				
+		char* cname;
+		if (identifier->params >= 0 && !strcmp(identifier->name, "main"))	{
+			// HACK: Makes sure we have an actual function called main so the C compiler can find
+			//		and entry point.  Fix this by passing the name of the main function to the compiler
+			asprintf(&cname, "%s", identifier->name);
+		}
+		else if (!scope_name) {
+			asprintf(&cname, "%s", identifier->name);
+		} else {
+			asprintf(&cname, "%s_%s", scope_name, identifier->name);
+		}
+		
+		cn = _cname_new(identifier, cname);
+		_cname_insert(cn);		
+		
+		//fprintf(stderr, "Making a cname: %s\n", cname);
+
+	}
+	
+	return cn->cname;
 }

@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(CX)
 
-set(Cx_SRCS base.c ast.c symbol_table.c cxc.c context_visitor.c c_codegen_visitor.c graphprinter_visitor.c)
+set(Cx_SRCS base.c ast.c identifier_table.c cxc.c context_visitor.c c_codegen_visitor.c graphprinter_visitor.c)
 
 add_subdirectory(common)
 

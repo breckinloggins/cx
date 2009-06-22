@@ -36,11 +36,12 @@
 [X]	BUG: Graph visitor complains about invalid return statements
 [X]	Rename base types to C-type names
 [X]	Add Flex/Bison support to CMake file
+[X]	Rename symbol_table.h to Identifier Table and add more attributes to make code gen easier
+[X]	When generating C code, append namespace to variables and functions
 []	BUG: function parameters aren't supported and are still Pascal syntax
 []	BUG: access modifiers on function declarations should be optional
 []	Refactor variable declaration syntax and add support for assignments on the same line
 []	Test all control and loop structures
-[]	When generating C code, append namespace to variables and functions
 []	Add proper tabbing when generating C Code
 []	Parse the input file name to create good output intermediate and executable names
 []  Add feature where type of last expression in function will be the return value of
@@ -68,5 +69,6 @@
 []	Define way to expose a C function interface manually.
 		// Define C convenience function
 		"C" string accessFoo()	{ // Do some Cx stuff here.  C caller will see the return as an ARRAY struct }
+[]	Fix memory leaks
 []	Rewrite README to be more public-oriented
 []	Get Cx compiling under Windows

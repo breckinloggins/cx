@@ -7,7 +7,7 @@
 
 #include "ast.h"
 #include "base.h"
-#include "symbol_table.h"
+#include "identifier_table.h"
 
 #define	CTX_VISITOR(kind)		void context_visit_##kind(Visitor* visitor, AstNode* node)
 

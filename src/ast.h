@@ -6,7 +6,7 @@
  */
 
 #include "base.h"
-#include "symbol_table.h"
+#include "identifier_table.h"
 
 #define VISITOR_PFN(fn)		void (*fn) (struct Visitor_tag*, struct AstNode_tag *)
 
@@ -15,7 +15,7 @@ typedef struct AstNode_tag	{
 	int kind;
 	Type type;
 	Value value;
-	Symbol* symbol;
+	Identifier* identifier;
 	int linenum;
 	int child_counter;
 	
@@ -62,7 +62,7 @@ typedef struct Visitor_tag	{
 
 typedef VISITOR_PFN(VisitFunc);
 
-AstNode* ast_node_new(const char* name, Kind kind, Type type, int linenum, Symbol* symbol);
+AstNode* ast_node_new(const char* name, Kind kind, Type type, int linenum, Identifier* identifier);
 void ast_node_destroy(AstNode* node);
 
 Value ast_node_get_value(AstNode* node);

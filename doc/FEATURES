@@ -62,12 +62,12 @@
 			- The SubclassPolicyAttribute just does this declaratively
 		- Subclass types can optionally override the DidSubclassType method.  This could be considered a "constructor" for the subclass
  
- Symbols:
+ identifier_table.hs:
 	- Like in Ruby
 	- Atomic strings.  Only one instance of that string in the whole system
 	- Syntax highlighting and intellisense should pick them up
 	- What notation?
-		- :foo - like Ruby, but clashes with the named parameter syntax.  Foo(myParam::someSymbol) is amiguous to the
+		- :foo - like Ruby, but clashes with the named parameter syntax.  Foo(myParam::someidentifier_table.h) is amiguous to the
 			scope resolution operator and looks ugly anyway
 		- $foo - possible, but then we'll start looking like perl
 		- @foo - better
@@ -295,7 +295,7 @@ interface() operator:
 	
 		
 		
-Symbols:
+identifier_table.hs:
 	- Just like in Ruby, use ":symbol" where a string is expected:
 		IPrintable myPrintableObject = printableObjectMap[:defaultViewObject];
 	- Show up in intellisense in their enclosing scope

@@ -6,7 +6,7 @@
 #include "base.h"
 #include "parser.h"
 #include "ast.h"
-#include "symbol_table.h"
+#include "identifier_table.h"
 
 #define YYDEBUG 1
 
@@ -214,13 +214,13 @@ FunctionDecl:
 	/* HACK: T_PUBLIC is here just to avoid some shift/reduce conflicts for the time being */
 	T_PUBLIC TYPE_IDENTIFIER Identifier T_LPAR ParamList T_RPAR Block
 	{
-		Symbol* symtab;
+		Identifier* idtable;
 		AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, $2, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $3);	// Identifier
 		ast_node_add_child(ast_node, $5);	// ParamList
 		ast_node_add_child(ast_node, $7);	// Block
 
-		ast_node->symbol = symbol_new(NULL);
+		ast_node->identifier = identifier_new(NULL);
 		$$ = ast_node;
 	}
 	;
@@ -600,7 +600,7 @@ Identifier:
 	IDENTIFIER
 	{
 		AstNode* ast_node = ast_node_new("Identifier", IDENTIFIER, VOID, yylloc.last_line, NULL);
-		ast_node->symbol = symbol_new($1);
+		ast_node->identifier = identifier_new($1);
 		$$ = ast_node;
 	}
 	;
