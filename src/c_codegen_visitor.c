@@ -48,14 +48,13 @@ Visitor* c_codegen_new(FILE* output)
 	V_INIT(notfactor, notfactor);
 	V_INIT(call, call);
 	V_INIT(callparam_list, callparam_list);
+	V_INIT(callparam, callparam);
 	V_INIT(identifier, identifier);
 	V_INIT(literal, literal);
 	V_INIT(add_op, binary_op);
 	V_INIT(mul_op, binary_op);
 	V_INIT(rel_op, binary_op);
 	V_INIT(not_op, not_op);
-	
-	visitor->visit_callparam = NULL;
 	
 	return visitor;
 } 
@@ -301,18 +300,35 @@ C_VISITOR(binary_expr)
 
 C_VISITOR(notfactor)
 {
+	fprintf(out, "!");
 	ast_node_accept_children(node->children, visitor);
 }
 
 C_VISITOR(call)
 {
-	fprintf(out, "%s ()", _identifier_get_cname(node->children->identifier));
-	//ast_node_accept(node->children, visitor);
+	fprintf(out, "%s (", _identifier_get_cname(node->children->identifier));
+	if (node->children->sibling)	{
+		// Parameters
+		ast_node_accept(node->children->sibling, visitor);
+	}
+	fprintf(out, ")");
 }
 
 C_VISITOR(callparam_list)
 {
-	ast_node_accept_children(node->children, visitor);
+	AstNode* param;
+	for (param = node->children; (param); param = param->sibling)	{
+		ast_node_accept(param, visitor);
+		if (param->sibling)	{
+			fprintf(out, ", ");
+		}	
+	}
+}
+
+C_VISITOR(callparam)
+{
+	// The expression for the call parameter
+	ast_node_accept(node->children, visitor);
 }
 
 C_VISITOR(identifier)

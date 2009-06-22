@@ -48,6 +48,8 @@
 													}
 
 "public"					{ uploc; return T_PUBLIC; }
+"private"					{ uploc; return T_PRIVATE; }
+"fn"						{ uploc; return T_FN; }
 "return"					{ uploc; return T_RETURN; }
 
 "printInt"					{ uploc; return T_PRINT_INT; }

@@ -47,6 +47,8 @@ AstNode* ast;
 %token T_VAR
 
 %token T_PUBLIC
+%token T_PRIVATE
+%token T_FN
 %token T_RETURN
 
 %token T_IF
@@ -88,12 +90,12 @@ AstNode* ast;
 %type <astnode> VarDeclList
 %type <astnode> VarDecl
 
+%type <astnode> Modifier
 %type <astnode> FunctionList
 %type <astnode> MultiFunctionDecl
 %type <astnode> FunctionDecl
 %type <astnode> ParamList
 %type <astnode> SingleParam
-%type <astnode> MultiParam
 
 %type <astnode> LocalVariableDeclarationsAndStatements
 %type <astnode> LocalVariableDeclarationOrStatement
@@ -122,7 +124,7 @@ AstNode* ast;
 %type <astnode> Term
 
 %type <astnode> Call
-%type <astnode> ParameterList
+%type <astnode> CallParameterList
 
 %type <astnode> Assignment
 %type <astnode> Identifier
@@ -190,6 +192,12 @@ VarDecl:
 	}
 	;
 
+Modifier:
+	/* empty */ { $$ = NULL; }
+	| T_PUBLIC { $$ = NULL; fprintf(stderr, "FIXME: Public modifier not yet supported\n"); exit(1); }	
+	| T_PRIVATE { $$ = NULL; fprintf(stderr, "FIXME: Private modifier not yet supported\n"); exit(1); }
+	| T_FN { $$ = NULL; }	/* TODO: REMOVE ME */
+
 FunctionList:
 	/* empty */ { $$ = NULL; }
 	| FunctionDecl MultiFunctionDecl
@@ -209,12 +217,11 @@ MultiFunctionDecl:
 		$$ = $1;
 	}
 	;
-	
+
 FunctionDecl:
 	/* HACK: T_PUBLIC is here just to avoid some shift/reduce conflicts for the time being */
-	T_PUBLIC TYPE_IDENTIFIER Identifier T_LPAR ParamList T_RPAR Block
+	Modifier TYPE_IDENTIFIER Identifier T_LPAR ParamList T_RPAR Block
 	{
-		Identifier* idtable;
 		AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, $2, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $3);	// Identifier
 		ast_node_add_child(ast_node, $5);	// ParamList
@@ -223,32 +230,41 @@ FunctionDecl:
 		ast_node->identifier = identifier_new(NULL);
 		$$ = ast_node;
 	}
+	| Modifier TYPE_IDENTIFIER Identifier T_LPAR T_RPAR Block
+	{
+			AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, $2, yylloc.last_line, NULL);
+			ast_node_add_child(ast_node, $3);	// Identifier
+			ast_node_add_child(ast_node, $6);	// Block
+
+			ast_node->identifier = identifier_new(NULL);
+			$$ = ast_node;
+	}
 	;
 	
 ParamList:
-	/* empty */ { $$ = NULL; }
-	| SingleParam MultiParam
+	SingleParam
 	{
 		AstNode* ast_node = ast_node_new("ParamList", PARAM_LIST, VOID, yylloc.last_line, NULL);
-		ast_node_add_sibling($1, $2);
 		ast_node_add_child(ast_node, $1);
 		$$ = ast_node;
 	}
-	;
-	
-MultiParam:
-	/* empty */ { $$ = NULL; }
-	| T_COMMA SingleParam MultiParam
+	| ParamList T_COMMA SingleParam
 	{
-		ast_node_add_sibling($2, $3);
-		$$ = $2;
+		AstNode* ast_node = $1;
+		if (!ast_node)	{
+			ast_node = ast_node_new("ParamList", PARAM_LIST, VOID, yylloc.last_line,  NULL);
+		}
+		
+		ast_node_add_child(ast_node, $3);
+		$$ = ast_node;
 	}
+	;
 
 SingleParam:
-	Identifier T_COLON TYPE_IDENTIFIER
+	TYPE_IDENTIFIER Identifier
 	{
-		AstNode* ast_node = ast_node_new("Parameter", PARAMETER, $3, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $1);	// Identifier
+		AstNode* ast_node = ast_node_new("Parameter", PARAMETER, $1, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $2);	// Identifier
 		$$ = ast_node;
 	}
 	;
@@ -486,7 +502,7 @@ Factor:
 	;
 	
 Call:
-	Identifier T_LPAR ParameterList T_RPAR
+	Identifier T_LPAR CallParameterList T_RPAR
 	{
 		AstNode* ast_node = ast_node_new("Call", CALL, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $1);	// Identifier
@@ -501,22 +517,24 @@ Call:
 	}
 	;
 	
-ParameterList:
+CallParameterList:
 	Expression
 	{
-		AstNode* ast_node = ast_node_new("CallParameter", CALLPARAM, ((AstNode*)$1)->type, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $1);
+		AstNode* ast_node = ast_node_new("CallParamList", CALLPARAM_LIST, VOID, yylloc.last_line, NULL);
+		
+		AstNode* param_node = ast_node_new("CallParameter", CALLPARAM, ((AstNode*)$1)->type, yylloc.last_line, NULL);
+		ast_node_add_child(param_node, $1);
+		ast_node_add_child(ast_node, param_node);
 		$$ = ast_node;
 	}
-	| ParameterList T_COMMA Expression
+	| CallParameterList T_COMMA Expression
 	{
 		AstNode* ast_node = $1;
 		if (!ast_node)	{
 			ast_node = ast_node_new("CallParamList", CALLPARAM_LIST, VOID, yylloc.last_line, NULL);
 		}
-		
-		// TODO: Is this extra bit of indirection really necessary?
-		AstNode* param_node = ast_node_new("CallParameter", CALLPARAM, ((AstNode*)$1)->type, yylloc.last_line, NULL);
+
+		AstNode* param_node = ast_node_new("CallParameter", CALLPARAM, ((AstNode*)$3)->type, yylloc.last_line, NULL);
 		ast_node_add_child(param_node, $3);
 		ast_node_add_child(ast_node, param_node);
 		$$ = ast_node;

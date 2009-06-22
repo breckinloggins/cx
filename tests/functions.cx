@@ -1,0 +1,109 @@
+/*
+ *	Tests various capabilities of functions
+ */
+
+namespace functions	{
+
+	fn void doesNothing()	{
+	}
+	
+	fn int returnsANumber()	{
+		return 1;
+	}
+	
+	fn char returnsAChar()	{
+		return 'A';
+	}
+	
+	fn bool returnsABool()	{
+		return true;
+	}
+	
+	fn int returnTheNumber(int theNumber)	{
+		return theNumber;
+	}
+	
+	fn char returnTheChar(char theChar)	{
+		return theChar;
+	}
+	
+	fn bool returnTheBool(bool theBool)	{
+		return theBool;
+	}
+	
+	fn int addTwo(int one, int two)	{
+		return one + two;
+	}
+	
+	fn int addThree(int one, int two, int three)	{
+		return one + two + three;
+	}
+	
+	fn void multiParamTypes(char c, int i, bool b)	{
+		i = i + 1;
+		
+		c = 'D';
+		
+		if (b)	{
+			b = false;
+		}
+	}
+	
+	fn int main()	{
+		doesNothing();
+		
+		if (returnsANumber() != 1)	{
+			_C_ { fprintf(stderr, "functions.cx: returnsANumber() did not return the expected value\n");
+			exit(1);
+			}
+		}
+		
+		if (returnsAChar() != 'A')	{
+			_C_ { fprintf(stderr, "functions.cx: returnsAChar() did not return the expected value\n");
+			exit(1);
+			}
+		}
+		
+		if (!returnsABool())	{
+			_C_ { fprintf(stderr, "functions.cx: returnsABool() did not return the expected value\n");
+			exit(1);
+			}
+		}
+		
+		if (returnTheNumber(42) != 42)	{
+			_C_ { fprintf(stderr, "functions.cx: returnTheNumber(int) did not return the expected value\n");
+			exit(1);
+			}
+		}
+		
+		if (returnTheChar('B') != 'B')	{
+			_C_ { fprintf(stderr, "functions.cx: returnTheChar(char) did not return the expected value\n");
+			exit(1);
+			}
+		}
+		
+		if (returnTheBool(false))	{
+			_C_ { fprintf(stderr, "functions.cx: returnTheBool(bool) did not return the expected value\n");
+			exit(1);	
+			}
+		}
+		
+		if (addTwo(2, 3) != 5)	{
+			_C_ { fprintf(stderr, "functions.cx: addTwo(int, int) did not return the expected value\n");
+			exit(1);
+			}
+		}
+		
+		if (addThree(3, 4, 5) != 12)	{
+			_C_ { fprintf(stderr, "functions.cx: addThree(int, int, int) did not return the expected value\n");
+			exit(1);
+			}
+		}
+		
+		multiParamTypes('C', 32, false);
+		
+		// If we got here, all is well
+		return 0;
+	}
+	
+}

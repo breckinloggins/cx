@@ -32,6 +32,7 @@ C_VISITOR(binary_expr);
 C_VISITOR(notfactor);
 C_VISITOR(call);
 C_VISITOR(callparam_list);
+C_VISITOR(callparam);
 C_VISITOR(identifier);
 C_VISITOR(literal);
 C_VISITOR(binary_op);
