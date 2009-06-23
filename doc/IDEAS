@@ -27,3 +27,13 @@ Automatic Meta generator:
 	- MetaClass has MetaFunctions, etc. so you can do:
 		
 		meta(SomeClass).Methods.DoSomething.Call(someClassInstance, ...);
+
+Exceptions:
+	- setjmp/longjmp with some macros around them
+	- Check out Greg's response: http://stackoverflow.com/questions/533968/c-finally-block-that-only-runs-on-exceptions/534242#534242
+	
+	- Support try/catch/finally/filter/fault
+	- try/catch/finally as normal
+	- filter: like catch, but can match on any expression and has access to the exception object
+	- fault: like finally, but only runs when an exception (any exception!) is thrown.  Does not perturb the stack frame
+	- resume: for when you don't care about the error and know you can continue

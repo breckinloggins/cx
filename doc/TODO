@@ -40,11 +40,12 @@
 [X]	When generating C code, append namespace to variables and functions
 [X]	BUG: NOT operator doesn't work
 [X]	BUG: function parameters aren't supported and are still Pascal syntax
+[X]	Add proper tabbing when generating C Code
 []	BUG: access modifiers on function declarations should be optional
 []	Remove temporary "fn" modifier
 []	Refactor variable declaration syntax and add support for assignments on the same line
 []	Test all control and loop structures
-[]	Add proper tabbing when generating C Code
+[]	BUG: For loop behavior is hard coded and stupid
 []	Parse the input file name to create good output intermediate and executable names
 []	Add hexadecimal and octal literals
 []	Add a string type/string literals
@@ -61,6 +62,7 @@
 []	Add support for IEEE floating point notation (e notation)
 []  Add support for symbols (: syntax)
 []	Add support for named parameters (parameterName = value syntax)
+[]	Add foreach
 []	Test (and fix) dangling else
 []	Replace built in I/O statements with a standard environment
 []	Add more test files and create a testing framework with CMake/CTest
@@ -75,3 +77,4 @@
 []	Get Cx compiling under Windows
 []  Add feature where type of last expression in function will be the return value of
 	that function (??)
+[]	Add support for compound statements, support them in for loops

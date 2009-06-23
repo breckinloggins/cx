@@ -8,12 +8,11 @@
 
 #define V_INIT(lhs, rhs)	visitor->visit_##lhs = &c_codegen_visit_##rhs			
 
-static int tmp_var = 0;
+static int tab_level = 0;
 static FILE* out;
 
-static void _tab(AstNode* node);
+static void _tab();
 static char* _get_type_string(Type type);
-static char* _create_temporary();
 static void _print_op_symbol(AstNode* node);
 static char* _identifier_get_cname(Identifier* identifier);
 
@@ -96,6 +95,7 @@ C_VISITOR(function)
 	
 	type = _get_type_string(node->type);
 	
+	_tab();
 	fprintf(out, "%s ", type);
 	
 	child = node->children;						// Identifier
@@ -109,13 +109,16 @@ C_VISITOR(function)
 		child = child->sibling;
 	}
 	
-	fprintf(out, ")\n{\n");
-		
-	fprintf(out, "\n");
-
+	fprintf(out, ")\n");
+	_tab();
+	fprintf(out, "{\n");	
+	++tab_level;
 	ast_node_accept(child, visitor);
+	--tab_level;
 	
-	fprintf(out, "\n}\n\n");
+	fprintf(out, "\n");
+	_tab();
+	fprintf(out, "}\n\n");
 }
 
 C_VISITOR(vardecl_list)
@@ -155,7 +158,7 @@ C_VISITOR(statement_list)
 	AstNode* child;
 	
 	for(child = node->children; (child); child = child->sibling)	{
-		_tab(child);
+		_tab();
 		ast_node_accept(child, visitor);
 		fprintf(out, ";\n");
 	}
@@ -198,7 +201,9 @@ C_VISITOR(cblock_stmt)
 	// into the output and hope the user knows what he's doing
 	fprintf(out, "{\n");
 	fprintf(out, "%s", node->value.literal_content);
-	fprintf(out, "\n}");
+	fprintf(out, "\n");
+	_tab();
+	fprintf(out, "}");
 }
 
 C_VISITOR(return_stmt)
@@ -228,25 +233,32 @@ C_VISITOR(if_stmt)
 	fprintf(out, ") {\n");
 	
 	child = child->sibling;					// If Statements
+	
+	++tab_level;
 	ast_node_accept(child, visitor);
 	
 	if (child->kind != STATEMENT_LIST)	{
+		_tab();
 		fprintf(out, ";\n");
 	}
 	
 	fprintf(out, "\n");
-	_tab(node);
+	--tab_level;
+	_tab();
 	fprintf(out, "}");
 	
 	child = child->sibling;					// Else Statements
 	if (child)	{
 		fprintf(out, " else {\n");
+		++tab_level;
 		ast_node_accept(child, visitor);
 		if (child->kind != STATEMENT_LIST)	{
+			_tab();
 			fprintf(out, ";\n");
 		}
 		fprintf(out, "\n");
-		_tab(node);
+		--tab_level;
+		_tab();
 		fprintf(out, "}");
 	}
 }
@@ -261,10 +273,12 @@ C_VISITOR(while_stmt)
 	ast_node_accept(child, visitor);
 	fprintf(out, ") {\n");
 	
+	++tab_level;
 	child = child->sibling;					// Statements
 	ast_node_accept(child, visitor);
-	
-	_tab(node);
+	--tab_level;
+	fprintf(out, "\n");
+	_tab();
 	fprintf(out, "}");
 }
 
@@ -285,11 +299,13 @@ C_VISITOR(for_stmt)
 	
 	fprintf(out, "; %s++) {\n", var);		// TODO: More hard-coded crap
 	
+	++tab_level;
 	child = child->sibling;					// Statements
 	ast_node_accept_children(child, visitor);
+	--tab_level;
 	
 	fprintf(out, "\n");
-	_tab(node);
+	_tab();
 	fprintf(out, "}");
 }
 
@@ -356,14 +372,13 @@ C_VISITOR(not_op)
 	fprintf(out, " !");
 }
 
-static void _tab(AstNode* node)
+static void _tab()
 {
-	// TODO: Replace with sane tabbing
-	/*
-	AstNode* parent;
-	for (parent = node->parent; parent->parent != NULL; parent = parent->parent)
-		fprintf(out, TAB);
-	*/
+	int i;
+	for (i = 0; i < tab_level; i++)	{
+		//fprintf(out, "%d%d%d%d", tab_level, tab_level, tab_level, tab_level);
+		fprintf(out, "%s", TAB);
+	}
 }
 
 static char* _get_type_string(Type type)
@@ -384,17 +399,6 @@ static char* _get_type_string(Type type)
 			fprintf(stderr, "Inernal Compiler Error: _get_type_string: Unknown type %d\n", type);
 			exit(1);
 	}
-}
-
-static char* _create_temporary()
-{
-	char* temp;
-	
-	if (asprintf(&temp, "tmp%.5d", tmp_var) < 0)
-		return NULL;
-	
-	tmp_var++;
-	return temp;
 }
 
 static void _print_op_symbol(AstNode* node)
