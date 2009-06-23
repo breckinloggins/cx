@@ -132,14 +132,11 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 		case NAMESPACE_DECL:
 			visit = visitor->visit_NamespaceDecl;
 			break;
-		case VARDECL_LIST:
-			visit = visitor->visit_vardecl_list;
+		case NAMESPACEDECL_LIST:
+			visit = visitor->visit_NamespaceDecl_list;
 			break;
 		case VARDECL:
 			visit = visitor->visit_vardecl;
-			break;
-		case FUNCTION_LIST:
-			visit = visitor->visit_function_list;
 			break;
 		case FUNCTION:
 			visit = visitor->visit_function;

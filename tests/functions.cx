@@ -4,42 +4,42 @@
 
 namespace functions	{
 
-	fn void doesNothing()	{
+	void doesNothing()	{
 	}
 	
-	fn int returnsANumber()	{
+	int returnsANumber()	{
 		return 1;
 	}
 	
-	fn char returnsAChar()	{
+	char returnsAChar()	{
 		return 'A';
 	}
 	
-	fn bool returnsABool()	{
+	bool returnsABool()	{
 		return true;
 	}
 	
-	fn int returnTheNumber(int theNumber)	{
+	int returnTheNumber(int theNumber)	{
 		return theNumber;
 	}
 	
-	fn char returnTheChar(char theChar)	{
+	char returnTheChar(char theChar)	{
 		return theChar;
 	}
 	
-	fn bool returnTheBool(bool theBool)	{
+	bool returnTheBool(bool theBool)	{
 		return theBool;
 	}
 	
-	fn int addTwo(int one, int two)	{
+	int addTwo(int one, int two)	{
 		return one + two;
 	}
 	
-	fn int addThree(int one, int two, int three)	{
+	int addThree(int one, int two, int three)	{
 		return one + two + three;
 	}
 	
-	fn void multiParamTypes(char c, int i, bool b)	{
+	void multiParamTypes(char c, int i, bool b)	{
 		i = i + 1;
 		
 		c = 'D';
@@ -49,7 +49,7 @@ namespace functions	{
 		}
 	}
 	
-	fn int main()	{
+	int main()	{
 		doesNothing();
 		
 		if (returnsANumber() != 1)	{

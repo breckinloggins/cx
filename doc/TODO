@@ -41,8 +41,9 @@
 [X]	BUG: NOT operator doesn't work
 [X]	BUG: function parameters aren't supported and are still Pascal syntax
 [X]	Add proper tabbing when generating C Code
-[]	BUG: access modifiers on function declarations should be optional
-[]	Remove temporary "fn" modifier
+[X]	Allow variable and function declarations in any order inside namespaces
+[X]	BUG: access modifiers on function declarations should be optional
+[X]	Remove temporary "fn" modifier
 []	Refactor variable declaration syntax and add support for assignments on the same line
 []	Test all control and loop structures
 []	BUG: For loop behavior is hard coded and stupid

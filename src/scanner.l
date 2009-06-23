@@ -42,14 +42,16 @@
 							}
 "namespace"					{ uploc; return T_NAMESPACE; }	
 "var"						{ uploc; return T_VAR; }
-"int"|"bool"|"char"|"double"|"float"|"void"			{ uploc;
-							  						yylval->type = type_get_from_lexeme(yytext); 
-							  						return TYPE_IDENTIFIER; 
-													}
+							
+"int"						{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_INT; }
+"bool"						{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_BOOL; }
+"char"						{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_CHAR; }
+"double"					{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_DOUBLE; }
+"float"						{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_FLOAT; }
+"void"						{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_VOID; }
 
 "public"					{ uploc; return T_PUBLIC; }
 "private"					{ uploc; return T_PRIVATE; }
-"fn"						{ uploc; return T_FN; }
 "return"					{ uploc; return T_RETURN; }
 
 "printInt"					{ uploc; return T_PRINT_INT; }

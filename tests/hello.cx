@@ -15,12 +15,12 @@ namespace helloworld
 	
 	// HACK: Right now you HAVE to specify an access modifer because of shift/reduce
 	//			bugs in the grammar.  *sigh*
-	fn char getSomeChar()
+	char getSomeChar()
 	{
 		return 'Z';
 	}
 	
-	fn int main()
+	int main()
 	{
 		
 		_C_ {

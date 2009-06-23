@@ -1,18 +1,18 @@
 namespace incompatible_return_type_test	{
 	
-	fn void doNothing()	{
+	void doNothing()	{
 		// Shouldn't throw an error, as the compiler knows that void functions don't need returns
 	}
 	
-	fn char doesReturnChar()	{
+	char doesReturnChar()	{
 		return 'C';			// This should be fine
 	}
 	
-	fn char doesntReturnChar()	{
+	char doesntReturnChar()	{
 		return 77;			// Error: return must be of type char
 	}
 	
-	fn int multiReturns()	{
+	int multiReturns()	{
 		
 		if (true)	{
 			return 7;

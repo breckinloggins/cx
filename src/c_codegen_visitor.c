@@ -23,9 +23,8 @@ Visitor* c_codegen_new(FILE* output)
 	
 	V_INIT(TranslationUnit, TranslationUnit);
 	V_INIT(NamespaceDecl, NamespaceDecl);
-	V_INIT(vardecl_list, vardecl_list);
+	V_INIT(NamespaceDecl_list, NamespaceDecl_list);
 	V_INIT(vardecl, vardecl);
-	V_INIT(function_list, function_list);
 	V_INIT(function, function);
 	V_INIT(param_list, param_list);
 	V_INIT(parameter, parameter);
@@ -83,9 +82,10 @@ C_VISITOR(NamespaceDecl)
 	}
 }
 
-C_VISITOR(function_list)
+C_VISITOR(NamespaceDecl_list)
 {
 	ast_node_accept_children(node->children, visitor);
+	fprintf(out, "\n");
 }
 
 C_VISITOR(function)
@@ -119,12 +119,6 @@ C_VISITOR(function)
 	fprintf(out, "\n");
 	_tab();
 	fprintf(out, "}\n\n");
-}
-
-C_VISITOR(vardecl_list)
-{
-	ast_node_accept_children(node->children, visitor);
-	fprintf(out, "\n");
 }
 
 C_VISITOR(vardecl)

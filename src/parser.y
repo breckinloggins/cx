@@ -77,7 +77,13 @@ AstNode* ast;
 
 %token <literal_content> T_C_BLOCK
 
-%token <type> TYPE_IDENTIFIER
+%token <type> T_INT;
+%token <type> T_BOOL;
+%token <type> T_CHAR;
+%token <type> T_DOUBLE;
+%token <type> T_FLOAT;
+%token <type> T_VOID;
+
 %token <lexeme> IDENTIFIER
 %token <integer> INT_LITERAL
 %token <boolean> BOOL_LITERAL
@@ -87,12 +93,16 @@ AstNode* ast;
 
 %type <astnode> TranslationUnit
 %type <astnode> NamespaceDecl
-%type <astnode> VarDeclList
+
+%type <type> TypeSpecifier
+%type <type> TypeName
+%type <type> PrimitiveType
+
+%type <astnode> NamespaceVariableAndFunctionDeclarations
+%type <astnode> NamespaceVariableOrFunctionDeclaration
 %type <astnode> VarDecl
 
 %type <astnode> Modifier
-%type <astnode> FunctionList
-%type <astnode> MultiFunctionDecl
 %type <astnode> FunctionDecl
 %type <astnode> ParamList
 %type <astnode> SingleParam
@@ -151,40 +161,66 @@ TranslationUnit:
 	;
 
 NamespaceDecl:
-	T_NAMESPACE Identifier T_LBRACK VarDeclList FunctionList T_RBRACK
+	T_NAMESPACE Identifier T_LBRACK NamespaceVariableAndFunctionDeclarations T_RBRACK
 	{
 		AstNode* ast_node = ast_node_new("NamespaceDecl", NAMESPACE_DECL, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $2);	// Namespace Identifier
-		ast_node_add_child(ast_node, $4);	// VarDeclList
-		ast_node_add_child(ast_node, $5);	// ProcFuncList
+		ast_node_add_child(ast_node, $4);	// Variable and Function Declarations
 	
 		$$ = ast_node;
 	}
-	;
-
-VarDeclList:
-	/* empty */ { $$ = NULL; }
-	| VarDecl
+	| T_NAMESPACE Identifier T_LBRACK T_RBRACK
 	{
-		AstNode* ast_node = ast_node_new("VarDeclList", VARDECL_LIST, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $1);
-
+		AstNode* ast_node = ast_node_new("NamespaceDecl", NAMESPACE_DECL, VOID, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $2);	// Namespace Identifier
+			
 		$$ = ast_node;
 	}
-	| VarDecl T_SEMICOLON VarDeclList
+	;
+	
+TypeSpecifier:
+	TypeName	{ $$ = $1; }
+	;
+
+TypeName:
+	PrimitiveType	{ $$ = $1; }
+	;
+	
+PrimitiveType:
+	T_INT	{ $$ = $1; }
+	| T_BOOL	{ $$ = $1; }
+	| T_CHAR	{ $$ = $1; }
+	| T_DOUBLE	{ $$ = $1; }
+	| T_FLOAT	{ $$ = $1; }
+	| T_VOID	{ $$ = $1; }
+
+NamespaceVariableAndFunctionDeclarations:
+	NamespaceVariableOrFunctionDeclaration
 	{
-		AstNode* ast_node = $3;
+		AstNode* ast_node = ast_node_new("NamespaceDeclList", NAMESPACEDECL_LIST, VOID, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $1);
+		
+		$$ = ast_node;
+	}
+	| NamespaceVariableAndFunctionDeclarations NamespaceVariableOrFunctionDeclaration
+	{
+		AstNode* ast_node = $1;
 		if (!ast_node)	{
-			ast_node = ast_node_new("VarDeclList", VARDECL_LIST, VOID, yylloc.last_line, NULL);
+			ast_node = ast_node_new("NamespaceDeclList", NAMESPACEDECL_LIST, VOID, yylloc.last_line, NULL);
 		}
-		ast_node_add_child(ast_node, $1);
+		
+		ast_node_add_child(ast_node, $2);
 		$$ = ast_node;
 	}
 	;
 
+NamespaceVariableOrFunctionDeclaration:
+	VarDecl T_SEMICOLON { $$ = $1; }
+	| FunctionDecl { $$ = $1; }
+	;
 
 VarDecl:
-	TYPE_IDENTIFIER Identifier
+	TypeSpecifier Identifier
 	{
 		AstNode* ast_node = ast_node_new("VarDecl", VARDECL, $1, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $2);
@@ -193,48 +229,77 @@ VarDecl:
 	;
 
 Modifier:
-	/* empty */ { $$ = NULL; }
-	| T_PUBLIC { $$ = NULL; fprintf(stderr, "FIXME: Public modifier not yet supported\n"); exit(1); }	
+	T_PUBLIC { $$ = NULL; fprintf(stderr, "FIXME: Public modifier not yet supported\n"); exit(1); }	
 	| T_PRIVATE { $$ = NULL; fprintf(stderr, "FIXME: Private modifier not yet supported\n"); exit(1); }
-	| T_FN { $$ = NULL; }	/* TODO: REMOVE ME */
-
-FunctionList:
-	/* empty */ { $$ = NULL; }
-	| FunctionDecl MultiFunctionDecl
-	{
-		AstNode* ast_node = ast_node_new("FunctionList", FUNCTION_LIST, VOID, yylloc.last_line, NULL);
-		ast_node_add_sibling($1, $2);
-		ast_node_add_child(ast_node, $1);
-		$$ = ast_node;
-	}
-	;
-	
-MultiFunctionDecl:
-	/* empty */ { $$ = NULL; }
-	| FunctionDecl MultiFunctionDecl
-	{
-		ast_node_add_sibling($1, $2);
-		$$ = $1;
-	}
 	;
 
 FunctionDecl:
-	/* HACK: T_PUBLIC is here just to avoid some shift/reduce conflicts for the time being */
-	Modifier TYPE_IDENTIFIER Identifier T_LPAR ParamList T_RPAR Block
+	VarDecl T_LPAR ParamList T_RPAR Block
 	{
-		AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, $2, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $3);	// Identifier
-		ast_node_add_child(ast_node, $5);	// ParamList
-		ast_node_add_child(ast_node, $7);	// Block
+		AstNode* vardecl_node = $1;
+		
+		AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, vardecl_node->type, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, vardecl_node->children);	// Identifier
+		ast_node_add_child(ast_node, $3);						// ParamList
+		ast_node_add_child(ast_node, $5);						// Block
+		
+		// We don't need the vardecl_node anymore as we've collapsed its information
+		// into this node
+		vardecl_node->children = NULL;
+		vardecl_node->sibling = NULL;
+		ast_node_destroy(vardecl_node);
 
 		ast_node->identifier = identifier_new(NULL);
 		$$ = ast_node;
 	}
-	| Modifier TYPE_IDENTIFIER Identifier T_LPAR T_RPAR Block
+	| Modifier VarDecl T_LPAR ParamList T_RPAR Block
 	{
-			AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, $2, yylloc.last_line, NULL);
-			ast_node_add_child(ast_node, $3);	// Identifier
-			ast_node_add_child(ast_node, $6);	// Block
+		AstNode* vardecl_node = $2;
+		
+		AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, vardecl_node->type, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, vardecl_node->children);	// Identifier
+		ast_node_add_child(ast_node, $4);						// ParamList
+		ast_node_add_child(ast_node, $6);						// Block
+		
+		// We don't need the vardecl_node anymore as we've collapsed its information
+		// into this node
+		vardecl_node->children = NULL;
+		vardecl_node->sibling = NULL;
+		ast_node_destroy(vardecl_node);
+
+		ast_node->identifier = identifier_new(NULL);
+		$$ = ast_node;
+	}
+	| Modifier VarDecl T_LPAR T_RPAR Block
+	{
+			AstNode* vardecl_node = $2;
+			
+			AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, vardecl_node->type, yylloc.last_line, NULL);
+			ast_node_add_child(ast_node, vardecl_node->children);	// Identifier
+			ast_node_add_child(ast_node, $5);						// Block
+
+			// We don't need the vardecl_node anymore as we've collapsed its information
+			// into this node
+			vardecl_node->children = NULL;
+			vardecl_node->sibling = NULL;
+			ast_node_destroy(vardecl_node);
+
+			ast_node->identifier = identifier_new(NULL);
+			$$ = ast_node;
+	}
+	| VarDecl T_LPAR T_RPAR Block
+	{
+			AstNode* vardecl_node = $1;
+			
+			AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, vardecl_node->type, yylloc.last_line, NULL);
+			ast_node_add_child(ast_node, vardecl_node->children);	// Identifier
+			ast_node_add_child(ast_node, $4);						// Block
+
+			// We don't need the vardecl_node anymore as we've collapsed its information
+			// into this node
+			vardecl_node->children = NULL;
+			vardecl_node->sibling = NULL;
+			ast_node_destroy(vardecl_node);
 
 			ast_node->identifier = identifier_new(NULL);
 			$$ = ast_node;
@@ -261,7 +326,7 @@ ParamList:
 	;
 
 SingleParam:
-	TYPE_IDENTIFIER Identifier
+	TypeSpecifier Identifier
 	{
 		AstNode* ast_node = ast_node_new("Parameter", PARAMETER, $1, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $2);	// Identifier

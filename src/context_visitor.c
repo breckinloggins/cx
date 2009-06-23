@@ -23,9 +23,8 @@ Visitor* context_new()
 	
 	V_INIT(TranslationUnit, TranslationUnit);
 	V_INIT(NamespaceDecl, NamespaceDecl);
-	V_INIT(vardecl_list, vardecl_list);
+	V_INIT(NamespaceDecl_list, NamespaceDecl_list);
 	V_INIT(vardecl, vardecl);
-	V_INIT(function_list, function_list);
 	V_INIT(function, function);
 	V_INIT(param_list, param_list);
 	V_INIT(parameter, parameter);
@@ -82,7 +81,7 @@ CTX_VISITOR(NamespaceDecl)
 	ast_node_accept_children(node->children->sibling, visitor);
 }
 
-CTX_VISITOR(function_list)
+CTX_VISITOR(NamespaceDecl_list)
 {
 	idtable = global_idtable;
 	
@@ -137,14 +136,6 @@ CTX_VISITOR(function)
 	}
 	
 	_inside_procfunc = NULL;
-}
-
-CTX_VISITOR(vardecl_list)
-{
-	AstNode* child;
-	
-	for (child = node->children; (child); child = child->sibling)
-		ast_node_accept(child, visitor);
 }
 
 CTX_VISITOR(vardecl)

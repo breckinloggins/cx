@@ -18,8 +18,7 @@ Visitor *graphprinter_new(FILE*);
 
 void graphprinter_visit_TranslationUnit (Visitor *, AstNode *);
 void graphprinter_visit_NamespaceDecl (Visitor *, AstNode *);
-void graphprinter_visit_vardecl_list (Visitor *, AstNode *);
-void graphprinter_visit_function_list (Visitor *, AstNode *);
+void graphprinter_visit_NamespaceDecl_list (Visitor *, AstNode *);
 void graphprinter_visit_function (Visitor *, AstNode *);
 void graphprinter_visit_param_list (Visitor *, AstNode *);
 void graphprinter_visit_parameter (Visitor *, AstNode *);

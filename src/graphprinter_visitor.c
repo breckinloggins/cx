@@ -19,9 +19,8 @@ graphprinter_new(FILE* output)
 
     visitor->visit_TranslationUnit = &graphprinter_visit_TranslationUnit;
     visitor->visit_NamespaceDecl = &graphprinter_visit_NamespaceDecl;
-    visitor->visit_vardecl_list = &graphprinter_visit_vardecl_list;
+	visitor->visit_NamespaceDecl_list = &graphprinter_visit_NamespaceDecl_list;
     visitor->visit_vardecl = &graphprinter_visit_simplenode;
-    visitor->visit_function_list = &graphprinter_visit_function_list;
     visitor->visit_function = &graphprinter_visit_function;
     visitor->visit_param_list = &graphprinter_visit_param_list;
     visitor->visit_parameter = &graphprinter_visit_parameter;
@@ -102,7 +101,7 @@ graphprinter_visit_NamespaceDecl(Visitor *visitor, AstNode *node)
 }
 
 void
-graphprinter_visit_vardecl_list (Visitor *visitor, AstNode *node)
+graphprinter_visit_NamespaceDecl_list (Visitor *visitor, AstNode *node)
 {
     _print_arrow(node);
     fprintf(out,"\tnode_%x [label=\"%s\",style=filled,", node, node->name);
@@ -110,15 +109,6 @@ graphprinter_visit_vardecl_list (Visitor *visitor, AstNode *node)
     fprintf(out,"\nsubgraph cluster_%x {\n\tstyle=dotted;\n", node);
     ast_node_accept_children(node->children, visitor);
     fprintf(out,"}\n\n");
-}
-
-void
-graphprinter_visit_function_list (Visitor *visitor, AstNode *node)
-{
-    _print_arrow(node);
-    fprintf(out,"\tnode_%x [label=\"%s\",style=filled,", node, node->name);
-    fprintf(out,"color="COLOR_EDGE_GROUP",fillcolor="COLOR_FILL_COMMON"];\n");
-    ast_node_accept_children(node->children, visitor);
 }
 
 void
