@@ -124,6 +124,7 @@ int main(int argc, char** argv)
 	
 	ast_node_destroy(ast);
 	context_cleanup();
+	c_codegen_cleanup();
 	free(cfile);
 	free(ofile);
 	return 0;

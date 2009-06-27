@@ -6,13 +6,12 @@
 #include "context_visitor.h"
 
 static Type declared_type = VOID;
-static Identifier* idtable;
-static Identifier* global_idtable;
 static AstNode* _inside_procfunc = NULL;
+
+static Scope* _current_scope = NULL;
 
 static void _typecheck_print_stmt(AstNode* node, Type type, const char* ptype_str);
 static Identifier* _complete_identifier_lookup(Identifier* id);
-static void _fetch_identifier(AstNode* node, Identifier* id);
 static AstNode* _get_nearest_scope_node(AstNode* node);
 
 #define V_INIT(lhs, rhs)	visitor->visit_##lhs = &context_visit_##rhs
@@ -60,15 +59,12 @@ Visitor* context_new()
 
 void context_cleanup()
 {
-	if (global_idtable)
-		identifier_table_destroy(global_idtable);
+	scope_destroy_all();
 }
 
 CTX_VISITOR(TranslationUnit)
 {
-	node->identifier = identifier_new(NULL);
-	global_idtable = node->identifier;
-	idtable = global_idtable;
+	_current_scope = scope_new(NULL, node);
 	_inside_procfunc = NULL;
 	
 	// Namespace
@@ -77,17 +73,17 @@ CTX_VISITOR(TranslationUnit)
 
 CTX_VISITOR(NamespaceDecl)
 {
+	_current_scope = scope_new(_current_scope, node);
+	
 	node->children->identifier->decl_linenum = node->linenum;
 	ast_node_accept_children(node->children->sibling, visitor);
+	
+	_current_scope = _current_scope->parent;
 }
 
 CTX_VISITOR(NamespaceDecl_list)
 {
-	idtable = global_idtable;
-	
 	ast_node_accept_children(node->children, visitor);
-	
-	idtable = global_idtable;
 }
 
 CTX_VISITOR(function)
@@ -98,7 +94,6 @@ CTX_VISITOR(function)
 	_inside_procfunc = node;
 	
 	// Identifier
-	idtable = global_idtable;
 	ident = node->children;
 	ident->type = node->type;
 	
@@ -108,10 +103,10 @@ CTX_VISITOR(function)
 	
 	ast_node_accept(ident, visitor);
 	
+	_current_scope = scope_new(_current_scope, node);
 	int has_return = 0;
 	
 	// ParamList, VarDeclList, Statements
-	idtable = node->identifier;
 	for (child = ident->sibling; (child); child = child->sibling)	{
 		if (child->kind == PARAM_LIST)
 			child->identifier = ident->identifier;
@@ -136,6 +131,7 @@ CTX_VISITOR(function)
 	}
 	
 	_inside_procfunc = NULL;
+	_current_scope = _current_scope->parent;
 }
 
 CTX_VISITOR(vardecl)
@@ -244,7 +240,7 @@ CTX_VISITOR(assignment_stmt)
 	ast_node_accept(lnode, visitor);
 	ast_node_accept(rnode, visitor);
 	
-	if (identifier_is_function(lnode->identifier))	{
+	if (lnode->identifier->params >= 0)	{
 		
 		node->type = ERROR;
 		fprintf(stderr, "Error (line %d): Identifier '%s' is a function identifier, you cannot "
@@ -261,11 +257,16 @@ CTX_VISITOR(if_stmt)
 	AstNode* stmt = expr->sibling;
 	
 	ast_node_accept(expr, visitor);
+	
+	_current_scope = scope_new(_current_scope, node);
 	ast_node_accept(stmt, visitor);
+	_current_scope = _current_scope->parent;
 	
 	if (stmt && stmt->sibling)	{
 		// This is the else part
+		_current_scope = scope_new(_current_scope, node);
 		ast_node_accept(stmt->sibling, visitor);
+		_current_scope = _current_scope->parent;
 	}
 	
 	if (expr->type != BOOLEAN)	{
@@ -280,7 +281,10 @@ CTX_VISITOR(while_stmt)
 	AstNode* stmt = expr->sibling;
 	
 	ast_node_accept(expr, visitor);
+	
+	_current_scope = scope_new(_current_scope, node);
 	ast_node_accept(stmt, visitor);
+	_current_scope = _current_scope->parent;
 	
 	if (expr->type != BOOLEAN)	{
 		node->type = ERROR;
@@ -308,8 +312,10 @@ CTX_VISITOR(for_stmt)
 		node->type = ERROR;
 		fprintf(stderr, "Error (line %d): Value of stop condition is not of Integer type\n", expr->linenum);
 	}
-	
+
+	_current_scope = scope_new(_current_scope, node);
 	ast_node_accept(stmt, visitor);
+	_current_scope = _current_scope->parent;
 }
 
 CTX_VISITOR(binary_expr)
@@ -412,35 +418,25 @@ CTX_VISITOR(callparam)
 
 CTX_VISITOR(identifier)
 {
-	Identifier* id = identifier_lookup(idtable, node->identifier->name);
-	Identifier* _id = id;
-	
+	Identifier* id = scope_lookup(_current_scope, node->identifier->name);
+
 	if (id == NULL)	{
-		if (node->identifier->decl_linenum > 0)	{
-			node->identifier->type = node->type;
-			node->identifier->is_global = (idtable == global_idtable);
-			node->identifier->decl_scope_node = _get_nearest_scope_node(node);			
-			node->identifier = identifier_insert(idtable, node->identifier);
-		} else if ((id = identifier_lookup(global_idtable, node->identifier->name)) != NULL)	{
-			_fetch_identifier(node, id);
-		} else {
+		if (node->identifier->decl_linenum == 0)	{
 			node->identifier->type = node->type = ERROR;
 			fprintf(stderr, "Error (line %d): Undeclared identifier '%s'\n", node->linenum, node->identifier->name);
+		} else {
+			node->identifier->type = node->type;
+			node->identifier = scope_insert(_current_scope, node->identifier);
 		}
 	} else if (node->identifier->decl_linenum == 0)	{
-		_fetch_identifier(node, id);
+		identifier_destroy(node->identifier);
+		node->identifier = id;
+		node->type = id->type;
 	} else {
 		node->identifier->type = node->type = ERROR;
 		fprintf(stderr, "Error (line %d): Identifier '%s' already defined on line %d\n", 
-			node->linenum, _id->name, _id->decl_linenum);
+			node->linenum, id->name, id->decl_linenum);
 	}	
-}
-
-static void _fetch_identifier(AstNode* node, Identifier *id)
-{
-	identifier_table_destroy(node->identifier);
-	node->identifier = id;
-	node->type = id->type;
 }
 
 static void _typecheck_print_stmt(AstNode* node, Type type, const char* ptype_str)
@@ -450,37 +446,4 @@ static void _typecheck_print_stmt(AstNode* node, Type type, const char* ptype_st
 		fprintf(stderr, "Error (line %d): Expression print%s statement must be of %s type\n",
 			node->linenum, ptype_str, type_get_lexeme(type));
 	}
-}
-
-/* Returns the nearest node that represents the scope that encloses the given node */
-/*	In the special case that the node given is an outer node, returns NULL */
-static AstNode* _get_nearest_scope_node(AstNode* node)
-{
-	// NOTE: Even if the current node IS a scoping node, we still return the next outer scoping node
-	// 		so that the behavior is consistent
-	if (!node || !node->parent)	{
-		return NULL;
-	}
-	
-	if (node->parent->kind == NAMESPACE_DECL && node->parent->children == node)	{
-		// We are the declaration node for the namespace, we have no next outer scope
-		return NULL;
-	}
-	
-	if (node->parent->kind == FUNCTION && node->parent->children == node)	{
-		// We are the declaration node for the function, the next scope is 
-		// the function's next scope
-		return _get_nearest_scope_node(node->parent);
-	}
-	
-	while (node->parent)	{
-		node = node->parent;
-		if (node->kind == NAMESPACE_DECL ||
-			node->kind == FUNCTION)	{
-				
-			return node;
-		}
-	}
-	
-	return NULL;
 }

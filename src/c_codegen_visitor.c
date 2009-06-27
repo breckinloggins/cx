@@ -15,6 +15,7 @@ static void _tab();
 static char* _get_type_string(Type type);
 static void _print_op_symbol(AstNode* node);
 static char* _identifier_get_cname(Identifier* identifier);
+static void _cname_cleanup();
 
 Visitor* c_codegen_new(FILE* output)
 {
@@ -56,6 +57,11 @@ Visitor* c_codegen_new(FILE* output)
 	
 	return visitor;
 } 
+
+void c_codegen_cleanup()
+{
+	_cname_cleanup();
+}
 
 C_VISITOR(TranslationUnit)
 {	
@@ -448,8 +454,24 @@ CName* _cname_new(Identifier* id, char* cname)
 	CName* cn = (CName*)malloc(sizeof(CName));
 	cn->id = id;
 	cn->cname = cname;
+	cn->next = NULL;
 	
 	return cn;
+}
+
+void _cname_destroy(CName* cn)
+{
+	if (!cn)	{
+		return;
+	}
+	
+	_cname_destroy(cn->next);
+	free(cn);
+}
+
+void _cname_cleanup()
+{
+	_cname_destroy(_cname_cache);
 }
 
 void _cname_insert(CName* cname)
@@ -490,7 +512,12 @@ CName* _cname_lookup(Identifier* id)
 /* Gets the name that will be used for code generation */
 char* _identifier_get_cname(Identifier* identifier)
 {
-	AstNode* scope = identifier->decl_scope_node;
+	Scope* s = identifier->decl_scope;
+	if (!s)	{
+		return identifier->name;
+	}
+	
+	AstNode* scope = s->decl_node;
 	if (!scope)	{
 		return identifier->name;
 	}

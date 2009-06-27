@@ -232,14 +232,14 @@ graphprinter_visit_identifier (Visitor *visitor, AstNode *node)
 
     if (node->identifier->decl_linenum == 0)
         fprintf(out,COLOR_EDGE_ERROR);
-    else if (node->identifier->is_global)
+    else if (node->identifier->decl_scope != NULL && node->identifier->decl_scope->parent == NULL)
         fprintf(out,COLOR_FILL_GLOBAL);
     else
         fprintf(out,COLOR_FILL_LOCAL);
 
     fprintf(out,",fillcolor=");
 
-    if (node->identifier->is_global)
+    if (node->identifier->decl_scope != NULL && node->identifier->decl_scope->parent == NULL)
         fprintf(out,COLOR_FILL_GLOBAL);
     else
         fprintf(out,COLOR_FILL_LOCAL);

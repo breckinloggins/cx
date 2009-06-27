@@ -43,6 +43,13 @@ void ast_node_destroy(AstNode* self)
 		if (self->type == CBLOCK_STMT)
 			free(self->value.literal_content);
 		
+		if (self->identifier && self->identifier->decl_scope == NULL)	{
+			// TODO: This is probably an error.  ALL identifiers should be claimed
+			// by a scope!
+			//fprintf(stderr, "Internal Compiler Error: Orphaned identifier '%s' at line %d\n", self->identifier->name, self->linenum);
+			identifier_destroy(self->identifier);
+		}
+		
 		free(self);
 	}
 }

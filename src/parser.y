@@ -249,7 +249,6 @@ FunctionDecl:
 		vardecl_node->sibling = NULL;
 		ast_node_destroy(vardecl_node);
 
-		ast_node->identifier = identifier_new(NULL);
 		$$ = ast_node;
 	}
 	| Modifier VarDecl T_LPAR ParamList T_RPAR Block
@@ -267,7 +266,6 @@ FunctionDecl:
 		vardecl_node->sibling = NULL;
 		ast_node_destroy(vardecl_node);
 
-		ast_node->identifier = identifier_new(NULL);
 		$$ = ast_node;
 	}
 	| Modifier VarDecl T_LPAR T_RPAR Block
@@ -284,7 +282,6 @@ FunctionDecl:
 			vardecl_node->sibling = NULL;
 			ast_node_destroy(vardecl_node);
 
-			ast_node->identifier = identifier_new(NULL);
 			$$ = ast_node;
 	}
 	| VarDecl T_LPAR T_RPAR Block
@@ -301,7 +298,6 @@ FunctionDecl:
 			vardecl_node->sibling = NULL;
 			ast_node_destroy(vardecl_node);
 
-			ast_node->identifier = identifier_new(NULL);
 			$$ = ast_node;
 	}
 	;

@@ -44,16 +44,18 @@
 [X]	Allow variable and function declarations in any order inside namespaces
 [X]	BUG: access modifiers on function declarations should be optional
 [X]	Remove temporary "fn" modifier
+[X]	Fix memory leaks
+[X]	Implement chained identifier tables
+[]	Show chained scope tables in the graph
+[]	Parse the input file name to create good output intermediate and executable names
+[]	Add a "declaration node" to the identifier table in place of the ad-hoc stuff in there now
+[]	Add Ast Node Types for types and type declarations
+[]	Add array type
+[]	Add string type/string literals
 []	Refactor variable declaration syntax and add support for assignments on the same line
 []	Test all control and loop structures
 []	BUG: For loop behavior is hard coded and stupid
-[]	Parse the input file name to create good output intermediate and executable names
 []	Add hexadecimal and octal literals
-[]	Add a string type/string literals
-[]	Add array type
-[]	Add struct type
-[]	Add class type
-[]	Add enum type
 []	Add bitwise operators
 []	Add ternary operator
 []	Add do/while
@@ -63,6 +65,9 @@
 []	Add support for IEEE floating point notation (e notation)
 []  Add support for symbols (: syntax)
 []	Add support for named parameters (parameterName = value syntax)
+[]	Add struct type
+[]	Add class type
+[]	Add enum type
 []	Add foreach
 []	Test (and fix) dangling else
 []	Replace built in I/O statements with a standard environment
@@ -72,7 +77,6 @@
 []	Define way to expose a C function interface manually.
 		// Define C convenience function
 		"C" string accessFoo()	{ // Do some Cx stuff here.  C caller will see the return as an ARRAY struct }
-[]	Fix memory leaks
 []	Rewrite README to be more public-oriented
 []	Output #line info so that GDB can debug our programs
 []	Get Cx compiling under Windows

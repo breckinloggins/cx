@@ -3,34 +3,33 @@
 
 #include "base.h"
 
+typedef struct Scope_tag	{
+	struct Scope_tag* parent;			// This scope's enclosing scope
+	struct AstNode_tag* decl_node;		// The node that encompasses this scope, for example, a NAMESPACE or FUNCTION
+	struct Identifier_tag* idtable;		// Pointer to the list of identifiers for this scope
+} Scope;
+
 typedef struct Identifier_tag	{
 	char* name;							// The name of the identifier as declared in source
 	Type type;
 	Value value;
 	int decl_linenum;
-	struct AstNode_tag* decl_scope_node;	// The innermost scoping node in which this identifier was
-											// declared.  For example, a NAMESPACE, FUNCTION, or CLASS node
+	struct Scope_tag* decl_scope;		// The scope in which this identifier was declared
 	
 	// For functions
 	int params;
 	Type* param_types;
 	
-	bool is_global;
-	int stack_index;
-	
 	struct Identifier_tag* next;
 } Identifier;
 
 Identifier* identifier_new(const char* name);
-Identifier* identifier_lookup(Identifier* idtable, const char* name);
-Identifier* identifier_insert(Identifier* idtable, Identifier* identifier);
 void identifier_destroy(Identifier* identifier);
-
 void identifier_create_params(Identifier* identifier, int quantity);
-bool identifier_is_function(Identifier* identifier);
-void identifier_print(Identifier* identifier);
 
-void identifier_table_destroy(Identifier* idtable);
-void identifier_table_dump(Identifier* idtable);
+Scope*		scope_new(Scope* parent, struct AstNode_tag* decl_node);
+void		scope_destroy_all();
+Identifier*	scope_lookup(Scope* scope, char* name);
+Identifier* scope_insert(Scope* scope, Identifier* id);
 
 #endif // IDENTIFIER_TABLE_H

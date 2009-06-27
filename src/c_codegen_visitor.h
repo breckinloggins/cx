@@ -7,6 +7,7 @@
 #define	C_VISITOR(kind)		void c_codegen_visit_##kind(Visitor* visitor, AstNode* node)
 
 Visitor* c_codegen_new(FILE*);
+void c_codegen_cleanup();
 
 C_VISITOR(TranslationUnit);
 C_VISITOR(NamespaceDecl);
