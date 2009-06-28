@@ -1,0 +1,9 @@
+namespace arrays
+{
+	int main()
+	{
+		int[] foo = new int[3];
+		
+		return 0;
+	}
+}

@@ -13,7 +13,7 @@
 typedef struct AstNode_tag	{
 	char* name;
 	int kind;
-	Type type;
+	PrimitiveType type;
 	Value value;
 	Identifier* identifier;
 	int linenum;
@@ -60,7 +60,7 @@ typedef struct Visitor_tag	{
 
 typedef VISITOR_PFN(VisitFunc);
 
-AstNode* ast_node_new(const char* name, Kind kind, Type type, int linenum, Identifier* identifier);
+AstNode* ast_node_new(const char* name, Kind kind, PrimitiveType type, int linenum, Identifier* identifier);
 void ast_node_destroy(AstNode* node);
 
 Value ast_node_get_value(AstNode* node);

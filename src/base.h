@@ -5,6 +5,8 @@
  *	Base tyoes and methods for Cx compiler.  Based on the toypasc source (code.google.com/p/toypasc)
  */
 
+#include <stdio.h>		// For FILE*
+
 #define VOID(var)		((void *)&var)
 #define IS_LITERAL(k)	( k == BOOL_LITERAL   || \
 					   	  k == DOUBLE_LITERAL || \
@@ -17,7 +19,7 @@ typedef enum	{
 	TRUE
 } bool;
 
-typedef enum TypeEnum	{
+typedef enum PrimTypeEnum	{
 	ERROR = -1,
 	VOID,
 	INTEGER,
@@ -25,7 +27,7 @@ typedef enum TypeEnum	{
 	FLOAT,
 	BOOLEAN,
 	CHAR
-} Type;
+} PrimitiveType;
 
 typedef enum KindEnum	{
 	NONE_KIND = -1,
@@ -68,11 +70,11 @@ typedef union	{
 	char* literal_content;
 } Value;
 
-char* type_get_lexeme(Type type);
-Type type_get_from_lexeme(const char* lexeme);
+char* type_get_lexeme(PrimitiveType type);
+PrimitiveType type_get_from_lexeme(const char* lexeme);
 
-void value_get(Value* value, Type type, void* val);
-void value_set(Value* value, Type type, void* val);
+void value_get(Value* value, PrimitiveType type, void* val);
+void value_set(Value* value, PrimitiveType type, void* val);
 
 void value_set_from_int(Value* value, int val);
 void value_set_from_bool(Value* value, bool val);
@@ -80,6 +82,6 @@ void value_set_from_char(Value* value, char val);
 void value_set_from_double(Value* value, double val);
 void value_set_from_float(Value* value, float val);
 
-void value_print(FILE* file, Value* value, Type type);
+void value_print(FILE* file, Value* value, PrimitiveType type);
 
 #endif	// BASE_H

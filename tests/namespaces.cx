@@ -1,0 +1,23 @@
+namespace ns1
+{
+	// Empty
+}
+
+namespace ns2
+{
+	int someFunction()
+	{
+		return 0;
+	}
+}
+
+namespace ns3
+{
+	int someNumber;
+	
+	int someFunction()
+	{
+		someNumber = 1;
+		return someNumber;
+	}
+}

@@ -44,7 +44,7 @@ AstNode* ast;
 %left <lexeme> T_NOT
 
 %token T_NAMESPACE
-%token T_VAR
+%token T_DIM
 
 %token T_PUBLIC
 %token T_PRIVATE
@@ -62,8 +62,8 @@ AstNode* ast;
 
 %token T_LPAR
 %token T_RPAR
-%token T_LBRACK
-%token T_RBRACK
+%token T_LBRACE
+%token T_RBRACE
 %token T_SEMICOLON
 %token T_COLON
 %token T_COMMA
@@ -92,11 +92,13 @@ AstNode* ast;
 %token <flt> FLOAT_LITERAL
 
 %type <astnode> TranslationUnit
+%type <astnode> NamespaceDeclList
 %type <astnode> NamespaceDecl
 
 %type <type> TypeSpecifier
 %type <type> TypeName
 %type <type> PrimitiveType
+%type <integer> Dims
 
 %type <astnode> NamespaceVariableAndFunctionDeclarations
 %type <astnode> NamespaceVariableOrFunctionDeclaration
@@ -150,18 +152,38 @@ AstNode* ast;
 %%
 
 TranslationUnit:
-	NamespaceDecl
+	NamespaceDeclList
 	{
 		AstNode* ast_node = ast_node_new("TranslationUnit", TRANSLATIONUNIT, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $1);	// NamespaceDecl
+		ast_node_add_child(ast_node, $1);	// NamespaceDeclList
 		$$ = ast_node;
 		
 		ast = ast_node;
 	}
 	;
 
+NamespaceDeclList:
+	NamespaceDecl
+	{
+		AstNode* ast_node = ast_node_new("NamespaceDeclList", NAMESPACEDECL_LIST, VOID, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $1);
+		
+		$$ = ast_node;
+	}
+	| NamespaceDeclList NamespaceDecl
+	{
+		AstNode* ast_node = $1;
+		if (!ast_node)	{
+			ast_node = ast_node_new("NamespaceDeclList", NAMESPACEDECL_LIST, VOID, yylloc.last_line, NULL);
+		}
+		ast_node_add_child(ast_node, $2);
+		
+		$$ = ast_node;
+	}
+	;
+
 NamespaceDecl:
-	T_NAMESPACE Identifier T_LBRACK NamespaceVariableAndFunctionDeclarations T_RBRACK
+	T_NAMESPACE Identifier T_LBRACE NamespaceVariableAndFunctionDeclarations T_RBRACE
 	{
 		AstNode* ast_node = ast_node_new("NamespaceDecl", NAMESPACE_DECL, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $2);	// Namespace Identifier
@@ -169,7 +191,7 @@ NamespaceDecl:
 	
 		$$ = ast_node;
 	}
-	| T_NAMESPACE Identifier T_LBRACK T_RBRACK
+	| T_NAMESPACE Identifier T_LBRACE T_RBRACE
 	{
 		AstNode* ast_node = ast_node_new("NamespaceDecl", NAMESPACE_DECL, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $2);	// Namespace Identifier
@@ -180,6 +202,7 @@ NamespaceDecl:
 	
 TypeSpecifier:
 	TypeName	{ $$ = $1; }
+	| TypeName Dims { $$ = $1; }
 	;
 
 TypeName:
@@ -193,6 +216,11 @@ PrimitiveType:
 	| T_DOUBLE	{ $$ = $1; }
 	| T_FLOAT	{ $$ = $1; }
 	| T_VOID	{ $$ = $1; }
+
+Dims:
+	T_DIM { $$ = 1; }
+	| Dims T_DIM { $$ = ++$1; }
+	;
 
 NamespaceVariableAndFunctionDeclarations:
 	NamespaceVariableOrFunctionDeclaration
@@ -339,8 +367,8 @@ SingleParam:
 	;
 
 Block:
-	T_LBRACK LocalVariableDeclarationsAndStatements T_RBRACK { $$ = $2; }
-	| T_LBRACK T_RBRACK {$$ = ast_node_new("StatementList", STATEMENT_LIST, VOID, yylloc.last_line, NULL); }
+	T_LBRACE LocalVariableDeclarationsAndStatements T_RBRACE { $$ = $2; }
+	| T_LBRACE T_RBRACE {$$ = ast_node_new("StatementList", STATEMENT_LIST, VOID, yylloc.last_line, NULL); }
 	;
 	
 LocalVariableDeclarationsAndStatements:
@@ -530,7 +558,7 @@ SimpleExpression:
 	| SimpleExpression AddOp Term
 	{
 		AstNode* ast_node;
-		Type type = ((AstNode*)$2)->type;
+		PrimitiveType type = ((AstNode*)$2)->type;
 		ast_node = ast_node_new("AddExpression", ADD_EXPR, type, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $1);	// LH Expression
 		ast_node_add_child(ast_node, $2);	// AddOp (+/-)
@@ -544,7 +572,7 @@ Term:
 	| Term MulOp NotFactor
 	{
 		AstNode* ast_node;
-		Type type = ((AstNode*)$2)->type;
+		PrimitiveType type = ((AstNode*)$2)->type;
 		ast_node = ast_node_new("MulExpression", MUL_EXPR, type, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $1);	// Term
 		ast_node_add_child(ast_node, $2);	// MulOp (*//)

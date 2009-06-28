@@ -5,7 +5,7 @@
 #include "common/memory.h"
 #include "base.h"
 
-Type type_get_from_lexeme(const char* lexeme)
+PrimitiveType type_get_from_lexeme(const char* lexeme)
 {
 	// TODO: This needs to come from the lexer
 	if (!strcasecmp(lexeme, "int"))
@@ -21,7 +21,7 @@ Type type_get_from_lexeme(const char* lexeme)
 	else return VOID;
 }
 
-char* type_get_lexeme(Type type)
+char* type_get_lexeme(PrimitiveType type)
 {
 	switch (type)	{
 		case VOID:
@@ -43,7 +43,7 @@ char* type_get_lexeme(Type type)
 	}
 }
 
-void value_print(FILE* file, Value* value, Type type)
+void value_print(FILE* file, Value* value, PrimitiveType type)
 {
 	if (type == INTEGER)	{
 		fprintf(file, "%d", value->integer);
@@ -58,7 +58,7 @@ void value_print(FILE* file, Value* value, Type type)
 	}
 }
 
-void value_get(Value* value, Type type, void* val)
+void value_get(Value* value, PrimitiveType type, void* val)
 {
 	if (value == NULL)	{
 		fprintf(stderr, "%s: value_get: value == NULL\n", __FILE__);
@@ -81,7 +81,7 @@ void value_get(Value* value, Type type, void* val)
 	}
 }
 
-void value_set(Value* value, Type type, void* val)
+void value_set(Value* value, PrimitiveType type, void* val)
 {
 	if (value == NULL)	{
 		fprintf(stderr, "%s: value_set: value == NULL\n", __FILE__);

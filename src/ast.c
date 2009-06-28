@@ -10,7 +10,7 @@
 #include "ast.h"
 #include "parser.h"
 
-AstNode* ast_node_new(const char* name, Kind kind, Type type, int linenum, Identifier* identifier)
+AstNode* ast_node_new(const char* name, Kind kind, PrimitiveType type, int linenum, Identifier* identifier)
 {
 	//printf("Created a node of type %s\n", name);
 	

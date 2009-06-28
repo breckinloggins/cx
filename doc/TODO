@@ -49,12 +49,14 @@
 [X]	Add AST codenode_helper module for AST helper functions
 [X]	BUG: Graphprinter crashes with new type system
 [X] Replace hardcoded function information in the identifier table with a reference to the declaration node
+[X]	Allow translation units to have multiple namespaces
+[]	Add code for standard environment
+[]	BUG: Cleanup partially constructed AST when program exits due to syntax error
 []	Add Ast Node Types for types and type declarations
 []	Add a "declaration node" to the identifier table in place of the ad-hoc stuff in there now
 []	Add array type
 []	Add string type/string literals
 []	Add using declaration, initial lookup logic
-[]	Add code for standard environment
 []	Refactor variable declaration syntax and add support for assignments on the same line
 []	Test all control and loop structures
 []	BUG: For loop behavior is hard coded and stupid

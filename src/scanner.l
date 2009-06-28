@@ -41,7 +41,6 @@
 								}
 							}
 "namespace"					{ uploc; return T_NAMESPACE; }	
-"var"						{ uploc; return T_VAR; }
 							
 "int"						{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_INT; }
 "bool"						{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_BOOL; }
@@ -49,6 +48,8 @@
 "double"					{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_DOUBLE; }
 "float"						{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_FLOAT; }
 "void"						{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_VOID; }
+
+"[]"						{ uploc; return T_DIM; }
 
 "public"					{ uploc; return T_PUBLIC; }
 "private"					{ uploc; return T_PRIVATE; }
@@ -110,8 +111,8 @@
 "="							{ uploc; return T_ASSIGNMENT; }
 "("							{ uploc; return T_LPAR; }
 ")"							{ uploc; return T_RPAR; }
-"{"							{ uploc; return T_LBRACK; }
-"}"							{ uploc; return T_RBRACK; }
+"{"							{ uploc; return T_LBRACE; }
+"}"							{ uploc; return T_RBRACE; }
 "+"							{ uploc; yylval->lexeme=strdup(yytext); return T_PLUS; }
 "-"							{ uploc; yylval->lexeme=strdup(yytext); return T_MINUS; }
 "*"							{ uploc; yylval->lexeme=strdup(yytext); return T_STAR; }

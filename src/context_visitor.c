@@ -6,12 +6,12 @@
 #include "codenode_helper.h"
 #include "context_visitor.h"
 
-static Type declared_type = VOID;
+static PrimitiveType declared_type = VOID;
 static AstNode* _inside_procfunc = NULL;
 
 static Scope* _current_scope = NULL;
 
-static void _typecheck_print_stmt(AstNode* node, Type type, const char* ptype_str);
+static void _typecheck_print_stmt(AstNode* node, PrimitiveType type, const char* ptype_str);
 static Identifier* _complete_identifier_lookup(Identifier* id);
 static AstNode* _get_nearest_scope_node(AstNode* node);
 
@@ -68,7 +68,7 @@ CTX_VISITOR(TranslationUnit)
 	_current_scope = scope_new(NULL, node);
 	_inside_procfunc = NULL;
 	
-	// Namespace
+	// Namespaces
 	ast_node_accept(node->children, visitor);
 }
 
@@ -200,7 +200,7 @@ CTX_VISITOR(cblock_stmt)
 
 CTX_VISITOR(return_stmt)
 {
-	Type return_type = VOID;
+	PrimitiveType return_type = VOID;
 	if (node->children)	{
 		ast_node_accept(node->children, visitor);
 		return_type = node->children->type;
@@ -416,7 +416,7 @@ CTX_VISITOR(identifier)
 	}	
 }
 
-static void _typecheck_print_stmt(AstNode* node, Type type, const char* ptype_str)
+static void _typecheck_print_stmt(AstNode* node, PrimitiveType type, const char* ptype_str)
 {
 	if (node->children->type != type)	{
 		node->type = ERROR;

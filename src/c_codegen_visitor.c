@@ -12,7 +12,7 @@ static int tab_level = 0;
 static FILE* out;
 
 static void _tab();
-static char* _get_type_string(Type type);
+static char* _get_type_string(PrimitiveType type);
 static void _print_op_symbol(AstNode* node);
 static char* _identifier_get_cname(Identifier* identifier);
 static void _cname_cleanup();
@@ -66,9 +66,11 @@ void c_codegen_cleanup()
 C_VISITOR(TranslationUnit)
 {	
 	fprintf(out, "/* Generated with cxc */\n");
+	fprintf(out, "#include <stdio.h>\n\n");
+	fprintf(out, "#ifndef FALSE\n#define FALSE\t0\n#endif\n\n");
+	fprintf(out, "#ifndef TRUE\n#define TRUE\t1\n#endif\n");
 	
 	ast_node_accept_children(node->children, visitor);
-	
 }
 
 C_VISITOR(NamespaceDecl)
@@ -77,9 +79,6 @@ C_VISITOR(NamespaceDecl)
 	fprintf(out, "/* namespace ");
 	ast_node_accept(namespace_identifier, visitor);
 	fprintf(out, " */\n\n");
-	fprintf(out, "#include <stdio.h>\n\n");
-	fprintf(out, "#ifndef FALSE\n#define FALSE\t0\n#endif\n\n");
-	fprintf(out, "#ifndef TRUE\n#define TRUE\t1\n#endif\n");
 		
 	AstNode* child;
 	for (child = namespace_identifier->sibling; (child); child = child->sibling)	{
@@ -381,7 +380,7 @@ static void _tab()
 	}
 }
 
-static char* _get_type_string(Type type)
+static char* _get_type_string(PrimitiveType type)
 {
 	switch (type)	{
 		case INTEGER:

@@ -8,6 +8,7 @@
 #include "common/memory.h"
 #include "ast.h"
 #include "parser.h"
+#include "standard_environment.h"
 #include "context_visitor.h"
 #include "c_codegen_visitor.h"
 #include "graphprinter_visitor.h"
@@ -82,7 +83,11 @@ int main(int argc, char** argv)
 	yyparse();
 	fclose(yyin);
 	
-	// First, we'll do some contextual analysis on the parse tree
+	// First, we'll setup the standard environment, which includes some builtin complex types, 
+	//	functions, etc.
+	stdenv_init(ast);
+	
+	// Next, we'll do some contextual analysis on the parse tree
 	Visitor* context_visitor = context_new();
 	ast_node_accept(ast, context_visitor);
 	free(context_visitor);
@@ -96,6 +101,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	
+	// Finally, time to generate the output, using one of the several generator visitors
 	Visitor* visitor;
 	if (compile_flag)	{
 		FILE* out = stdout;

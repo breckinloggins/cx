@@ -11,7 +11,7 @@ typedef struct Scope_tag	{
 
 typedef struct Identifier_tag	{
 	char* name;							// The name of the identifier as declared in source
-	Type type;
+	PrimitiveType type;
 	Value value;
 	
 	struct Scope_tag* decl_scope;		// The scope in which this identifier was declared
