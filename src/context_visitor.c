@@ -3,6 +3,7 @@
 
 #include "common/memory.h"
 #include "parser.h"
+#include "codenode_helper.h"
 #include "context_visitor.h"
 
 static Type declared_type = VOID;
@@ -75,7 +76,7 @@ CTX_VISITOR(NamespaceDecl)
 {
 	_current_scope = scope_new(_current_scope, node);
 	
-	node->children->identifier->decl_linenum = node->linenum;
+	node->children->identifier->decl_node = node;
 	ast_node_accept_children(node->children->sibling, visitor);
 	
 	_current_scope = _current_scope->parent;
@@ -94,35 +95,32 @@ CTX_VISITOR(function)
 	_inside_procfunc = node;
 	
 	// Identifier
-	ident = node->children;
+	ident = function_get_identifier(node);
 	ident->type = node->type;
-	
-	// Let other code know we're dealing with a function
-	ident->identifier->params = 0;
-	ident->identifier->decl_linenum = node->linenum;
+		
+	ident->identifier->decl_node = node;
 	
 	ast_node_accept(ident, visitor);
 	
 	_current_scope = scope_new(_current_scope, node);
 	int has_return = 0;
 	
-	// ParamList, VarDeclList, Statements
-	for (child = ident->sibling; (child); child = child->sibling)	{
-		if (child->kind == PARAM_LIST)
-			child->identifier = ident->identifier;
-		ast_node_accept(child, visitor);
+	// ParamList, Statements
+	AstNode* params = function_get_params(node);
+	params->identifier = ident->identifier;
+	ast_node_accept(params, visitor);
 	
-		if (child->kind == STATEMENT_LIST)	{
-			// It is important that all the "returns" in the function have a return
-			// type compatible with the function itself
-			AstNode* stmt;
-			for (stmt = child->children; (stmt); stmt = stmt->sibling)	{
-				if (stmt->kind == RETURN_STMT)	{
-					has_return = 1;
-					break;
-				}			
-			}
-		}
+	AstNode* stmts = function_get_statements(node);
+	ast_node_accept(stmts, visitor);
+	
+	// It is important that all the "returns" in the function have a return
+	// type compatible with the function itself
+	AstNode* stmt;
+	for (stmt = stmts->children; (stmt); stmt = stmt->sibling)	{
+		if (stmt->kind == RETURN_STMT)	{
+			has_return = 1;
+			break;
+		}			
 	}
 	
 	if (!has_return && node->type != ERROR && node->type != VOID)	{
@@ -142,35 +140,24 @@ CTX_VISITOR(vardecl)
 	}
 	
 	node->children->type = node->type;
-	node->children->identifier->decl_linenum = node->linenum;
+	node->children->identifier->decl_node = node;
 	ast_node_accept(node->children, visitor);
 	
 }
 
 CTX_VISITOR(param_list)
 {
-	int i;
 	AstNode* child;
 	
-	node->child_counter = 0;
 	for (child = node->children; (child); child = child->sibling)	{
 		ast_node_accept(child, visitor);
-		node->child_counter++;
-	}
-	
-	identifier_create_params(node->identifier, node->child_counter);
-	
-	i = 0;
-	for (child = node->children; (child); child = child->sibling)	{
-		node->identifier->param_types[i] = child->type;
-		i++;
 	}
 }
 
 CTX_VISITOR(parameter)
 {
 	node->children->type = node->type;
-	node->children->identifier->decl_linenum = node->linenum;
+	node->children->identifier->decl_node = node;
 	
 	ast_node_accept(node->children, visitor);
 }
@@ -240,7 +227,7 @@ CTX_VISITOR(assignment_stmt)
 	ast_node_accept(lnode, visitor);
 	ast_node_accept(rnode, visitor);
 	
-	if (lnode->identifier->params >= 0)	{
+	if (lnode->identifier->decl_node->kind == FUNCTION)	{
 		
 		node->type = ERROR;
 		fprintf(stderr, "Error (line %d): Identifier '%s' is a function identifier, you cannot "
@@ -345,58 +332,47 @@ CTX_VISITOR(notfactor)
 
 CTX_VISITOR(call)
 {
-	int params;
 	AstNode* ident = node->children;
 	AstNode* plist = ident->sibling;
-	
+
 	ast_node_accept(ident, visitor);
 	
 	if (ident->type == ERROR)
 		return;
 	
-	node->type = ident->identifier->type;
-	
-	if (plist != NULL)	{
-		plist->identifier = ident->identifier;
-		
-		ast_node_accept(plist, visitor);
-		params = plist->child_counter;
-	} else {
-		params = 0;
-	}
-	
-	if (params != ident->identifier->params)	{
+	node->type = ident->identifier->type;	
+	plist->identifier = ident->identifier;	
+
+	ast_node_accept(plist, visitor);
+	int decl_param_count = paramlist_get_count(function_get_params(ident->identifier->decl_node));
+	int call_param_count = callparamlist_get_count(plist);
+	if (call_param_count != decl_param_count)	{
 		node->type = ERROR;
-		fprintf(stderr, "Error (line %d): Expecting %d parameters, received %d\n", node->linenum, ident->identifier->params, params);
+		fprintf(stderr, "Error (line %d): Expecting %d parameters, received %d\n", node->linenum, decl_param_count, call_param_count);
 	}
 }
 
 CTX_VISITOR(callparam_list)
 {
-	int i;
+	AstNode* function = node->identifier->decl_node;
+	AstNode* declparams = function_get_params(function);
+		
 	AstNode* child;
+	AstNode* declparam;
 	
-	node->child_counter = 0;
-	for (child = node->children; (child); child = child->sibling)	
-		node->child_counter++;
-	
-	if (node->identifier->params != node->child_counter)	{
-		node->type = ERROR;
-		return;
-	}
-	
-	i = 0;
-	for (child = node->children; (child); child = child->sibling)	{
+	int i = 0;
+	for (child = node->children, declparam = declparams->children; 
+		(child) && (declparam); 
+		child = child->sibling, declparam = declparam->sibling)	{
 		ast_node_accept(child, visitor);
 		
 		if (child->type != ERROR && 
-			child->type != node->identifier->param_types[i])	{
+			child->type != declparam->type)	{
 				
 			node->type = ERROR;
-			child->type = node->identifier->param_types[i];
 			
 			fprintf(stderr, "Error (line %d): Call '%s' expecting %s on parameter %d (",
-				node->linenum, node->identifier->name, type_get_lexeme(node->identifier->param_types[i]),
+				node->linenum, node->identifier->name, type_get_lexeme(declparam->type),
 				i+1);
 			
 			if (child->children->kind == IDENTIFIER)
@@ -405,8 +381,9 @@ CTX_VISITOR(callparam_list)
 				value_print(stderr, &child->value, child->type);
 			
 			fprintf(stderr, "), received %s\n", type_get_lexeme(child->type));
+			child->type = ERROR;
 		}
-		i++;
+		++i;
 	}
 }
 
@@ -421,21 +398,21 @@ CTX_VISITOR(identifier)
 	Identifier* id = scope_lookup(_current_scope, node->identifier->name);
 
 	if (id == NULL)	{
-		if (node->identifier->decl_linenum == 0)	{
+		if (node->identifier->decl_node == NULL)	{
 			node->identifier->type = node->type = ERROR;
 			fprintf(stderr, "Error (line %d): Undeclared identifier '%s'\n", node->linenum, node->identifier->name);
 		} else {
 			node->identifier->type = node->type;
 			node->identifier = scope_insert(_current_scope, node->identifier);
 		}
-	} else if (node->identifier->decl_linenum == 0)	{
+	} else if (node->identifier->decl_node == NULL)	{
 		identifier_destroy(node->identifier);
 		node->identifier = id;
 		node->type = id->type;
 	} else {
 		node->identifier->type = node->type = ERROR;
 		fprintf(stderr, "Error (line %d): Identifier '%s' already defined on line %d\n", 
-			node->linenum, id->name, id->decl_linenum);
+			node->linenum, id->name, id->decl_node->linenum);
 	}	
 }
 

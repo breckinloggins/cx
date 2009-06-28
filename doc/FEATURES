@@ -87,7 +87,7 @@ Remove stupid C# restrictions:
 	- Lambdas are not allowed in anonymous types.  Why?
 	- if you have a delegate of "void d(int foo, int bar)" and a instance of that delegate, you should be able to do () => //whatever
 		with no arguments if the delgate has default paramater values
-	- Anonymous methods cannot be strongly returned from methods.  Why?  I can understand not being able to pass them as parameters, 
+	- Anonymous types cannot be strongly returned from methods.  Why?  I can understand not being able to pass them as parameters, 
 	but a method defined as var Foo() should be able to infer its anonymous type by the type of the return.  You simply make a restriction
 	that ALL return values must resolve to the same anonymous type
  
@@ -98,8 +98,31 @@ Remove stupid C# restrictions:
 	- Now we support aspect-oriented programming!  Logging a method call is as simple as:
 		[Log(LogOptions.ErrorOnly)]
 		public void DoFoo() {}
+	- We can also use this, combined with some other syntactic tricks, to support contracts:
+		[Requires {
+			x > 7, n == 41;
+		}, 
+		Ensures {
+			x == 0, value != null;
+		}]
+		public object DoFoo(int x, int n)	{ ... }
+	- Maybe attributes can appear between a declaration (function, class, ...) and its enclosing block:
+	 	public void Foo()	
+		Requires	{
+			x > 7, n == 41;
+		}, 
+		Ensures	{
+			x == 0, value != null;
+		}
+		{
+			// Function is here
+		}
+		
+		Maybe these are different than attributes.  A "Hook" is an attribute that takes a block as its last parameter, and
+		registers to run that block at certain hook points in whatever it's attached to
  
- refs to almost everything:
+
+refs to almost everything:
 	Property refs
 	Method refs
 	Typerefs

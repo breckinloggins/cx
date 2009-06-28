@@ -13,19 +13,15 @@ typedef struct Identifier_tag	{
 	char* name;							// The name of the identifier as declared in source
 	Type type;
 	Value value;
-	int decl_linenum;
-	struct Scope_tag* decl_scope;		// The scope in which this identifier was declared
 	
-	// For functions
-	int params;
-	Type* param_types;
+	struct Scope_tag* decl_scope;		// The scope in which this identifier was declared
+	struct AstNode_tag* decl_node;		// The node at which this identifier was declared
 	
 	struct Identifier_tag* next;
 } Identifier;
 
 Identifier* identifier_new(const char* name);
 void identifier_destroy(Identifier* identifier);
-void identifier_create_params(Identifier* identifier, int quantity);
 
 Scope*		scope_new(Scope* parent, struct AstNode_tag* decl_node);
 void		scope_destroy_all();

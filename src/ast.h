@@ -17,7 +17,6 @@ typedef struct AstNode_tag	{
 	Value value;
 	Identifier* identifier;
 	int linenum;
-	int child_counter;
 	
 	struct AstNode_tag* parent;
 	struct AstNode_tag* children;
@@ -66,7 +65,6 @@ void ast_node_destroy(AstNode* node);
 
 Value ast_node_get_value(AstNode* node);
 int ast_node_get_value_as_int(AstNode* node);
-int ast_node_get_child_counter(AstNode* node);
 bool ast_node_check_errors(AstNode* node);
 void ast_node_add_child(AstNode* node, AstNode* child);
 void ast_node_add_sibling(AstNode* node, AstNode* sibling);

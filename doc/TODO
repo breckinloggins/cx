@@ -46,12 +46,15 @@
 [X]	Remove temporary "fn" modifier
 [X]	Fix memory leaks
 [X]	Implement chained identifier tables
-[]	Show chained scope tables in the graph
-[]	Parse the input file name to create good output intermediate and executable names
-[]	Add a "declaration node" to the identifier table in place of the ad-hoc stuff in there now
+[X]	Add AST codenode_helper module for AST helper functions
+[X]	BUG: Graphprinter crashes with new type system
+[X] Replace hardcoded function information in the identifier table with a reference to the declaration node
 []	Add Ast Node Types for types and type declarations
+[]	Add a "declaration node" to the identifier table in place of the ad-hoc stuff in there now
 []	Add array type
 []	Add string type/string literals
+[]	Add using declaration, initial lookup logic
+[]	Add code for standard environment
 []	Refactor variable declaration syntax and add support for assignments on the same line
 []	Test all control and loop structures
 []	BUG: For loop behavior is hard coded and stupid
@@ -70,6 +73,7 @@
 []	Add enum type
 []	Add foreach
 []	Test (and fix) dangling else
+[]	Show chained scope tables in the graph
 []	Replace built in I/O statements with a standard environment
 []	Add more test files and create a testing framework with CMake/CTest
 []	Add /// comment that clings to closest program unit
@@ -82,4 +86,5 @@
 []	Get Cx compiling under Windows
 []  Add feature where type of last expression in function will be the return value of
 	that function (??)
+[]	Parse the input file name to create good output intermediate and executable names
 []	Add support for compound statements, support them in for loops

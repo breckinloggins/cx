@@ -12,6 +12,18 @@ Reference Arithmetic:
 		
 		MyObject bar = &ref;					// Same as MyObject bar = ref;
 		
+Non-null References:
+	- Allowing null references called the "Billion Dollar Mistake" by Hoare
+	- Languages like Spec# solve the problem, but I believe the method may be too complicated for everyday use
+	- Concept of "defaults"
+	- Every type has a default
+		Primitives are easy: int/double/float = 0, char = '\0', bool = false, string = "", etc...
+		Arrays have zero count, which will work find with foreach, for, etc.
+		Defaults of structs/classes are the defaults of all their primitives
+	- Defaults can be modified using some syntax (undecided)
+	- The "has value" concept is implemented with nullable types, which returns a default if no value but allows client code to query it
+	- NULL can still be utilized within _C_ blocks, which should allow for backward compatibility
+	
 Automatic Meta generator:
 
 	- meta(SomeClass) 		-> MetaClass

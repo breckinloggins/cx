@@ -536,7 +536,7 @@ char* _identifier_get_cname(Identifier* identifier)
 		}
 				
 		char* cname;
-		if (identifier->params >= 0 && !strcmp(identifier->name, "main"))	{
+		if (identifier->decl_node->kind == FUNCTION && !strcmp(identifier->name, "main"))	{
 			// HACK: Makes sure we have an actual function called main so the C compiler can find
 			//		and entry point.  Fix this by passing the name of the main function to the compiler
 			asprintf(&cname, "%s", identifier->name);

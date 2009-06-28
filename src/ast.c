@@ -24,7 +24,6 @@ AstNode* ast_node_new(const char* name, Kind kind, Type type, int linenum, Ident
 	node->kind = kind;
 	node->type = type;
 	node->linenum = linenum;
-	node->child_counter = 0;
 	node->identifier = identifier;
 	node->parent = NULL;
 	node->children = NULL;
@@ -66,11 +65,6 @@ Value ast_node_get_value(AstNode* self)
 int ast_node_get_value_as_int(AstNode* self)
 {
 	return ast_node_get_value(self).integer;
-}
-
-int ast_node_get_child_counter(AstNode* self)
-{
-	return self->child_counter++;
 }
 
 bool ast_node_check_errors(AstNode* self)
@@ -129,8 +123,6 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 	
 	if (!self)
 		return;
-		
-	self->child_counter = 1;
 	
 	switch(self->kind)	{
 		case TRANSLATIONUNIT:

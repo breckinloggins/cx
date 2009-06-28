@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "common/memory.h"
+#include "codenode_helper.h"
 #include "graphprinter_visitor.h"
 
 static void _print_arrow(AstNode *node);
@@ -188,15 +189,17 @@ graphprinter_visit_call (Visitor *visitor, AstNode *node)
 void
 graphprinter_visit_callparam_list (Visitor *visitor, AstNode *node)
 {
-    int i;
-
     _print_arrow(node);
     fprintf(out,"\tnode_%x [label=\"%s\\n<", node, node->name);
-
-    for (i = 0; i < node->identifier->params; i++) {
-        fprintf(out,"%s", type_get_lexeme(node->identifier->param_types[i]));
-        if (i + 1 < node->identifier->params)
+	
+	int param_count = callparamlist_get_count(node);
+	int i = 0;
+	AstNode* param;
+	for (param = node->children; (param); param = param->sibling)	{
+        fprintf(out,"%s", type_get_lexeme(param->type));
+        if (i + 1 < param_count)
             fprintf(out,", ");
+		++i;
     }
 
 
@@ -224,13 +227,13 @@ graphprinter_visit_identifier (Visitor *visitor, AstNode *node)
 
     fprintf(out,"\tnode_%x [label=\"", node);
 
-    if (node->identifier->decl_linenum == 0)
+	if (node->identifier->decl_node == NULL)
         fprintf(out,"UNDECLARED\\n");
 
     fprintf(out,"%s\\n'%s'\\n<%s>\",style=filled,color=",
            node->name, node->identifier->name, type_get_lexeme(node->type));
 
-    if (node->identifier->decl_linenum == 0)
+    if (node->identifier->decl_node == NULL)
         fprintf(out,COLOR_EDGE_ERROR);
     else if (node->identifier->decl_scope != NULL && node->identifier->decl_scope->parent == NULL)
         fprintf(out,COLOR_FILL_GLOBAL);
@@ -263,9 +266,7 @@ graphprinter_visit_literal (Visitor *visitor, AstNode *node)
 static void
 _print_arrow(AstNode *node)
 {
-    fprintf(out,"\tnode_%x -> node_%x [label=\"%d\",",
-           node->parent, node, ast_node_get_child_counter(node->parent));
-    fprintf(out,"fontsize=11,fontname=Courier];\n");
+	fprintf(out,"\tnode_%x -> node_%x [fontsize=11,fontname=Courier];\n", node->parent, node);
 }
 
 static void

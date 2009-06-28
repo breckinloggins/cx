@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "common/memory.h"
+#include "ast.h"
 #include "identifier_table.h"
 
 Identifier* _identifier_lookup(Identifier* idtable, const char* name)
@@ -52,7 +53,11 @@ void _identifier_print(Identifier* identifier)
 	printf("\ttype: %d\n", identifier->type);
 	printf("\tvalue: ");
 	value_print(stdout, &identifier->value, identifier->type);
-	printf("\n\tdeclaration line: %d\n", identifier->decl_linenum);
+	int decl_linenum = 0;
+	if (identifier->decl_node)	{
+		decl_linenum = identifier->decl_node->linenum;
+	}
+	printf("\n\tdeclaration line: %d\n", decl_linenum);
 	printf("\tnext: %x\n\n", identifier->next);
 }
 
@@ -109,11 +114,8 @@ Identifier* identifier_new(const char* name)
 
 	identifier->type = VOID;
 	value_set(&identifier->value, identifier->type, NULL);
-	identifier->params = -1;
-	identifier->param_types = NULL;
-	identifier->decl_linenum = 0;
 	identifier->decl_scope = NULL;
-
+	identifier->decl_node = NULL;
 	identifier->next = NULL;
 
 	if (name != NULL)
@@ -124,25 +126,15 @@ Identifier* identifier_new(const char* name)
 	return identifier;
 }
 
-void identifier_create_params(Identifier* identifier, int quantity)
-{
-	identifier->params = quantity;
-	if (quantity > 0)
-		identifier->param_types = (Type *)malloc(sizeof(Type) * quantity);
-}
-
 void identifier_destroy(Identifier* identifier)
 {
 	free(identifier->name);
 	
-	if (identifier->param_types)	{
-		free(identifier->param_types);
-	}
-	
 	free(identifier);
 	
 	// The following don't belong to us:
-	//	- decl_scope_node
+	//	- decl_node
+	//	- decl_scope
 }
 
 Scope* scope_new(Scope* parent, struct AstNode_tag* decl_node)

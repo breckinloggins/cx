@@ -274,6 +274,10 @@ FunctionDecl:
 			
 			AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, vardecl_node->type, yylloc.last_line, NULL);
 			ast_node_add_child(ast_node, vardecl_node->children);	// Identifier
+			
+			AstNode* params = ast_node_new("ParamList", PARAM_LIST, VOID, yylloc.last_line, NULL);
+			ast_node_add_child(ast_node, params);					// Empty parameter list
+			
 			ast_node_add_child(ast_node, $5);						// Block
 
 			// We don't need the vardecl_node anymore as we've collapsed its information
@@ -290,6 +294,10 @@ FunctionDecl:
 			
 			AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, vardecl_node->type, yylloc.last_line, NULL);
 			ast_node_add_child(ast_node, vardecl_node->children);	// Identifier
+			
+			AstNode* params = ast_node_new("ParamList", PARAM_LIST, VOID, yylloc.last_line, NULL);
+			ast_node_add_child(ast_node, params);					// Empty parameter list
+			
 			ast_node_add_child(ast_node, $4);						// Block
 
 			// We don't need the vardecl_node anymore as we've collapsed its information
@@ -332,7 +340,7 @@ SingleParam:
 
 Block:
 	T_LBRACK LocalVariableDeclarationsAndStatements T_RBRACK { $$ = $2; }
-	| T_LBRACK T_RBRACK {$$ = NULL; }
+	| T_LBRACK T_RBRACK {$$ = ast_node_new("StatementList", STATEMENT_LIST, VOID, yylloc.last_line, NULL); }
 	;
 	
 LocalVariableDeclarationsAndStatements:
@@ -573,7 +581,11 @@ Call:
 	| Identifier T_LPAR T_RPAR
 	{
 		AstNode* ast_node = ast_node_new("Call", CALL, VOID, yylloc.last_line, NULL);
-		ast_node_add_child(ast_node, $1);	// Identifier
+		ast_node_add_child(ast_node, $1);				// Identifier
+		
+		AstNode* callparams = ast_node_new("CallParamList", CALLPARAM_LIST, VOID, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, callparams);		// Empty call param list
+		
 		$$ = ast_node;
 	}
 	;
