@@ -105,7 +105,6 @@
 "else"						{ uploc; return T_ELSE; }
 "while"						{ uploc; return T_WHILE; }
 "for"						{ uploc; return T_FOR; }
-"to"						{ uploc; return T_TO; }
 "do"						{ uploc; return T_DO; }
 
 "="							{ uploc; return T_ASSIGNMENT; }

@@ -42,6 +42,7 @@ typedef struct Visitor_tag	{
 	VISITOR_PFN(visit_return_stmt);
 	VISITOR_PFN(visit_if_stmt);
 	VISITOR_PFN(visit_while_stmt);
+	VISITOR_PFN(visit_dowhile_stmt);
 	VISITOR_PFN(visit_for_stmt);
 	VISITOR_PFN(visit_readchar_expr);
 	VISITOR_PFN(visit_rel_expr);

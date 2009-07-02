@@ -48,14 +48,12 @@ AstNode* ast;
 
 %token T_PUBLIC
 %token T_PRIVATE
-%token T_FN
 %token T_RETURN
 
 %token T_IF
 %token T_ELSE
 %token T_WHILE
 %token T_FOR
-%token T_TO
 %token T_DO
 
 %token T_ASSIGNMENT
@@ -116,8 +114,10 @@ AstNode* ast;
 %type <astnode> EmptyStatement
 %type <astnode> AssignmentStatement
 %type <astnode> ExpressionStatement
+%type <astnode> ExpressionStatements
 %type <astnode> IfStatement
 %type <astnode> WhileStatement
+%type <astnode> DoWhileStatement
 %type <astnode> ForStatement
 %type <astnode> PrintStatement
 %type <astnode> PrintCharStatement
@@ -398,9 +398,10 @@ LocalVariableDeclarationOrStatement:
 Statement:
 	EmptyStatement { $$ = NULL; }
 	| AssignmentStatement { $$ = $1; }
-	| ExpressionStatement { $$ = $1; }
+	| ExpressionStatement T_SEMICOLON { $$ = $1; }
 	| IfStatement { $$ = $1; }
 	| WhileStatement { $$ = $1; }
+	| DoWhileStatement { $$ = $1; }
 	| ForStatement { $$ = $1; }
 	| PrintStatement { $$ = $1; }
 	| ReturnStatement { $$ = $1; }
@@ -517,9 +518,18 @@ WhileStatement:
 		$$ = ast_node;
 	}
 	;
+
+DoWhileStatement:
+	T_DO Statement T_WHILE T_LPAR Expression T_RPAR T_SEMICOLON
+	{
+		AstNode* ast_node = ast_node_new("DoWhileStatement", DOWHILE_STMT, VOID, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $2);	// Statement
+		ast_node_add_child(ast_node, $5);	// Expression
+		$$ = ast_node;
+	}
 	
 ForStatement:
-	T_FOR T_LPAR Assignment T_TO Expression T_RPAR Statement
+	T_FOR T_LPAR Assignment T_SEMICOLON Expression T_RPAR Statement
 	{
 		AstNode* ast_node = ast_node_new("ForStatement", FOR_STMT, VOID, yylloc.last_line, NULL);
 		ast_node_add_child(ast_node, $3);	// Assignment
@@ -527,9 +537,30 @@ ForStatement:
 		ast_node_add_child(ast_node, $7);	// Statements
 		$$ = ast_node;
 	}
-	
+	;
+
+ExpressionStatements:
+	ExpressionStatement 
+	{
+		AstNode* ast_node = ast_node_new("ExpressionStatementList", EXPRESSIONSTMT_LIST, VOID, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $1);
+		
+		$$ = ast_node;
+	}
+	| ExpressionStatements T_COMMA ExpressionStatement
+	{
+		AstNode* ast_node = $1;
+		if (!ast_node)	{
+			ast_node = ast_node_new("ExpressionStatementList", EXPRESSIONSTMT_LIST, VOID, yylloc.last_line, NULL);
+		}
+		
+		ast_node_add_child(ast_node, $3);
+		$$ = ast_node;
+	}
+	;
+
 ExpressionStatement:
-	Expression T_SEMICOLON	{ $$ = $1; }
+	Expression { $$ = $1; }
 	;
 	
 Expression:

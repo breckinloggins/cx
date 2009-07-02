@@ -50,6 +50,12 @@
 [X]	BUG: Graphprinter crashes with new type system
 [X] Replace hardcoded function information in the identifier table with a reference to the declaration node
 [X]	Allow translation units to have multiple namespaces
+[X]	Add do/while
+[X]	Test (and fix) dangling else
+[]	Allow C Block to live outside of namespace and function declarations
+[]	BUG: For loop behavior is hard coded and stupid
+[]	Add support for compound statements, support them in for loops
+[]	Test all control and loop structures
 []	Add code for standard environment
 []	BUG: Cleanup partially constructed AST when program exits due to syntax error
 []	Add Ast Node Types for types and type declarations
@@ -58,12 +64,9 @@
 []	Add string type/string literals
 []	Add using declaration, initial lookup logic
 []	Refactor variable declaration syntax and add support for assignments on the same line
-[]	Test all control and loop structures
-[]	BUG: For loop behavior is hard coded and stupid
 []	Add hexadecimal and octal literals
 []	Add bitwise operators
 []	Add ternary operator
-[]	Add do/while
 []	Add break/continue statements
 []	Add switch statement
 []	Add goto/labels
@@ -74,7 +77,6 @@
 []	Add class type
 []	Add enum type
 []	Add foreach
-[]	Test (and fix) dangling else
 []	Show chained scope tables in the graph
 []	Replace built in I/O statements with a standard environment
 []	Add more test files and create a testing framework with CMake/CTest
@@ -89,4 +91,3 @@
 []  Add feature where type of last expression in function will be the return value of
 	that function (??)
 []	Parse the input file name to create good output intermediate and executable names
-[]	Add support for compound statements, support them in for loops

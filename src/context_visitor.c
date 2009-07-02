@@ -275,7 +275,24 @@ CTX_VISITOR(while_stmt)
 	
 	if (expr->type != BOOLEAN)	{
 		node->type = ERROR;
-		fprintf(stderr, "Error (line %d): Expressin in While statement must be of Boolean type\n", node->linenum);
+		fprintf(stderr, "Error (line %d): Expression in While statement must be of Boolean type\n", node->linenum);
+	}
+}
+
+CTX_VISITOR(dowhile_stmt)
+{
+	AstNode* stmt = node->children;
+	AstNode* expr = stmt->sibling;
+	
+	_current_scope = scope_new(_current_scope, node);
+	ast_node_accept(stmt, visitor);
+	_current_scope = _current_scope->parent;
+		
+	ast_node_accept(expr, visitor);
+	
+	if (expr->type != BOOLEAN)	{
+		node->type = ERROR;
+		fprintf(stderr, "Error (line %d): Expression in Do-While statement must be of Boolean type\n", node->linenum);
 	}
 }
 

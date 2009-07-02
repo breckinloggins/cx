@@ -31,6 +31,7 @@ CTX_VISITOR(return_stmt);
 CTX_VISITOR(assignment_stmt);
 CTX_VISITOR(if_stmt);
 CTX_VISITOR(while_stmt);
+CTX_VISITOR(dowhile_stmt);
 CTX_VISITOR(for_stmt);
 CTX_VISITOR(binary_expr);
 CTX_VISITOR(notfactor);

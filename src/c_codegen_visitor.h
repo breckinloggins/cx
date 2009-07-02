@@ -27,6 +27,7 @@ C_VISITOR(return_stmt);
 C_VISITOR(assignment_stmt);
 C_VISITOR(if_stmt);
 C_VISITOR(while_stmt);
+C_VISITOR(dowhile_stmt);
 C_VISITOR(for_stmt);
 C_VISITOR(binary_expr);
 C_VISITOR(notfactor);

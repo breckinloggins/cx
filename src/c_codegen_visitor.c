@@ -40,6 +40,7 @@ Visitor* c_codegen_new(FILE* output)
 	V_INIT(assignment_stmt, assignment_stmt);
 	V_INIT(if_stmt, if_stmt);
 	V_INIT(while_stmt, while_stmt);
+	V_INIT(dowhile_stmt, dowhile_stmt);
 	V_INIT(for_stmt, for_stmt);
 	V_INIT(rel_expr, binary_expr);
 	V_INIT(add_expr, binary_expr);
@@ -265,8 +266,7 @@ C_VISITOR(if_stmt)
 C_VISITOR(while_stmt)
 {
 	AstNode* child;
-	const char* var;
-	
+
 	fprintf(out, "while (");
 	child = node->children;					// Expression
 	ast_node_accept(child, visitor);
@@ -279,6 +279,21 @@ C_VISITOR(while_stmt)
 	fprintf(out, "\n");
 	_tab();
 	fprintf(out, "}");
+}
+
+C_VISITOR(dowhile_stmt)
+{
+	AstNode* child;
+	
+	fprintf(out, "do {\n");
+	++tab_level;
+	child = node->children;					// Statement
+	ast_node_accept(child, visitor);
+	--tab_level;
+	fprintf(out, "\n} while (");
+	child = child->sibling;					// Expression
+	ast_node_accept(child, visitor);
+	fprintf(out, ");\n");
 }
 
 C_VISITOR(for_stmt)

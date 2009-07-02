@@ -176,6 +176,9 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 		case WHILE_STMT:
 			visit = visitor->visit_while_stmt;
 			break;
+		case DOWHILE_STMT:
+			visit = visitor->visit_dowhile_stmt;
+			break;
 		case FOR_STMT:
 			visit = visitor->visit_for_stmt;
 			break;
