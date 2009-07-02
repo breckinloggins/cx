@@ -2,6 +2,10 @@
  *	Tests various capabilities of functions
  */
 
+_C_ {
+	#include <stdlib.h>
+}
+
 namespace functions	{
 
 	void doesNothing()	{

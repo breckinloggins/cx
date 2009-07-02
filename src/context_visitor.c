@@ -68,8 +68,8 @@ CTX_VISITOR(TranslationUnit)
 	_current_scope = scope_new(NULL, node);
 	_inside_procfunc = NULL;
 	
-	// Namespaces
-	ast_node_accept(node->children, visitor);
+	// Namespaces and/or CBlocks
+	ast_node_accept_children(node->children, visitor);
 }
 
 CTX_VISITOR(NamespaceDecl)

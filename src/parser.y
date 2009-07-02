@@ -160,6 +160,23 @@ TranslationUnit:
 		
 		ast = ast_node;
 	}
+	| CBlockStatement NamespaceDeclList
+	{
+		AstNode* ast_node = ast_node_new("TranslationUnit", TRANSLATIONUNIT, VOID, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $1);	// CBlock
+		ast_node_add_child(ast_node, $2);	// NamespaceDeclList
+		$$ = ast_node;
+		
+		ast = ast_node;
+	}
+	| CBlockStatement
+	{
+		AstNode* ast_node = ast_node_new("TranslationUnit", TRANSLATIONUNIT, VOID, yylloc.last_line, NULL);
+		ast_node_add_child(ast_node, $1);	// CBlock
+		$$ = ast_node;
+
+		ast = ast_node;
+	}
 	;
 
 NamespaceDeclList:

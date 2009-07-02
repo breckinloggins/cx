@@ -52,7 +52,7 @@
 [X]	Allow translation units to have multiple namespaces
 [X]	Add do/while
 [X]	Test (and fix) dangling else
-[]	Allow C Block to live outside of namespace and function declarations
+[X]	Allow C Block to live outside of namespace declarations (for header files, macros, etc)
 []	BUG: For loop behavior is hard coded and stupid
 []	Add support for compound statements, support them in for loops
 []	Test all control and loop structures

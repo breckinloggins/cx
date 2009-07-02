@@ -159,7 +159,19 @@ C_VISITOR(statement_list)
 	
 	for(child = node->children; (child); child = child->sibling)	{
 		_tab();
+		
+		// If a CBLOCK_STMT, we want to separate it by curly braces so 
+		// it will have its own C-Block 
+		if (child->kind == CBLOCK_STMT)	{
+			fprintf(out, "{\n");
+		}
+		
 		ast_node_accept(child, visitor);
+		
+		if (child->kind == CBLOCK_STMT)	{
+			fprintf(out, "\n}");
+		}
+		
 		fprintf(out, ";\n");
 	}
 }
@@ -199,11 +211,9 @@ C_VISITOR(cblock_stmt)
 {
 	// We just insert the code inside the block directly
 	// into the output and hope the user knows what he's doing
-	fprintf(out, "{\n");
 	fprintf(out, "%s", node->value.literal_content);
 	fprintf(out, "\n");
 	_tab();
-	fprintf(out, "}");
 }
 
 C_VISITOR(return_stmt)
