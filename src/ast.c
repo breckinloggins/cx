@@ -10,7 +10,7 @@
 #include "ast.h"
 #include "parser.h"
 
-AstNode* ast_node_new(const char* name, Kind kind, PrimitiveType type, int linenum, Identifier* identifier)
+AstNode* ast_node_new(const char* name, Kind kind, PrimitiveType type, int linenum)
 {
 	//printf("Created a node of type %s\n", name);
 	
@@ -24,7 +24,7 @@ AstNode* ast_node_new(const char* name, Kind kind, PrimitiveType type, int linen
 	node->kind = kind;
 	node->type = type;
 	node->linenum = linenum;
-	node->identifier = identifier;
+	node->identifier = NULL;
 	node->parent = NULL;
 	node->children = NULL;
 	node->sibling = NULL;
@@ -250,4 +250,60 @@ void ast_node_accept_children(AstNode* self, Visitor* visitor)
 	AstNode* temp;
 	for (temp = self; (temp); temp = temp->sibling)
 		ast_node_accept(temp, visitor);
+}
+
+char* kind_get_name(int kind)
+{
+	switch(kind)	{
+		case TRANSLATIONUNIT: 			return "TranslationUnit";
+		case NAMESPACE_DECL: 			return "NamespaceDecl";
+		case NAMESPACEDECL_LIST: 		return "NamespaceDeclList";
+		case VARDECL: 					return "VarDecl";
+		case FUNCTION: 					return "Function";
+		case PARAM_LIST: 				return "ParamList";
+		case PARAMETER: 				return "Parameter";
+		case STATEMENT_LIST: 			return "StatementList";
+		case EXPRESSIONSTMT_LIST: 		return "ExpressionStatementList";
+		case PRINTINT_STMT: 			return "PrintIntStatement";
+		case PRINTCHAR_STMT: 			return "PrintCharStatement";
+		case PRINTBOOL_STMT: 			return "PrintBoolStatement";
+		case PRINTLINE_STMT:			return "PrintLineStatement";
+		case CBLOCK_STMT:				return "CBlockStatement";
+		case ASSIGNMENT_STMT:			return "AssignmentStatement";
+		case RETURN_STMT:				return "ReturnStatement";
+		case IF_STMT:					return "IfStatement";
+		case WHILE_STMT:				return "WhileStatement";
+		case DOWHILE_STMT:				return "DoWhileStatement";
+		case FOR_STMT:					return "ForStatement";
+		case REL_EXPR:					return "RelationExpression";
+		case ADD_EXPR:					return "AddExpression";
+		case MUL_EXPR:					return "MulExpression";
+		case READCHAR_EXPR:				return "ReadCharExpression";
+		case NOTFACTOR:					return "NotFactor";
+		case CALL:						return "Call";
+		case CALLPARAM_LIST:			return "CallParamList";
+		case CALLPARAM:					return "CallParam";
+		case IDENTIFIER:				return "Identifier";
+		case INT_LITERAL:				return "IntLiteral";
+		case BOOL_LITERAL:				return "BoolLiteral";
+		case CHAR_LITERAL:				return "CharLiteral";
+		case DOUBLE_LITERAL:			return "DoubleLiteral";
+		case FLOAT_LITERAL:				return "FloatLiteral";
+		case T_PLUS:					return "+";
+		case T_MINUS:					return "-";
+		case T_OR:						return "||";
+		case T_STAR:					return "*";
+		case T_SLASH:					return "/";
+		case T_AND:						return "&&";
+		case T_LESSER:					return "<";
+		case T_LESSEREQUAL:				return "<=";
+		case T_GREATER:					return ">";
+		case T_GREATEREQUAL:			return ">=";
+		case T_EQUAL:					return "==";
+		case T_NOTEQUAL:				return "!=";
+		
+		default:	
+			fprintf(stderr, "Internal Compiler Error: Unrecognized kind (%d) in kind_get_name\n", kind);
+			exit(1);
+	}
 }

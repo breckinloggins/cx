@@ -61,7 +61,7 @@ typedef struct Visitor_tag	{
 
 typedef VISITOR_PFN(VisitFunc);
 
-AstNode* ast_node_new(const char* name, Kind kind, PrimitiveType type, int linenum, Identifier* identifier);
+AstNode* ast_node_new(const char* name, Kind kind, PrimitiveType type, int linenum);
 void ast_node_destroy(AstNode* node);
 
 Value ast_node_get_value(AstNode* node);
@@ -73,4 +73,5 @@ void ast_node_add_sibling(AstNode* node, AstNode* sibling);
 void ast_node_accept(AstNode* self, Visitor* visitor);
 void ast_node_accept_children(AstNode* self, Visitor* visitor);
 
+char* kind_get_name(int kind);
 #endif

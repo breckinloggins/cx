@@ -53,6 +53,9 @@
 [X]	Add do/while
 [X]	Test (and fix) dangling else
 [X]	Allow C Block to live outside of namespace declarations (for header files, macros, etc)
+[X]	Remove superfluous parameter from ast_node_new()
+[X]	Add Macro to ast_node_new in parser.y
+[X]	Have lookup from AST Node Kind to string name in base.h, remove from ast_node_new
 []	BUG: For loop behavior is hard coded and stupid
 []	Add support for compound statements, support them in for loops
 []	Test all control and loop structures

@@ -28,3 +28,6 @@ Or you might even see:
 (cxi stands for "Cx Interface")
 
 When a Cx application uses the standard library, it only pulls in the minimum needed to do the work.  Using Console.WriteLine() will NOT pull in 8mbs of crap into the binary.
+
+Object Model:
+	Look into id-objmodel: http://www.piumarta.com/software/id-objmodel/

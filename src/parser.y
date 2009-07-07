@@ -10,6 +10,9 @@
 
 #define YYDEBUG 1
 
+#define AST_NEW(k)		ast_node_new(kind_get_name(k), k, VOID, yylloc.last_line)
+#define AST_NEW_T(k, t)	ast_node_new(kind_get_name(k), k, t, yylloc.last_line)
+
 extern FILE *yyin;
 
 static void yyerror(const char* msg);
@@ -154,27 +157,24 @@ AstNode* ast;
 TranslationUnit:
 	NamespaceDeclList
 	{
-		AstNode* ast_node = ast_node_new("TranslationUnit", TRANSLATIONUNIT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(TRANSLATIONUNIT);
 		ast_node_add_child(ast_node, $1);	// NamespaceDeclList
 		$$ = ast_node;
-		
 		ast = ast_node;
 	}
 	| CBlockStatement NamespaceDeclList
 	{
-		AstNode* ast_node = ast_node_new("TranslationUnit", TRANSLATIONUNIT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(TRANSLATIONUNIT);
 		ast_node_add_child(ast_node, $1);	// CBlock
 		ast_node_add_child(ast_node, $2);	// NamespaceDeclList
 		$$ = ast_node;
-		
 		ast = ast_node;
 	}
 	| CBlockStatement
 	{
-		AstNode* ast_node = ast_node_new("TranslationUnit", TRANSLATIONUNIT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(TRANSLATIONUNIT);
 		ast_node_add_child(ast_node, $1);	// CBlock
 		$$ = ast_node;
-
 		ast = ast_node;
 	}
 	;
@@ -182,7 +182,7 @@ TranslationUnit:
 NamespaceDeclList:
 	NamespaceDecl
 	{
-		AstNode* ast_node = ast_node_new("NamespaceDeclList", NAMESPACEDECL_LIST, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(NAMESPACEDECL_LIST);
 		ast_node_add_child(ast_node, $1);
 		
 		$$ = ast_node;
@@ -191,7 +191,7 @@ NamespaceDeclList:
 	{
 		AstNode* ast_node = $1;
 		if (!ast_node)	{
-			ast_node = ast_node_new("NamespaceDeclList", NAMESPACEDECL_LIST, VOID, yylloc.last_line, NULL);
+			ast_node = AST_NEW(NAMESPACEDECL_LIST);
 		}
 		ast_node_add_child(ast_node, $2);
 		
@@ -202,7 +202,7 @@ NamespaceDeclList:
 NamespaceDecl:
 	T_NAMESPACE Identifier T_LBRACE NamespaceVariableAndFunctionDeclarations T_RBRACE
 	{
-		AstNode* ast_node = ast_node_new("NamespaceDecl", NAMESPACE_DECL, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(NAMESPACE_DECL);
 		ast_node_add_child(ast_node, $2);	// Namespace Identifier
 		ast_node_add_child(ast_node, $4);	// Variable and Function Declarations
 	
@@ -210,7 +210,7 @@ NamespaceDecl:
 	}
 	| T_NAMESPACE Identifier T_LBRACE T_RBRACE
 	{
-		AstNode* ast_node = ast_node_new("NamespaceDecl", NAMESPACE_DECL, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(NAMESPACE_DECL);
 		ast_node_add_child(ast_node, $2);	// Namespace Identifier
 			
 		$$ = ast_node;
@@ -242,7 +242,7 @@ Dims:
 NamespaceVariableAndFunctionDeclarations:
 	NamespaceVariableOrFunctionDeclaration
 	{
-		AstNode* ast_node = ast_node_new("NamespaceDeclList", NAMESPACEDECL_LIST, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(NAMESPACEDECL_LIST);
 		ast_node_add_child(ast_node, $1);
 		
 		$$ = ast_node;
@@ -251,7 +251,7 @@ NamespaceVariableAndFunctionDeclarations:
 	{
 		AstNode* ast_node = $1;
 		if (!ast_node)	{
-			ast_node = ast_node_new("NamespaceDeclList", NAMESPACEDECL_LIST, VOID, yylloc.last_line, NULL);
+			ast_node = AST_NEW(NAMESPACEDECL_LIST);
 		}
 		
 		ast_node_add_child(ast_node, $2);
@@ -267,7 +267,7 @@ NamespaceVariableOrFunctionDeclaration:
 VarDecl:
 	TypeSpecifier Identifier
 	{
-		AstNode* ast_node = ast_node_new("VarDecl", VARDECL, $1, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(VARDECL, $1);
 		ast_node_add_child(ast_node, $2);
 		$$ = ast_node;
 	}
@@ -283,7 +283,7 @@ FunctionDecl:
 	{
 		AstNode* vardecl_node = $1;
 		
-		AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, vardecl_node->type, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(FUNCTION, vardecl_node->type);
 		ast_node_add_child(ast_node, vardecl_node->children);	// Identifier
 		ast_node_add_child(ast_node, $3);						// ParamList
 		ast_node_add_child(ast_node, $5);						// Block
@@ -300,7 +300,7 @@ FunctionDecl:
 	{
 		AstNode* vardecl_node = $2;
 		
-		AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, vardecl_node->type, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(FUNCTION, vardecl_node->type);
 		ast_node_add_child(ast_node, vardecl_node->children);	// Identifier
 		ast_node_add_child(ast_node, $4);						// ParamList
 		ast_node_add_child(ast_node, $6);						// Block
@@ -317,10 +317,10 @@ FunctionDecl:
 	{
 			AstNode* vardecl_node = $2;
 			
-			AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, vardecl_node->type, yylloc.last_line, NULL);
+			AstNode* ast_node = AST_NEW_T(FUNCTION, vardecl_node->type);
 			ast_node_add_child(ast_node, vardecl_node->children);	// Identifier
 			
-			AstNode* params = ast_node_new("ParamList", PARAM_LIST, VOID, yylloc.last_line, NULL);
+			AstNode* params = AST_NEW(PARAM_LIST);
 			ast_node_add_child(ast_node, params);					// Empty parameter list
 			
 			ast_node_add_child(ast_node, $5);						// Block
@@ -337,10 +337,10 @@ FunctionDecl:
 	{
 			AstNode* vardecl_node = $1;
 			
-			AstNode* ast_node = ast_node_new("FunctionDecl", FUNCTION, vardecl_node->type, yylloc.last_line, NULL);
+			AstNode* ast_node = AST_NEW_T(FUNCTION, vardecl_node->type);
 			ast_node_add_child(ast_node, vardecl_node->children);	// Identifier
 			
-			AstNode* params = ast_node_new("ParamList", PARAM_LIST, VOID, yylloc.last_line, NULL);
+			AstNode* params = AST_NEW(PARAM_LIST);
 			ast_node_add_child(ast_node, params);					// Empty parameter list
 			
 			ast_node_add_child(ast_node, $4);						// Block
@@ -358,7 +358,7 @@ FunctionDecl:
 ParamList:
 	SingleParam
 	{
-		AstNode* ast_node = ast_node_new("ParamList", PARAM_LIST, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(PARAM_LIST);
 		ast_node_add_child(ast_node, $1);
 		$$ = ast_node;
 	}
@@ -366,7 +366,7 @@ ParamList:
 	{
 		AstNode* ast_node = $1;
 		if (!ast_node)	{
-			ast_node = ast_node_new("ParamList", PARAM_LIST, VOID, yylloc.last_line,  NULL);
+			ast_node = AST_NEW(PARAM_LIST);
 		}
 		
 		ast_node_add_child(ast_node, $3);
@@ -377,7 +377,7 @@ ParamList:
 SingleParam:
 	TypeSpecifier Identifier
 	{
-		AstNode* ast_node = ast_node_new("Parameter", PARAMETER, $1, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(PARAMETER, $1);
 		ast_node_add_child(ast_node, $2);	// Identifier
 		$$ = ast_node;
 	}
@@ -385,13 +385,13 @@ SingleParam:
 
 Block:
 	T_LBRACE LocalVariableDeclarationsAndStatements T_RBRACE { $$ = $2; }
-	| T_LBRACE T_RBRACE {$$ = ast_node_new("StatementList", STATEMENT_LIST, VOID, yylloc.last_line, NULL); }
+	| T_LBRACE T_RBRACE {$$ = AST_NEW(STATEMENT_LIST); }
 	;
 	
 LocalVariableDeclarationsAndStatements:
 	LocalVariableDeclarationOrStatement 
 	{ 
-		AstNode* ast_node = ast_node = ast_node_new("StatementList", STATEMENT_LIST, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = ast_node = AST_NEW(STATEMENT_LIST);
 		ast_node_add_child(ast_node, $1);
 		$$ = ast_node; 
 	}
@@ -399,7 +399,7 @@ LocalVariableDeclarationsAndStatements:
 	{
 		AstNode* ast_node = $1;
 		if (!ast_node)	{
-			ast_node = ast_node_new("StatementList", STATEMENT_LIST, VOID, yylloc.last_line, NULL);
+			ast_node = AST_NEW(STATEMENT_LIST);
 		}
 		
 		ast_node_add_child(ast_node, $2);
@@ -433,14 +433,14 @@ EmptyStatement:
 IfStatement:
 	T_IF T_LPAR Expression T_RPAR Statement
 	{
-		AstNode* ast_node = ast_node_new("IfStatement", IF_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(IF_STMT);
 		ast_node_add_child(ast_node, $3);	// Expression
 		ast_node_add_child(ast_node, $5);	// Statements
 		$$ = ast_node;
 	}
 	| T_IF T_LPAR Expression T_RPAR Statement T_ELSE Statement
 	{
-		AstNode* ast_node = ast_node_new("IfStatement", IF_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(IF_STMT);
 		ast_node_add_child(ast_node, $3);	// Expression
 		ast_node_add_child(ast_node, $5);	// StatementMatched true
 		ast_node_add_child(ast_node, $7);	// StatementMatched false
@@ -458,7 +458,7 @@ PrintStatement:
 PrintIntStatement:
 	T_PRINT_INT T_LPAR Expression T_RPAR
 	{
-		AstNode* ast_node = ast_node_new("PrintIntStatement", PRINTINT_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(PRINTINT_STMT);
 		ast_node_add_child(ast_node, $3);
 		$$ = ast_node;
 	}
@@ -467,7 +467,7 @@ PrintIntStatement:
 PrintCharStatement:
 	T_PRINT_CHAR T_LPAR Expression T_RPAR
 	{
-		AstNode* ast_node = ast_node_new("PrintCharStatement", PRINTCHAR_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(PRINTCHAR_STMT);
 		ast_node_add_child(ast_node, $3);
 		$$ = ast_node;
 	}
@@ -476,7 +476,7 @@ PrintCharStatement:
 PrintBoolStatement:
 	T_PRINT_BOOL T_LPAR Expression T_RPAR
 	{
-		AstNode* ast_node = ast_node_new("PrintBoolStatement", PRINTBOOL_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(PRINTBOOL_STMT);
 		ast_node_add_child(ast_node, $3);
 		$$ = ast_node;
 	}
@@ -485,7 +485,7 @@ PrintBoolStatement:
 PrintLineStatement:
 	T_PRINT_LINE T_LPAR T_RPAR
 	{
-		AstNode* ast_node = ast_node_new("PrintLineStatement", PRINTLINE_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(PRINTLINE_STMT);
 		$$ = ast_node;
 	}
 	;
@@ -493,7 +493,7 @@ PrintLineStatement:
 CBlockStatement:
 	T_C_BLOCK
 	{
-		AstNode* ast_node = ast_node_new("CBlock", CBLOCK_STMT, VOID, yyloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(CBLOCK_STMT);
 		ast_node->value.literal_content = $1;
 		$$ = ast_node;
 	}
@@ -501,12 +501,12 @@ CBlockStatement:
 ReturnStatement:
 	T_RETURN T_SEMICOLON
 	{
-		AstNode* ast_node = ast_node_new("ReturnStatement", RETURN_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(RETURN_STMT);
 		$$ = ast_node;
 	}
 	| T_RETURN Expression T_SEMICOLON
 	{
-		AstNode* ast_node = ast_node_new("ReturnStatement", RETURN_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(RETURN_STMT);
 		ast_node_add_child(ast_node, $2);
 		$$ = ast_node;
 	}
@@ -519,7 +519,7 @@ AssignmentStatement:
 Assignment:
 	Identifier T_ASSIGNMENT Expression
 	{
-		AstNode* ast_node = ast_node_new("Assignment", ASSIGNMENT_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(ASSIGNMENT_STMT);
 		ast_node_add_child(ast_node, $1);
 		ast_node_add_child(ast_node, $3);
 		$$ = ast_node;
@@ -529,7 +529,7 @@ Assignment:
 WhileStatement:
 	T_WHILE T_LPAR Expression T_RPAR Statement
 	{
-		AstNode* ast_node = ast_node_new("WhileStatement", WHILE_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(WHILE_STMT);
 		ast_node_add_child(ast_node, $3);
 		ast_node_add_child(ast_node, $5);
 		$$ = ast_node;
@@ -539,7 +539,7 @@ WhileStatement:
 DoWhileStatement:
 	T_DO Statement T_WHILE T_LPAR Expression T_RPAR T_SEMICOLON
 	{
-		AstNode* ast_node = ast_node_new("DoWhileStatement", DOWHILE_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(DOWHILE_STMT);
 		ast_node_add_child(ast_node, $2);	// Statement
 		ast_node_add_child(ast_node, $5);	// Expression
 		$$ = ast_node;
@@ -548,7 +548,7 @@ DoWhileStatement:
 ForStatement:
 	T_FOR T_LPAR Assignment T_SEMICOLON Expression T_RPAR Statement
 	{
-		AstNode* ast_node = ast_node_new("ForStatement", FOR_STMT, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(FOR_STMT);
 		ast_node_add_child(ast_node, $3);	// Assignment
 		ast_node_add_child(ast_node, $5);	// Expression
 		ast_node_add_child(ast_node, $7);	// Statements
@@ -559,7 +559,7 @@ ForStatement:
 ExpressionStatements:
 	ExpressionStatement 
 	{
-		AstNode* ast_node = ast_node_new("ExpressionStatementList", EXPRESSIONSTMT_LIST, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(EXPRESSIONSTMT_LIST);
 		ast_node_add_child(ast_node, $1);
 		
 		$$ = ast_node;
@@ -568,7 +568,7 @@ ExpressionStatements:
 	{
 		AstNode* ast_node = $1;
 		if (!ast_node)	{
-			ast_node = ast_node_new("ExpressionStatementList", EXPRESSIONSTMT_LIST, VOID, yylloc.last_line, NULL);
+			ast_node = AST_NEW(EXPRESSIONSTMT_LIST);
 		}
 		
 		ast_node_add_child(ast_node, $3);
@@ -585,7 +585,7 @@ Expression:
 	| ReadCharExpression { $$ = $1; }
 	| SimpleExpression RelOp SimpleExpression
 	{
-		AstNode* ast_node = ast_node_new("RelExpression", REL_EXPR, BOOLEAN, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(REL_EXPR, BOOLEAN);
 		ast_node_add_child(ast_node, $1);	// LH Expression
 		ast_node_add_child(ast_node, $2);	// Relop
 		ast_node_add_child(ast_node, $3);	// RH Expression
@@ -596,7 +596,7 @@ Expression:
 ReadCharExpression:
 	T_READ_CHAR T_LPAR T_RPAR
 	{
-		AstNode* ast_node = ast_node_new("ReadCharExpression", READCHAR_EXPR, CHAR, yyloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(READCHAR_EXPR, CHAR);
 		$$ = ast_node;
 	}
 	
@@ -607,7 +607,7 @@ SimpleExpression:
 	{
 		AstNode* ast_node;
 		PrimitiveType type = ((AstNode*)$2)->type;
-		ast_node = ast_node_new("AddExpression", ADD_EXPR, type, yylloc.last_line, NULL);
+		ast_node = AST_NEW_T(ADD_EXPR, type);
 		ast_node_add_child(ast_node, $1);	// LH Expression
 		ast_node_add_child(ast_node, $2);	// AddOp (+/-)
 		ast_node_add_child(ast_node, $3);	// Term
@@ -621,7 +621,7 @@ Term:
 	{
 		AstNode* ast_node;
 		PrimitiveType type = ((AstNode*)$2)->type;
-		ast_node = ast_node_new("MulExpression", MUL_EXPR, type, yylloc.last_line, NULL);
+		ast_node = AST_NEW_T(MUL_EXPR, type);
 		ast_node_add_child(ast_node, $1);	// Term
 		ast_node_add_child(ast_node, $2);	// MulOp (*//)
 		ast_node_add_child(ast_node, $3);	// NotFactor
@@ -633,7 +633,7 @@ NotFactor:
 	Factor { $$ = $1; }
 	| NotOp Factor
 	{
-		AstNode* ast_node = ast_node_new("NotFactor", NOTFACTOR, BOOLEAN, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(NOTFACTOR, BOOLEAN);
 		ast_node_add_child(ast_node, $2);
 		$$ = ast_node; 
 	}
@@ -649,17 +649,17 @@ Factor:
 Call:
 	Identifier T_LPAR CallParameterList T_RPAR
 	{
-		AstNode* ast_node = ast_node_new("Call", CALL, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(CALL);
 		ast_node_add_child(ast_node, $1);	// Identifier
 		ast_node_add_child(ast_node, $3);	// Parameters
 		$$ = ast_node;
 	}
 	| Identifier T_LPAR T_RPAR
 	{
-		AstNode* ast_node = ast_node_new("Call", CALL, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(CALL);
 		ast_node_add_child(ast_node, $1);				// Identifier
 		
-		AstNode* callparams = ast_node_new("CallParamList", CALLPARAM_LIST, VOID, yylloc.last_line, NULL);
+		AstNode* callparams = AST_NEW(CALLPARAM_LIST);
 		ast_node_add_child(ast_node, callparams);		// Empty call param list
 		
 		$$ = ast_node;
@@ -669,9 +669,9 @@ Call:
 CallParameterList:
 	Expression
 	{
-		AstNode* ast_node = ast_node_new("CallParamList", CALLPARAM_LIST, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(CALLPARAM_LIST);
 		
-		AstNode* param_node = ast_node_new("CallParameter", CALLPARAM, ((AstNode*)$1)->type, yylloc.last_line, NULL);
+		AstNode* param_node = AST_NEW_T(CALLPARAM, ((AstNode*)$1)->type);
 		ast_node_add_child(param_node, $1);
 		ast_node_add_child(ast_node, param_node);
 		$$ = ast_node;
@@ -680,10 +680,10 @@ CallParameterList:
 	{
 		AstNode* ast_node = $1;
 		if (!ast_node)	{
-			ast_node = ast_node_new("CallParamList", CALLPARAM_LIST, VOID, yylloc.last_line, NULL);
+			ast_node = AST_NEW(CALLPARAM_LIST);
 		}
 
-		AstNode* param_node = ast_node_new("CallParameter", CALLPARAM, ((AstNode*)$3)->type, yylloc.last_line, NULL);
+		AstNode* param_node = AST_NEW_T(CALLPARAM, ((AstNode*)$3)->type);
 		ast_node_add_child(param_node, $3);
 		ast_node_add_child(ast_node, param_node);
 		$$ = ast_node;
@@ -693,17 +693,17 @@ CallParameterList:
 AddOp:
 	T_PLUS
 	{
-		AstNode* ast_node = ast_node_new($1, T_PLUS, INTEGER, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_PLUS, INTEGER);
 		$$ = ast_node;
 	}
 	| T_MINUS
 	{
-		AstNode* ast_node = ast_node_new($1, T_MINUS, INTEGER, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_MINUS, INTEGER);
 		$$ = ast_node;	
 	}
 	| T_OR
 	{
-		AstNode* ast_node = ast_node_new($1, T_OR, BOOLEAN, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_OR, BOOLEAN);
 		$$ = ast_node;
 	}
 	;
@@ -711,17 +711,17 @@ AddOp:
 MulOp:
 	T_STAR
 	{
-		AstNode* ast_node = ast_node_new($1, T_STAR, INTEGER, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_STAR, INTEGER);
 		$$ = ast_node;
 	}
 	| T_SLASH
 	{
-		AstNode* ast_node = ast_node_new($1, T_SLASH, INTEGER, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_SLASH, INTEGER);
 		$$ = ast_node;
 	}
 	| T_AND
 	{
-		AstNode* ast_node = ast_node_new($1, T_AND, BOOLEAN, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_AND, BOOLEAN);
 		$$ = ast_node;
 	}
 	;
@@ -729,32 +729,32 @@ MulOp:
 RelOp:
 	T_LESSER
 	{
-		AstNode* ast_node = ast_node_new($1, T_LESSER, BOOLEAN, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_LESSER, BOOLEAN);
 		$$ = ast_node;
 	}
 	| T_LESSEREQUAL
 	{
-		AstNode* ast_node = ast_node_new($1, T_LESSEREQUAL, BOOLEAN, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_LESSEREQUAL, BOOLEAN);
 		$$ = ast_node;
 	}
 	| T_GREATER
 	{
-		AstNode* ast_node = ast_node_new($1, T_GREATER, BOOLEAN, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_GREATER, BOOLEAN);
 		$$ = ast_node;
 	}
 	| T_GREATEREQUAL
 	{
-		AstNode* ast_node = ast_node_new($1, T_GREATEREQUAL, BOOLEAN, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_GREATEREQUAL, BOOLEAN);
 		$$ = ast_node;
 	}
 	| T_EQUAL
 	{
-		AstNode* ast_node = ast_node_new($1, T_EQUAL, BOOLEAN, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_EQUAL, BOOLEAN);
 		$$ = ast_node;
 	}
 	| T_NOTEQUAL
 	{
-		AstNode* ast_node = ast_node_new($1, T_NOTEQUAL, BOOLEAN, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(T_NOTEQUAL, BOOLEAN);
 		$$ = ast_node;
 	}
 	;
@@ -766,7 +766,7 @@ NotOp:
 Identifier:
 	IDENTIFIER
 	{
-		AstNode* ast_node = ast_node_new("Identifier", IDENTIFIER, VOID, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW(IDENTIFIER);
 		ast_node->identifier = identifier_new($1);
 		$$ = ast_node;
 	}
@@ -775,31 +775,31 @@ Identifier:
 Literal:
 	INT_LITERAL
 	{
-		AstNode* ast_node = ast_node_new("IntLiteral", INT_LITERAL, INTEGER, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(INT_LITERAL, INTEGER);
 		value_set_from_int(&ast_node->value, $1);
 		$$ = ast_node;
 	}
 	| BOOL_LITERAL
 	{
-		AstNode* ast_node = ast_node_new("BoolLiteral", BOOL_LITERAL, BOOLEAN, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(BOOL_LITERAL, BOOLEAN);
 		value_set_from_bool(&ast_node->value, $1);
 		$$ = ast_node;		
 	}
 	| CHAR_LITERAL
 	{
-		AstNode* ast_node = ast_node_new("CharLiteral", CHAR_LITERAL, CHAR, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(CHAR_LITERAL, CHAR);
 		value_set_from_char(&ast_node->value, $1);
 		$$ = ast_node;
 	}
 	| FLOAT_LITERAL
 	{
-		AstNode* ast_node = ast_node_new("FloatLiteral", FLOAT_LITERAL, FLOAT, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(FLOAT_LITERAL, FLOAT);
 		value_set_from_float(&ast_node->value, $1);
 		$$ = ast_node;
 	}
 	| DOUBLE_LITERAL
 	{
-		AstNode* ast_node = ast_node_new("DoubleLiteral", DOUBLE_LITERAL, DOUBLE, yylloc.last_line, NULL);
+		AstNode* ast_node = AST_NEW_T(DOUBLE_LITERAL, DOUBLE);
 		value_set_from_double(&ast_node->value, $1);
 		$$ = ast_node;
 	}
