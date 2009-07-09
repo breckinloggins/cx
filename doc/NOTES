@@ -1,0 +1,41 @@
+Symbol Table Search:
+	When looking for an identifier:
+	1) Look in the immediately enclosing scope
+	2) Recursively search outer scopes until reach global scope
+	3) If using declaration, search that namespace scope
+	
+	? How to handle "." qualifiers on identifier names
+	
+Multiple file compilation/external references:
+	"using" declaration
+		- Valid only at the beginning of a TranslationUnit (file)
+		- identifier following must be a namespace
+		- context_visitor: causes that namespace to be added in the identifier table search
+		- codegen_visitor: at first, outputs a comment.  Will eventually cause a header file to be included or something
+		- graphprinter_visitor: simple node
+
+	? How do we import the identifiers from the included namespace
+		- Obviously, if they pass all the source files in at once, there's no problem (see "circular dependencies" note below)
+		- Lookup that file name
+		- Lookup a CXI file by that name
+		- Eventually do a binary lookup on static and dynamic libs
+		- For now: we could pass to the compiler something like:
+			-R Some.Namespace=path/to/file/containing/code.cx
+	
+	? How do we handle circular dependencies
+		- Make sure enough information is included in the symbol table during the parsing phase
+		- Parse all the translation units FIRST, creating one big AST
+		- The top level node of the AST is now a "Target", which consists of one or more "TranslationUnits", this
+			corresponds to the idea of "many inputs -> one output"
+		- Now, context analysis should allow proper traversing of the AST to find circularly referenced identifiers
+	
+	CXI Files
+		- These allow us to properly reference identifiers without having the actual code
+		- Equivalent to header files
+		- Of course the actual code must be there during the link phase
+		
+		? Do we follow VAPI format or invent our own?
+	
+	C-Output
+		- Again, we want to make the generated C-code as friendly as possible.  To that end, if we have more than one input
+			Cx file, that will translate into the same number of .c files, plus (optional) header files

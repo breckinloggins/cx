@@ -56,6 +56,15 @@
 [X]	Remove superfluous parameter from ast_node_new()
 [X]	Add Macro to ast_node_new in parser.y
 [X]	Have lookup from AST Node Kind to string name in base.h, remove from ast_node_new
+[X]	BUG: If user gives a file that isn't found, program expects input from STDIN since FILE* is 0
+[X]	Parse the input file name to create good output intermediate names
+[X]	Use getopt for command line args parsing
+[X]	Allow user to specify name of output file
+[]	Allow passing multiple source files to compiler
+[]	Modify AST to include "Target" as top level node, which has multiple translation units (files)
+[]	For each Cx input file, output a corresponding C and H file
+[]	Make output to stdout a special option, instead of the default
+[]	Add using declaration, initial lookup logic
 []	BUG: For loop behavior is hard coded and stupid
 []	Add support for compound statements, support them in for loops
 []	Test all control and loop structures
@@ -65,7 +74,6 @@
 []	Add a "declaration node" to the identifier table in place of the ad-hoc stuff in there now
 []	Add array type
 []	Add string type/string literals
-[]	Add using declaration, initial lookup logic
 []	Refactor variable declaration syntax and add support for assignments on the same line
 []	Add hexadecimal and octal literals
 []	Add bitwise operators
@@ -91,6 +99,7 @@
 []	Rewrite README to be more public-oriented
 []	Output #line info so that GDB can debug our programs
 []	Get Cx compiling under Windows
+	[] Get portable getopt library from: http://www.pwilson.net/getopt.html
+	[] Link getopt library in separate module because LGPL is stupid
 []  Add feature where type of last expression in function will be the return value of
 	that function (??)
-[]	Parse the input file name to create good output intermediate and executable names

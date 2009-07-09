@@ -40,7 +40,8 @@
 										break;
 								}
 							}
-"namespace"					{ uploc; return T_NAMESPACE; }	
+"using"						{ uploc; return T_USING; }
+"namespace"					{ uploc; return T_NAMESPACE; }
 							
 "int"						{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_INT; }
 "bool"						{ uploc; yylval->type = type_get_from_lexeme(yytext); return T_BOOL; }

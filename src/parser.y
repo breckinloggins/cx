@@ -46,6 +46,7 @@ AstNode* ast;
 %left <lexeme> T_STAR T_SLASH
 %left <lexeme> T_NOT
 
+%token T_USING
 %token T_NAMESPACE
 %token T_DIM
 
@@ -95,6 +96,9 @@ AstNode* ast;
 %type <astnode> TranslationUnit
 %type <astnode> NamespaceDeclList
 %type <astnode> NamespaceDecl
+
+//%type <astnode> UsingDeclList
+//%type <astnode> UsingDecl
 
 %type <type> TypeSpecifier
 %type <type> TypeName

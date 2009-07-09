@@ -13,8 +13,6 @@ namespace helloworld
 	double someDouble;
 	float someFloat;
 	
-	// HACK: Right now you HAVE to specify an access modifer because of shift/reduce
-	//			bugs in the grammar.  *sigh*
 	char getSomeChar()
 	{
 		return 'Z';

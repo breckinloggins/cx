@@ -256,6 +256,8 @@ char* kind_get_name(int kind)
 {
 	switch(kind)	{
 		case TRANSLATIONUNIT: 			return "TranslationUnit";
+		case USING_DECL:				return "UsingDecl";
+		case USINGDECL_LIST:			return "UsingDeclList";
 		case NAMESPACE_DECL: 			return "NamespaceDecl";
 		case NAMESPACEDECL_LIST: 		return "NamespaceDeclList";
 		case VARDECL: 					return "VarDecl";

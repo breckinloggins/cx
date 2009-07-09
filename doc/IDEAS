@@ -49,3 +49,13 @@ Exceptions:
 	- filter: like catch, but can match on any expression and has access to the exception object
 	- fault: like finally, but only runs when an exception (any exception!) is thrown.  Does not perturb the stack frame
 	- resume: for when you don't care about the error and know you can continue
+
+Blocks:
+	- See here for inspiration: http://blog.rubybestpractices.com/posts/gregory/009-beautiful-blocks.html
+	- Blocks are really versatile.  In fact, I think they could be the enabling technology for "using", "lock", and other block-type syntactic constructs out there if they were performant enough.
+	- We really should enable the "last parameter can be outside parenthesis" syntax, which would let us do:
+		lock(this)	{
+			// Do something
+		}
+		Where lock, is really a method: lock(object, block);
+	- Can sections be implemented using blocks?

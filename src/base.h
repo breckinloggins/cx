@@ -32,6 +32,8 @@ typedef enum PrimTypeEnum	{
 typedef enum KindEnum	{
 	NONE_KIND = -1,
 	TRANSLATIONUNIT,
+	USING_DECL,
+	USINGDECL_LIST,
 	NAMESPACE_DECL,
 	NAMESPACEDECL_LIST,
 	VARDECL,
