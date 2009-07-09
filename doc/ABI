@@ -4,6 +4,18 @@ Two of the primary goals of Cx are:
 	
 To meet these goals, the Cx Application Binary Interface (ABI) will be clearly and cleanly specified.  Cx language features will use the bare minimum of C code necessary to do the job.  The C code that is required will be wrapped in macros and functions so that they can be used by C modules to talk to Cx types and namespaces.
 
+Basic Rules:
+	- ints are ints, chars are chars, doubles are doubles... (fancier features enabled with extension methods and boxing when necessary)
+	- structs are structs
+	- classes are structs with function pointers
+	- namespace methods are plain functions
+	- meta classes have well-defined C interfaces
+	- the logic as expressed in Cx will be, as close as possible, the logic expressed in C
+		For example: if a ternary operator is used in Cx, it will be a ternary operator in C
+	- Advanced: it would be nice if we could (optionally) replicate the comments from Cx into the equivalent area in C
+		Perhaps only in DEBUG
+	- Advanced: templates represented by fancy C macros (look at _why's potion code for examples)
+
 Name mangling will be well-defined.   If you have a method of a class inside a namespace, the name of the method callable in C will be:
 	namespace_class_methodname[_integer](...);
 
@@ -29,5 +41,18 @@ Or you might even see:
 
 When a Cx application uses the standard library, it only pulls in the minimum needed to do the work.  Using Console.WriteLine() will NOT pull in 8mbs of crap into the binary.
 
+Standard Library Rules:
+	- All methods must declare their dependencies
+	- There must be a way for users to replace the implementation of the standard libraries
+	- Standard Library methods must NOT use meta classes or other dynamic/reflection features
+
+Standard Library versus Extended Library:
+	- Standard Library includes the basics of working with a computer: console I/O, file I/O, math functions, strings, etc.
+	- Extended Library is less strict and includes things like XML parsing, Network IO, Web, DB, etc.
+		- Extended Library may use extension methods and properties to add on to the Standard Library
+
 Object Model:
 	Look into id-objmodel: http://www.piumarta.com/software/id-objmodel/
+	BUT, a lot of literature on object models in C is based around the idea of the programmer writing in C, so a lot of 
+		the code exists to reduce the burden on the C programmer.  However, since Cx writes its own C code, it can choose
+		to prefer simplicity of expression over ease of typing

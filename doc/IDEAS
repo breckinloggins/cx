@@ -23,6 +23,7 @@ Non-null References:
 	- Defaults can be modified using some syntax (undecided)
 	- The "has value" concept is implemented with nullable types, which returns a default if no value but allows client code to query it
 	- NULL can still be utilized within _C_ blocks, which should allow for backward compatibility
+	- null can also be used if option :allow_nulls is enabled
 	
 Automatic Meta generator:
 
@@ -59,3 +60,13 @@ Blocks:
 		}
 		Where lock, is really a method: lock(object, block);
 	- Can sections be implemented using blocks?
+
+Controlling Options:
+
+	- Use the option keyword and symbols
+	- Options are active in the current translation unit, unless specified on the command line
+	- Examples:
+		option :no_gc;
+		option :allow_nulls;
+		option :opt = "val";
+		option :opt1, :opt2 = "val", :opt3;
