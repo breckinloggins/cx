@@ -65,6 +65,8 @@
 [X]	For each Cx input file, output a corresponding C file
 [X]	The -c option should support compiling to an object file
 [X]	Make output to stdout a special option, instead of the default
+[]	Stop putting the _gen prefix on generated C files
+[]	Accept .o files as input
 []	Start Standard Library with some code in cxstd.o
 []	Output H files when CX files expose public symbols
 []	Add using declaration, initial lookup logic

@@ -1,0 +1,36 @@
+Cx Roadmap
+
+0.1
+-----------------------
+	Full support for all C operators and syntax
+	Structs
+	Arrays
+	Small Standard Library
+	Namespace Resolution
+	
+0.2
+-----------------------
+	Classes
+	CXI
+	
+0.3
+-----------------------
+	Generics
+	
+0.9 - FIRST RELEASE
+-----------------------
+	All of cxc except parser and scanner written in Cx
+	Syntax highlighting for Vi, Emacs, Textmate, Notepad2/Notepad++
+	
+1.0
+-----------------------
+	All of cxc written in Cx
+	Syntax highlighting for Visual Studio
+		
+2.0
+-----------------------
+	Functional paradigm support
+	Native concurrency
+	JVM support
+	MSIL support
+	LLVM support
