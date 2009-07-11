@@ -60,10 +60,11 @@
 [X]	Parse the input file name to create good output intermediate names
 [X]	Use getopt for command line args parsing
 [X]	Allow user to specify name of output file
-[]	Allow passing multiple source files to compiler
-[]	Modify AST to include "Target" as top level node, which has multiple translation units (files)
-[]	For each Cx input file, output a corresponding C and H file
+[X]	Allow passing multiple source files to compiler
+[X]	Modify AST to include "Target" as top level node, which has multiple translation units (files)
+[X]	For each Cx input file, output a corresponding C file
 []	Make output to stdout a special option, instead of the default
+[]	Output H files when CX files expose public symbols
 []	Add using declaration, initial lookup logic
 []	BUG: For loop behavior is hard coded and stupid
 []	Add support for compound statements, support them in for loops
