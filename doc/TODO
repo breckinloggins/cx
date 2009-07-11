@@ -63,6 +63,8 @@
 [X]	Allow passing multiple source files to compiler
 [X]	Modify AST to include "Target" as top level node, which has multiple translation units (files)
 [X]	For each Cx input file, output a corresponding C file
+[]	The -c option should support compiling to an object file
+[]	Start Standard Library with some code in cxstd.o
 []	Make output to stdout a special option, instead of the default
 []	Output H files when CX files expose public symbols
 []	Add using declaration, initial lookup logic
@@ -70,6 +72,7 @@
 []	Add support for compound statements, support them in for loops
 []	Test all control and loop structures
 []	Add code for standard environment
+[]	Support overloaded functions and methods
 []	BUG: Cleanup partially constructed AST when program exits due to syntax error
 []	Add Ast Node Types for types and type declarations
 []	Add a "declaration node" to the identifier table in place of the ad-hoc stuff in there now

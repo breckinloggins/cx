@@ -1,0 +1,53 @@
+namespace System
+{
+	/// Prints a newline to standard out
+	void WriteLine()
+	{
+		_C_	{ fprintf(stdout, "\n"); }
+	}
+	
+	/*
+	 * TODO: The following methods should all be called "Write" with type overloads.  Do this
+	 *	when Cx supports overloaded methods
+	 */
+	
+	/// Prints an integer to standard out
+	void WriteInt(int i)
+	{
+		_C_ { fprintf(stdout, "%d", i); }
+	}
+	
+	/// Prints a character to standard out
+	void WriteChar(char c)
+	{
+		_C_ { fprintf(stdout, "%c", c); }
+	}
+	
+	/// Prints "true" or "false" to standard out
+	void WriteBool(bool b)
+	{
+		_C_ { fprintf(stdout, "%s", b? "true": "false"); }
+	}
+	
+	/// Prints a floating point value to standard out
+	void WriteFloat(float f)
+	{
+		_C_ { fprintf(stdout, "%f", f); }
+	}
+	
+	/// Prints a double value to standard out
+	void WriteDouble(double d)
+	{
+		_C_ { fprintf(stdout, "%f", d); }
+	}
+	
+	/// Gets a character from standard in
+	char ReadChar()
+	{
+		char c;
+		_C_ { c = getchar(); }
+		return c;
+	}
+	
+	
+}
