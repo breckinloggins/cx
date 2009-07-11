@@ -18,6 +18,7 @@ graphprinter_new(FILE* output)
 	
     Visitor *visitor = (Visitor *) malloc (sizeof(Visitor));
 
+	visitor->visit_Target = &graphprinter_visit_Target;
     visitor->visit_TranslationUnit = &graphprinter_visit_TranslationUnit;
     visitor->visit_NamespaceDecl = &graphprinter_visit_NamespaceDecl;
 	visitor->visit_NamespaceDecl_list = &graphprinter_visit_NamespaceDecl_list;
@@ -54,9 +55,9 @@ graphprinter_new(FILE* output)
 }
 
 void
-graphprinter_visit_TranslationUnit(Visitor *visitor, AstNode *node)
+graphprinter_visit_Target(Visitor* visitor, AstNode* node)
 {
-    fprintf(out,"/* Cx AST graph. */\n");
+	fprintf(out,"/* Cx AST graph. */\n");
     fprintf(out,"digraph {\n");
 
     fprintf(out,"\tremincross=true;\n");
@@ -66,15 +67,24 @@ graphprinter_visit_TranslationUnit(Visitor *visitor, AstNode *node)
     fprintf(out,"\tnode [fontsize=11,fontname=Courier];\n");
     fprintf(out,"\tedge [color="COLOR_EDGE_GROUP"];\n\n");
 
+	ast_node_accept_children(node->children, visitor);
+	_print_identifier_table(node);
+	
+	fprintf(out, "}\n");
+}
+
+void
+graphprinter_visit_TranslationUnit(Visitor *visitor, AstNode *node)
+{
+    
+
     fprintf(out,"\tnode_%x [label=\"%s\",fontsize=16,fontname=Courier,",
            node, node->name);
     fprintf(out,"style=filled,color=black,fillcolor="COLOR_FILL_GLOBAL"];\n");
 
-    _print_identifier_table(node);
-
+    
     ast_node_accept_children(node->children, visitor);
 
-    fprintf(out,"}\n");
 }
 
 void

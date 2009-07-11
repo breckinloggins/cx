@@ -17,7 +17,7 @@ extern FILE *yyin;
 
 static void yyerror(const char* msg);
 
-AstNode* ast;
+AstNode* parse_ast;
 %}
 
 %defines
@@ -164,7 +164,7 @@ TranslationUnit:
 		AstNode* ast_node = AST_NEW(TRANSLATIONUNIT);
 		ast_node_add_child(ast_node, $1);	// NamespaceDeclList
 		$$ = ast_node;
-		ast = ast_node;
+		parse_ast = ast_node;
 	}
 	| CBlockStatement NamespaceDeclList
 	{
@@ -172,14 +172,14 @@ TranslationUnit:
 		ast_node_add_child(ast_node, $1);	// CBlock
 		ast_node_add_child(ast_node, $2);	// NamespaceDeclList
 		$$ = ast_node;
-		ast = ast_node;
+		parse_ast = ast_node;
 	}
 	| CBlockStatement
 	{
 		AstNode* ast_node = AST_NEW(TRANSLATIONUNIT);
 		ast_node_add_child(ast_node, $1);	// CBlock
 		$$ = ast_node;
-		ast = ast_node;
+		parse_ast = ast_node;
 	}
 	;
 

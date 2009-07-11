@@ -125,6 +125,9 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 		return;
 	
 	switch(self->kind)	{
+		case TARGET:
+			visit = visitor->visit_Target;
+			break;
 		case TRANSLATIONUNIT:
 			visit = visitor->visit_TranslationUnit;
 			break;
@@ -238,7 +241,8 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 			visit = visitor->visit_not_op;
 			break;
 		default:
-			visit = NULL;
+			fprintf(stderr, "Internal Compiler Error: Unrecognized kind (%d) in ast_node_accept\n", self->kind);
+			exit(1);
 	}
 	
 	if (visit != NULL)
@@ -255,6 +259,7 @@ void ast_node_accept_children(AstNode* self, Visitor* visitor)
 char* kind_get_name(int kind)
 {
 	switch(kind)	{
+		case TARGET:					return "Target";
 		case TRANSLATIONUNIT: 			return "TranslationUnit";
 		case USING_DECL:				return "UsingDecl";
 		case USINGDECL_LIST:			return "UsingDeclList";

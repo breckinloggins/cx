@@ -21,6 +21,7 @@ Visitor* context_new()
 {
 	Visitor* visitor = (Visitor*)malloc(sizeof(Visitor));
 	
+	V_INIT(Target, Target);
 	V_INIT(TranslationUnit, TranslationUnit);
 	V_INIT(NamespaceDecl, NamespaceDecl);
 	V_INIT(NamespaceDecl_list, NamespaceDecl_list);
@@ -63,9 +64,18 @@ void context_cleanup()
 	scope_destroy_all();
 }
 
-CTX_VISITOR(TranslationUnit)
+CTX_VISITOR(Target)
 {
 	_current_scope = scope_new(NULL, node);
+	_inside_procfunc = NULL;
+	
+	// Translation Units
+	ast_node_accept_children(node->children, visitor);
+}
+
+CTX_VISITOR(TranslationUnit)
+{
+	_current_scope = scope_new(_current_scope, node);
 	_inside_procfunc = NULL;
 	
 	// Namespaces and/or CBlocks

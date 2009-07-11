@@ -14,6 +14,7 @@
 Visitor* context_new();
 void context_cleanup();
 
+CTX_VISITOR(Target);
 CTX_VISITOR(TranslationUnit);
 CTX_VISITOR(NamespaceDecl);
 CTX_VISITOR(NamespaceDecl_list);

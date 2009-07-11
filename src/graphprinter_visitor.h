@@ -16,6 +16,7 @@
 
 Visitor *graphprinter_new(FILE*);
 
+void graphprinter_visit_Target(Visitor*, AstNode*);
 void graphprinter_visit_TranslationUnit (Visitor *, AstNode *);
 void graphprinter_visit_NamespaceDecl (Visitor *, AstNode *);
 void graphprinter_visit_NamespaceDecl_list (Visitor *, AstNode *);
