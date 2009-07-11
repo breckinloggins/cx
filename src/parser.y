@@ -17,7 +17,7 @@ extern FILE *yyin;
 
 static void yyerror(const char* msg);
 
-AstNode* parse_ast;
+AstNode* parse_ast = NULL;
 %}
 
 %defines

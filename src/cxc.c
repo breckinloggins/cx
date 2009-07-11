@@ -17,8 +17,8 @@
 
 // TODO: Parameterize these for different platforms
 #define PATH_SEPARATOR '/'
-#define CC_FORMAT "cc -o %s %s"	
-
+#define CC_O_FORMAT "cc -o %s %s"	
+#define CC_C_FORMAT "cc -c %s"
 
 char* get_filename_noext(const char* filename)
 {
@@ -75,6 +75,10 @@ InputFile* inputfile_new()
 
 void inputfile_destroy(InputFile* infile, bool deep)
 {
+	if (!infile)	{
+		return;
+	}
+	
 	if (deep && infile->next)	{
 		inputfile_destroy(infile->next, TRUE);
 	}
@@ -96,34 +100,50 @@ InputFile* inputfile_insert(InputFile* insertBefore, const char* fullpath)
 }
 
 static InputFile* input_files = NULL;
+static char* ofile = NULL;
+static int compile_flag = 0;
+static int link_flag = 0;
+static int stdout_flag = 0;
+static int graph_flag = 0;
 
 void usage()
 {
 	fprintf(stderr, "Usage: cxc [options] <filename>\n");
 	fprintf(stderr, "Options:\n");
+	fprintf(stderr, "\t-s\tPrint the generated code to stdout\n");
 	fprintf(stderr, "\t-c\tCompile\n");
-	fprintf(stderr, "\t-o\tOutput an executable (implies -c)\n");
+	fprintf(stderr, "\t-o name\tOutput an executable\n");
 	fprintf(stderr, "\t-g\tOutput AST Graph\n");	
 }
 
-int main(int argc, char** argv)
-{
-	atexit(checkmem);
-	//yydebug = 1;
-	
-	if (argc < 2)	{
-		usage();
-		return 1;
+void cleanup_exit(int error_code)	{
+	if (!ast)	{
+		ast_node_destroy(parse_ast);
+	}
+	else	{
+		ast_node_destroy(ast);
 	}
 	
-	int compile_flag = 0;
-	int graph_flag = 0;
-	int output_flag = 0;
-	char* ofile = NULL;
+	free(ofile);
+	inputfile_destroy(input_files, TRUE);
+	context_cleanup();
+	c_codegen_cleanup();
+	exit(error_code);
+}
+
+int parseopts(int argc, char** argv)
+{
+	if (argc < 2)	{
+		usage();
+		exit(1);
+	}
 	
 	int ch;
-	while ((ch = getopt(argc, argv, "cgo:")) != -1)	{
+	while ((ch = getopt(argc, argv, "scgo:")) != -1)	{
 		switch (ch)	{
+			case 's':
+				stdout_flag = 1;
+				break;
 			case 'c':
 				compile_flag = 1;
 				break;
@@ -131,8 +151,7 @@ int main(int argc, char** argv)
 				graph_flag = 1;
 				break;
 			case 'o':
-				compile_flag = 1;
-				output_flag = 1;
+				link_flag = 1;
 				ofile = strdup(optarg);
 				break;
 			case '?':
@@ -144,36 +163,49 @@ int main(int argc, char** argv)
 	argc -= optind;
 	argv += optind;
 	
-	if (!compile_flag && !graph_flag && !output_flag)	{
+	if (!stdout_flag && !compile_flag && !graph_flag && !link_flag)	{
 		compile_flag = 1;
 	}
 	
-	if (!output_flag)	{
-		ofile = strdup("a.out");
+	if (stdout_flag && (compile_flag || link_flag))	{
+		fprintf(stderr, "Standard Out flag cannot currently be used with the Compile or Link options\n");
+		cleanup_exit(1);
+	}
+	
+	if (compile_flag && link_flag)	{
+		fprintf(stderr, "Compile option cannot be used with Link option\n");
+		cleanup_exit(1);
 	}
 	
 	if (compile_flag && graph_flag)	{
 		fprintf(stderr, "Compile option cannot be used with Graph option\n");
-		free(ofile);
-		exit(1);
+		cleanup_exit(1);
 	}
 	
-	if (graph_flag & output_flag)	{
+	if (graph_flag & link_flag)	{
 		fprintf(stderr, "Output option cannot be used with Graph option\n");
-		free(ofile);
-		exit(1);
+		cleanup_exit(1);
 	}
 		
 	if (!argc)	{
 		fprintf(stderr, "No input file\n");
-		free(ofile);
-		exit(1);
+		cleanup_exit(1);
 	}
 	
 	int i;
 	for (i = 0; i < argc; i++)	{
 		input_files = inputfile_insert(input_files, argv[i]);
 	}
+	
+	return argc;
+}
+
+int main(int argc, char** argv)
+{
+	atexit(checkmem);
+	//yydebug = 1;
+	
+	argc = parseopts(argc, argv);
 	
 	// Create the master tree.  All parse trees from the inputted translation units will be children
 	// of TARGET
@@ -184,9 +216,7 @@ int main(int argc, char** argv)
 		yyin = fopen(in->fullpath, "r");
 		if (!yyin)	{
 			fprintf(stderr, "The file specified (\"%s\") does not exist or could not be opened\n", in->fullpath);
-			inputfile_destroy(input_files, TRUE);
-			free(ofile);
-			exit(1);
+			cleanup_exit(1);
 		}
 				
 		yyparse();
@@ -210,46 +240,42 @@ int main(int argc, char** argv)
 	
 	if (ast_node_check_errors(ast) && !graph_flag)	{
 		fprintf(stderr, "Errors in compilation\n");
-		ast_node_destroy(ast);
-		context_cleanup();
-		free(ofile);
-		inputfile_destroy(input_files, TRUE);
-	
-		return 1;
+		cleanup_exit(1);
 	}
 	
 	// Finally, time to generate the output, using one of the several generator visitors
 	Visitor* visitor;
-	if (compile_flag)	{
+	if (compile_flag || link_flag || stdout_flag)	{
 		// TODO: None of this code is safe!
 		AstNode* parse;
 		InputFile* in;
 		
 		char* infiles = NULL;
 		int infiles_length = 257*argc*sizeof(char);	// Max PATH length + one space per arg
-		if (output_flag)	{
+		if (link_flag || compile_flag)	{
 			infiles = (char*)malloc(infiles_length);
 			memset(infiles, 0, infiles_length);
 		}	
 		
 		for (in = input_files, parse = ast->children; (in && parse); in = in->next, parse = parse->sibling)	{
 			FILE* out = stdout;
-			
-			if (output_flag)	{
+	
+			if (link_flag || compile_flag)	{
 				char* cfile;
 				asprintf(&cfile, "%s_gen.c", in->name_noext);
 				out = fopen(cfile, "w");
+				
 				
 				// Add a space
 				free(cfile);
 				cfile = NULL;
 				asprintf(&cfile, " %s_gen.c", in->name_noext);
-				
+												
 				if (strlen(infiles) + strlen(cfile) > (infiles_length - 1))	{
 					infiles_length += strlen(cfile);
 					infiles = (char*)realloc(infiles, infiles_length);
 				}
-								
+												
 				strcat(infiles, cfile);
 				free(cfile);
 			}
@@ -263,13 +289,21 @@ int main(int argc, char** argv)
 			}
 		}
 		
-		if (output_flag)	{
+		if (compile_flag)	{
 			char* cmd;
-			asprintf(&cmd, CC_FORMAT, ofile, infiles);
+			asprintf(&cmd, CC_C_FORMAT, infiles);
 			system(cmd);
-			free(infiles);
 			free(cmd);
 		}
+		else if (link_flag)	{
+			char* cmd;
+			asprintf(&cmd, CC_O_FORMAT, ofile, infiles);
+			system(cmd);
+			free(cmd);
+		}
+		
+		free(infiles);
+		
 		
 	} else if (graph_flag)	{
 		visitor = graphprinter_new(stdout);
@@ -277,12 +311,7 @@ int main(int argc, char** argv)
 		free(visitor);
 	}
 	
-	ast_node_destroy(ast);
-	context_cleanup();
-	c_codegen_cleanup();
-	inputfile_destroy(input_files, TRUE);
-	free(ofile);
-	return 0;
+	cleanup_exit(0);
 }
 
 
