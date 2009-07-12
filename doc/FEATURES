@@ -24,13 +24,16 @@
 			- VScript would use -O1, and so would dynamically generated code inside a V# program (example: compiled expression trees)
 			- vsc itself would use -O2 by default
 			- Need to extend TinyC to know about MachO object format.  No PPC support on the Mac, too much work
+		- I don't know if I'm still onboard with this idea.  Perhaps the Windows version of Cx should come with an option to 
+			bundle MinGW if the user doesn't already have Visual Studio or cl.exe
  
  Language extensions:
-	- Core of V# language should be small.  Barely larger than C99
+	- NOTE: I'm not sure if I like this idea
+	- Core of Cx language should be small.  Barely larger than C99
 	- Most advanved functionalited implemented via "extensions"
-	- Standard extensions make up the "common V#", which is about as big as C# or Vala, maybe a little more
-	- Defined extensions in V# with an API
-	- Can modify and extend V# grammar in certain ways
+	- Standard extensions make up the "common Cx", which is about as big as C# or Vala, maybe a little more
+	- Defined extensions in Cx with an API
+	- Can modify and extend Cx grammar in certain ways
 	- Can plug in to all compiler passes
 	- Extensions can depend on each other
 	- Extensions can be applied to files or namespaces, with "extension" keyword
@@ -38,6 +41,13 @@
 	- "goto" should be implemented as an extension and not included in standard extensions!
 	- Files with .vtiny extensions only use core language and cannot have extensions
 	- Also can pass --no-standard-extensions to the compiler
+
+ Language Levels:
+	- Instead of (or in addition to) language extensions
+	- CX0 -> CXn
+	- CX0 would be "C with namespaces and methods inside structs" essentially
+	- CX1 would be the full Cx language
+	- Future revisions would be CX2, CX3, ..., CXn
  
  MethodNames in place of delegates:
 	Resolves to a new Delegate(M), which is a 
@@ -46,6 +56,7 @@
   
  Ability to replace ANY object with your own subclass of that object's type.  This would be
  supported at the Type level.  You could do:
+	- NOTE: I don't know if I still like this idea
 	Type.InplaceSubclass(SomeType, MyType) -- ANY time SomeType is created, replace with MyType instead
 	Type.InplaceSubclass(instance, MyType) -- Find the given instance of SomeType and replace with a new MyType
 	[SubtypePolicyAttribute] to allow Types to prohibity Subclassing.  We're HOPING people only use this when
@@ -73,7 +84,7 @@
 		- @foo - better
 		- !foo - too alarming
 		- ^foo - too technical looking
-		- Leaning towards @foo
+		- Leaning towards :foo with named parameter syntax using '=' instead of ':'
 
 Enums that don't suck:
 	- If you just use enums like normal, that's fine, but it'd also be nice if:
@@ -194,6 +205,10 @@ Typedef support with "alias":
  Optional last statement is return value
  
  Message Passing (parenthesis less) style on function calls:
+	- NOTE: I've thought some more on this.  I think the general syntactic principle is that the LAST argument of 
+		any method call can be outside the parenthesis.  I don't imagine this will be used much except for the block syntax, 
+		but there might be other uses for this that would make DSL's more readable
+		
 	public void DoFoo(someDelegate d)
 	{
 		d();
@@ -206,11 +221,11 @@ Typedef support with "alias":
  
  Named Parameters:
 	public void AddTwo(int first, int second);
-	AddTwo(first:1, second:2);
-	// Works great with message passing syntax
-	AddTwo first:1 second:2;
- 
+	AddTwo(second=2, first=1);
+	
  Return values for any scope block
+	- NOTE: I think we can use sections for this
+	
 	The main use case for this is when you want to break out of multiply nested control structures.
 	Most of the time you either have to use an ugly goto or have control variables at each layer.  Failing that, 
 	you would have to extract into a function.  It would be nice to be able to do this:
@@ -268,8 +283,8 @@ Support multiple return values:
 	
 	- So obviously what we really want to do is come up with some primitive type construct in the language for which
 	this falls out more-or-less naturally.  But there's nothing firm at this point
+	- Some more thinking on this: if methods could return anonymous types, this would be good
 	
-
 Duck Typing:
 	- Uses "as" specifier (maybe)  see below
 	// In some class:
@@ -290,7 +305,10 @@ Duck Typing:
 		object that inherits IPrintable
 		
 		- I don't know if this is correct.  I'm starting to think we may not need to do anything special
-			to support this.
+			to support this.  In "normal" cases, you might want to cast an Interface to a specific type, but you still don't
+			know what type it is (at least, not formally.  If you do only because there's one implementation in your code, 
+			that's breaking the principle of using interfaces anyway).  Thus you must do an as cast or test for types anyway.  
+			Peforming those operations on a Duck Typed interface would fail in the expected way.
 
 interface() operator:
 	- Used to treat a concrete class type as its own interface.  This will create an interface shim that will expose only the public properties and methods of the given concrete class

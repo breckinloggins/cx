@@ -56,3 +56,10 @@ Object Model:
 	BUT, a lot of literature on object models in C is based around the idea of the programmer writing in C, so a lot of 
 		the code exists to reduce the burden on the C programmer.  However, since Cx writes its own C code, it can choose
 		to prefer simplicity of expression over ease of typing
+		
+Generics:
+	I'm thinking that 
+		List<String> l;
+	Is actually
+		MAKE_LIST(String) l;
+	Where MAKE_LIST is emitted as a macro
