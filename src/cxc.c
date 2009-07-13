@@ -20,6 +20,41 @@
 #define CC_O_FORMAT "cc -o %s %s"	
 #define CC_C_FORMAT "cc -c %s"
 
+char* get_extension(const char* filename)
+{
+	int i = 0;
+	int len = strlen(filename);
+	int j = len;
+	
+	char* p = (char*)filename;
+	while (*p)	{
+		if (*p == PATH_SEPARATOR && j < len)	{
+			j = len;	// Rest because the dot we found was part of the path, NOT
+						// the file
+		}
+		
+		if (*p == '.')	{
+			j = p - filename + 1;
+		}
+		
+		p++;
+	}
+	
+	if (j == len)	{
+		// None found
+		return NULL;
+	}
+	
+	char* ext = (char*)malloc((len - j)*sizeof(char));
+	p = (char*)&filename[j];
+	int n = 0;
+	while (*p)	{
+		ext[n++] = *p++;
+	}
+	
+	return ext;
+}
+
 char* get_filename_noext(const char* filename)
 {
 	int i = 0;
@@ -60,6 +95,7 @@ static AstNode* ast;
 typedef struct InputFile_tag	{
 	char* fullpath;
 	char* name_noext;
+	AstNode* parse_ast;
 	struct InputFile_tag* next;
 } InputFile;
 
@@ -68,6 +104,7 @@ InputFile* inputfile_new()
 	InputFile* infile = (InputFile*)malloc(sizeof(InputFile));
 	infile->fullpath = NULL;
 	infile->name_noext = NULL;
+	infile->parse_ast = NULL;
 	infile->next = NULL;
 	
 	return infile;
@@ -218,13 +255,19 @@ int main(int argc, char** argv)
 			fprintf(stderr, "The file specified (\"%s\") does not exist or could not be opened\n", in->fullpath);
 			cleanup_exit(1);
 		}
-				
-		yyparse();
-		fclose(yyin);
 		
-		// If we got here we can be sure of no syntax errors, so add this parse tree to the main
-		// AST
-		ast_node_add_child(ast, parse_ast);
+		char* ext = get_extension(in->fullpath);
+		if (ext && !strcmp(ext, "cx"))	{	// HACK: We should probably not do this based on file ext	
+			yyparse();
+			
+			// If we got here we can be sure of no syntax errors, so add this parse tree to the main
+			// AST
+			ast_node_add_child(ast, parse_ast);
+			in->parse_ast = parse_ast;
+		}
+		
+		free(ext);		
+		fclose(yyin);
 		
 		in = in->next;
 	}
@@ -247,7 +290,6 @@ int main(int argc, char** argv)
 	Visitor* visitor;
 	if (compile_flag || link_flag || stdout_flag)	{
 		// TODO: None of this code is safe!
-		AstNode* parse;
 		InputFile* in;
 		
 		char* infiles = NULL;
@@ -257,19 +299,23 @@ int main(int argc, char** argv)
 			memset(infiles, 0, infiles_length);
 		}	
 		
-		for (in = input_files, parse = ast->children; (in && parse); in = in->next, parse = parse->sibling)	{
+		for (in = input_files; (in); in = in->next)	{
 			FILE* out = stdout;
 	
+			char* cfile;
+			char* ext = "c";
+			if (!in->parse_ast)	{
+				// Binary file
+				ext = "o";
+			}
+	
 			if (link_flag || compile_flag)	{
-				char* cfile;
-				asprintf(&cfile, "%s_gen.c", in->name_noext);
-				out = fopen(cfile, "w");
-				
-				
+				asprintf(&cfile, "%s.%s", in->name_noext, ext);
+								
 				// Add a space
 				free(cfile);
 				cfile = NULL;
-				asprintf(&cfile, " %s_gen.c", in->name_noext);
+				asprintf(&cfile, " %s.%s", in->name_noext, ext);
 												
 				if (strlen(infiles) + strlen(cfile) > (infiles_length - 1))	{
 					infiles_length += strlen(cfile);
@@ -280,12 +326,15 @@ int main(int argc, char** argv)
 				free(cfile);
 			}
 
-			visitor = c_codegen_new(out);
-			ast_node_accept(parse, visitor);
-			free(visitor);
+			if (in->parse_ast)	{
+				out = fopen(cfile, "w");
+				visitor = c_codegen_new(out);
+				ast_node_accept(in->parse_ast, visitor);
+				free(visitor);
 			
-			if (out != stdout)	{
-				fclose(out);
+				if (out != stdout)	{
+					fclose(out);
+				}
 			}
 		}
 		
