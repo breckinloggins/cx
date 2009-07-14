@@ -67,9 +67,12 @@
 [X]	Make output to stdout a special option, instead of the default
 [X]	Stop putting the _gen prefix on generated C files
 [X]	Accept .o files as input
+[X]	BUG: stdout output doesn't work, names have spaces in them
+[X]	Add using declaration to grammar
+[]	Add using lookup logic
+[]	Allow fully qualified identifiers in namespace declarations, using declarations
 []	Start Standard Library with some code in cxstd.o
 []	Output H files when CX files expose public symbols
-[]	Add using declaration, initial lookup logic
 []	BUG: For loop behavior is hard coded and stupid
 []	Add support for compound statements, support them in for loops
 []	Test all control and loop structures

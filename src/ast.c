@@ -131,6 +131,9 @@ void ast_node_accept(AstNode* self, Visitor* visitor)
 		case TRANSLATIONUNIT:
 			visit = visitor->visit_TranslationUnit;
 			break;
+		case USINGDECL_LIST:
+			visit = NULL;
+			break;
 		case NAMESPACE_DECL:
 			visit = visitor->visit_NamespaceDecl;
 			break;

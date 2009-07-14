@@ -97,8 +97,8 @@ AstNode* parse_ast = NULL;
 %type <astnode> NamespaceDeclList
 %type <astnode> NamespaceDecl
 
-//%type <astnode> UsingDeclList
-//%type <astnode> UsingDecl
+%type <astnode> UsingDeclList
+%type <astnode> UsingDecl
 
 %type <type> TypeSpecifier
 %type <type> TypeName
@@ -159,18 +159,20 @@ AstNode* parse_ast = NULL;
 %%
 
 TranslationUnit:
-	NamespaceDeclList
+	UsingDeclList NamespaceDeclList
 	{
 		AstNode* ast_node = AST_NEW(TRANSLATIONUNIT);
-		ast_node_add_child(ast_node, $1);	// NamespaceDeclList
+		ast_node_add_child(ast_node, $1);	// UsingDeclList
+		ast_node_add_child(ast_node, $2);	// NamespaceDeclList
 		$$ = ast_node;
 		parse_ast = ast_node;
 	}
-	| CBlockStatement NamespaceDeclList
+	| CBlockStatement UsingDeclList NamespaceDeclList
 	{
 		AstNode* ast_node = AST_NEW(TRANSLATIONUNIT);
 		ast_node_add_child(ast_node, $1);	// CBlock
-		ast_node_add_child(ast_node, $2);	// NamespaceDeclList
+		ast_node_add_child(ast_node, $2);	// UsingDeclList
+		ast_node_add_child(ast_node, $3);	// NamespaceDeclList
 		$$ = ast_node;
 		parse_ast = ast_node;
 	}
@@ -180,6 +182,31 @@ TranslationUnit:
 		ast_node_add_child(ast_node, $1);	// CBlock
 		$$ = ast_node;
 		parse_ast = ast_node;
+	}
+	;
+
+UsingDeclList:
+	/* empty */
+	{
+		AstNode* ast_node = AST_NEW(USINGDECL_LIST);
+		$$ = ast_node;
+	}
+	| UsingDeclList UsingDecl
+	{
+		AstNode* ast_node = $1;
+		ast_node_add_child(ast_node, $2);
+		
+		$$ = ast_node;
+	}
+	;
+	
+UsingDecl:
+	T_USING Identifier T_SEMICOLON
+	{
+		AstNode* ast_node = AST_NEW(USING_DECL);
+		ast_node_add_child(ast_node, $2);
+		
+		$$ = ast_node;
 	}
 	;
 

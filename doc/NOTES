@@ -39,3 +39,33 @@ Multiple file compilation/external references:
 	C-Output
 		- Again, we want to make the generated C-code as friendly as possible.  To that end, if we have more than one input
 			Cx file, that will translate into the same number of .c files, plus (optional) header files
+			
+CXI Files
+	
+	// Can reference other namespaces just like a normal CX file
+	using System;
+	using System.IO;
+	
+	namespace MyTypes
+	{
+		// Namespace method declaration
+		public string GetAString(int one, bool two);
+		
+		public class MyClass
+		{
+			// Field declarations
+			private int m_nInternal;
+			protected double m_dValue;
+			public bool m_bSomeBool;
+			
+			// Property declaration
+			public double Value { get; }
+			
+			// Method declarations
+			public void DoSomething();	
+		}
+	}
+	
+	- Several themes here:
+		1) CXI files are just normal Cx files
+		2) We allow forward declaration of namespaces, namespace methods, classes, and class members

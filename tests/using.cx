@@ -1,0 +1,15 @@
+using System;
+using System.IO;
+
+namespace UsingTest
+{
+	int getInt()
+	{
+		return 1;
+	}
+	
+	int main()
+	{
+		return getInt();
+	}
+}

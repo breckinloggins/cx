@@ -311,30 +311,27 @@ int main(int argc, char** argv)
 	
 			if (link_flag || compile_flag)	{
 				asprintf(&cfile, "%s.%s", in->name_noext, ext);
-								
-				// Add a space
-				free(cfile);
-				cfile = NULL;
-				asprintf(&cfile, " %s.%s", in->name_noext, ext);
-												
+																
 				if (strlen(infiles) + strlen(cfile) > (infiles_length - 1))	{
 					infiles_length += strlen(cfile);
 					infiles = (char*)realloc(infiles, infiles_length);
 				}
-												
+				
+				strcat(infiles, " ");								
 				strcat(infiles, cfile);
+				
+				out = fopen(cfile, "w");
 				free(cfile);
 			}
 
 			if (in->parse_ast)	{
-				out = fopen(cfile, "w");
 				visitor = c_codegen_new(out);
 				ast_node_accept(in->parse_ast, visitor);
 				free(visitor);
+			}
 			
-				if (out != stdout)	{
-					fclose(out);
-				}
+			if (out != stdout)	{
+				fclose(out);
 			}
 		}
 		
