@@ -1,0 +1,71 @@
+[X] Type in toypasc compiler example
+[X] Change up a few tokens like Begin and End to make it more C-like
+[X] Add command line options
+[X]	Add pass-through compilation
+[X]	Change grammar to put parenthesis around things that require parenthesis in C
+[X]	BUG: variables aren't recognized as their types
+[X]	Modify Var declaration to be C-like instead of pascal-like
+[X]	Rename ProgramDecl to NamespaceDecl
+[X]	Add // style comment
+[X]	Rename Program rule to TranslationUnit
+[X] BUG: only one variable gets translated in the vardecl_list
+[X]	Add float and double types
+[X]	BUG: last statement can't have a semicolon
+[X]	Remove distinction between procedures and functions
+[X]	BUG: compiler doesn't actually return the right value from a function
+[X] Add return statement
+[X]	BUG: functions cannot be called
+[X]	Move to C-style function declaration syntax
+[X]	Add a readChar() statement to make things more interesting
+[X]	Remove ProgramBody element.  Programs will need to explicitly declare a main function
+[X]	First pass for dropping to other languages with a _<language>_ {} syntax.  Start with _C_ { fprintf("hi!"); } and
+	directly output with the code generator
+[X]	Create GitHub repository
+[X]	Collect all the feature specs from various sources, clean up, put in FEATURES document
+[X]	Test and fix issues with if statments
+	[X] BUG: if statement doesn't allow blocks
+	[X] BUG: Grammar has insane complexity on if/then statements
+[X]	BUG: statements are inserted into the AST backward
+[X]	Allow declaration of vars inside a statement block
+[X]	Allow declarations and statements to be intermingled
+[X]	Better handling of semicolons in generated C-code
+[X]	BUG: readChar() should be an expression, not a statement
+[X]	Allow void functions
+[X]	Don't allow void variables
+[X]	BUG: Functions are allowed to not have the right return type as the last statement
+[X]	BUG: Graph visitor complains about invalid return statements
+[X]	Rename base types to C-type names
+[X]	Add Flex/Bison support to CMake file
+[X]	Rename symbol_table.h to Identifier Table and add more attributes to make code gen easier
+[X]	When generating C code, append namespace to variables and functions
+[X]	BUG: NOT operator doesn't work
+[X]	BUG: function parameters aren't supported and are still Pascal syntax
+[X]	Add proper tabbing when generating C Code
+[X]	Allow variable and function declarations in any order inside namespaces
+[X]	BUG: access modifiers on function declarations should be optional
+[X]	Remove temporary "fn" modifier
+[X]	Fix memory leaks
+[X]	Implement chained identifier tables
+[X]	Add AST codenode_helper module for AST helper functions
+[X]	BUG: Graphprinter crashes with new type system
+[X] Replace hardcoded function information in the identifier table with a reference to the declaration node
+[X]	Allow translation units to have multiple namespaces
+[X]	Add do/while
+[X]	Test (and fix) dangling else
+[X]	Allow C Block to live outside of namespace declarations (for header files, macros, etc)
+[X]	Remove superfluous parameter from ast_node_new()
+[X]	Add Macro to ast_node_new in parser.y
+[X]	Have lookup from AST Node Kind to string name in base.h, remove from ast_node_new
+[X]	BUG: If user gives a file that isn't found, program expects input from STDIN since FILE* is 0
+[X]	Parse the input file name to create good output intermediate names
+[X]	Use getopt for command line args parsing
+[X]	Allow user to specify name of output file
+[X]	Allow passing multiple source files to compiler
+[X]	Modify AST to include "Target" as top level node, which has multiple translation units (files)
+[X]	For each Cx input file, output a corresponding C file
+[X]	The -c option should support compiling to an object file
+[X]	Make output to stdout a special option, instead of the default
+[X]	Stop putting the _gen prefix on generated C files
+[X]	Accept .o files as input
+[X]	BUG: stdout output doesn't work, names have spaces in them
+[X]	Add using declaration to grammar
