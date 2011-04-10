@@ -1,8 +1,10 @@
+(NOTE: This project is currently "sleeping" - I'm too optimistic to call it dead)
+
 Cx - C' (C Prime) was unfortunately taken, and even though the project is dead, I don't want to steal the name
 
 Vala - Coolest idea ever, but has some downsides: Unix-centric, Gnome-centric
 
-I want to replace C as the systems programming language of choice, so my idea is Cx:
+I want to create yet another alternative to C as a systems programming language, so my idea is Cx:
     - Fully Open Source
     - Compiles to plain C (as terse yet readable as possible [ideas should be terse, identifiers readable])
     - Generates the smallest and most equivalent C Code possible
